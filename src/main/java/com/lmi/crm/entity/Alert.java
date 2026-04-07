@@ -26,6 +26,7 @@ public class Alert {
     @Column(name = "alert_type")
     private AlertType alertType;
 
+    // should we remove title and just display alert type?
     private String title;
 
     @Column(columnDefinition = "TEXT")

@@ -2,7 +2,7 @@
 
 A Spring Boot REST API for managing prospects, licensees, associates, groups, meetings, and related business workflows. The system is designed around a multi-role user hierarchy (Admin, Super Admin, Master Licensee, Licensee, Associate) and supports prospect tracking, group program management, alerting, audit logging, and resource sharing.
 
-**Stack:** Java 17 · Spring Boot 4.0.5 · Spring Data JPA · PostgreSQL (Supabase) · Lombok · Maven
+**Stack:** Java 17 · Spring Boot 4.0.5 · Spring Data JPA · PostgreSQL (Supabase) · Lombok · Maven · SpringDoc OpenAPI (Swagger)
 
 ---
 
@@ -14,13 +14,15 @@ A Spring Boot REST API for managing prospects, licensees, associates, groups, me
 
 Database credentials go in `src/main/resources/application-local.properties` (gitignored). See the existing file for the required keys.
 
+Swagger UI is available at `http://localhost:8080/swagger-ui/index.html` while the app is running.
+
 ---
 
 ## Work log
 
 ### Project setup
 - Initialised Spring Boot 4.0.5 project with Java 17 and Maven
-- Added dependencies: Spring Web, Spring Data JPA, PostgreSQL driver, Lombok
+- Added dependencies: Spring Web, Spring Data JPA, PostgreSQL driver, Lombok, SpringDoc OpenAPI 3.0.0
 - Connected to Supabase (PostgreSQL) via `application-local.properties` to keep credentials out of version control
 - Configured `spring.jpa.hibernate.ddl-auto=update` — Hibernate auto-creates and updates tables on startup
 
@@ -64,12 +66,17 @@ Entities: `User`, `Prospect`, `Group`, `Meeting`, `Alert`, `AuditLog`, `Resource
 Repositories: `UserRepository`, `ProspectRepository`, `GroupRepository`, `MeetingRepository`, `AlertRepository`, `AuditLogRepository`, `ResourceRepository`, `UserItemRepository`, `GroupProspectRepository`, `ProspectLicenseeRepository`, `LicenseeCityRepository`
 
 ### Service layer (`service/crud/`)
-- Implemented full CRUD for `User` following an interface + implementation pattern
-- `UserService` — interface defining the contract
-- `UserServiceImpl` — concrete implementation with logging via `@Slf4j`
-- Delete is a **soft delete**: sets `status = INACTIVE`, record is retained in the database
+- Implemented full CRUD for all 11 entities following an interface + implementation pattern
+- Each service has `create`, `getById`, `getAll`, `update`, and `delete` methods
+- `Prospect` and `Group` use soft delete (`deletionStatus = true`); `User` uses soft delete (`status = INACTIVE`); all other entities use hard delete
+- `licenseeId` on `User` and `createdBy` fields are excluded from request DTOs — will be derived from auth context once Spring Security is added
 
 ### DTO & Mapper (`dto/`, `mapper/`)
-- `UserRequestDTO` — fields accepted from the client (excludes `licenseeId`, which will be derived from auth context once Spring Security is added)
-- `UserResponseDTO` — fields returned to the client
-- `UserMapper` — handles `toEntity()`, `toDTO()`, and `updateEntity()` conversions, keeping mapping logic out of the service layer
+- Request and response DTOs created for all 11 entities
+- Each mapper handles `toEntity()`, `updateEntity()`, and `toDTO()` conversions
+- `Alert` mapper sets `status = PENDING` on creation
+- `ProspectLicensee` and `LicenseeCity` mappers default `isPrimary` to `false` if not provided
+
+### Controller layer (`controller/`)
+- `UserController` exposes full CRUD at `/api/users`
+- Controllers for remaining entities will be added progressively as business logic is built out

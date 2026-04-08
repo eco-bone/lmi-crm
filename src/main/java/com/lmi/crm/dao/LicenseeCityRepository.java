@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LicenseeCityRepository extends JpaRepository<LicenseeCity, Integer> {
+    void deleteByLicenseeId(Integer licenseeId);
 }

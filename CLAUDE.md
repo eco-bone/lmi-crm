@@ -10,6 +10,31 @@ Internal CRM for LMI Solutions. Manages Prospects, Clients, Training Groups, Ass
 
 The backend exposes a REST API only. The frontend is a separate project handled by a different developer.
 
+service/
+UserManagementService (interface)
+UserManagementServiceImpl
+ProspectService (interface)
+ProspectServiceImpl
+GroupService (interface)
+GroupServiceImpl
+AlertService (interface)
+AlertServiceImpl
+ResourceService (interface)
+ResourceServiceImpl
+TaskNoteService (interface)
+TaskNoteServiceImpl
+ReportService (interface)
+ReportServiceImpl
+ProtectionScheduler
+
+controller/
+UserManagementController
+ProspectController
+GroupController
+AlertController
+ResourceController
+TaskNoteController
+ReportController
 ---
 
 ## Tech Stack

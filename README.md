@@ -65,18 +65,7 @@ Entities: `User`, `Prospect`, `Group`, `Meeting`, `Alert`, `AuditLog`, `Resource
 
 Repositories: `UserRepository`, `ProspectRepository`, `GroupRepository`, `MeetingRepository`, `AlertRepository`, `AuditLogRepository`, `ResourceRepository`, `UserItemRepository`, `GroupProspectRepository`, `ProspectLicenseeRepository`, `LicenseeCityRepository`
 
-### Service layer (`service/crud/`)
-- Implemented full CRUD for all 11 entities following an interface + implementation pattern
-- Each service has `create`, `getById`, `getAll`, `update`, and `delete` methods
-- `Prospect` and `Group` use soft delete (`deletionStatus = true`); `User` uses soft delete (`status = INACTIVE`); all other entities use hard delete
-- `licenseeId` on `User` and `createdBy` fields are excluded from request DTOs — will be derived from auth context once Spring Security is added
-
-### DTO & Mapper (`dto/`, `mapper/`)
-- Request and response DTOs created for all 11 entities
-- Each mapper handles `toEntity()`, `updateEntity()`, and `toDTO()` conversions
-- `Alert` mapper sets `status = PENDING` on creation
-- `ProspectLicensee` and `LicenseeCity` mappers default `isPrimary` to `false` if not provided
-
-### Controller layer (`controller/`)
-- `UserController` exposes full CRUD at `/api/users`
-- Controllers for remaining entities will be added progressively as business logic is built out
+### Next: service layer, DTOs, mappers, controllers
+- DTOs, mappers, CRUD services, business services, and controllers are being rebuilt from scratch following the structure defined in `CLAUDE.md`
+- Package layout: `dto/`, `mapper/crud/`, `mapper/businessLogic/`, `service/crud/`, `service/businessLogic/`, `controller/`
+- All services follow interface + implementation split; controllers are thin and delegate to business services

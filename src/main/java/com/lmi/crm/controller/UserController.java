@@ -2,12 +2,17 @@ package com.lmi.crm.controller;
 
 import com.lmi.crm.dto.request.AddLicenseeRequest;
 import com.lmi.crm.dto.request.RequestAssociateCreationRequest;
+import com.lmi.crm.dto.request.UpdateUserRequest;
 import com.lmi.crm.dto.response.LicenseeResponse;
 import com.lmi.crm.dto.response.UserResponse;
+import com.lmi.crm.enums.UserRole;
+import com.lmi.crm.enums.UserStatus;
 import com.lmi.crm.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -39,5 +44,30 @@ public class UserController {
             @RequestParam boolean approve,
             @RequestParam Integer requestingAdminId) {
         return ResponseEntity.ok(userService.approveRejectAssociateCreation(alertId, approve, requestingAdminId));
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponse>> getUsers(
+            @RequestParam Integer requestingUserId,
+            @RequestParam(required = false) UserRole role,
+            @RequestParam(required = false) UserStatus status,
+            @RequestParam(defaultValue = "false") boolean includeAllStatuses) {
+        return ResponseEntity.ok(userService.getUsers(requestingUserId, role, status, includeAllStatuses));
+    }
+
+    @GetMapping("/users/{id}")
+    public ResponseEntity<UserResponse> getUserDetail(
+            @RequestParam Integer requestingUserId,
+            @PathVariable Integer id) {
+        return ResponseEntity.ok(userService.getUserDetail(requestingUserId, id));
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<UserResponse> updateUser(
+            @PathVariable Integer id,
+            @Valid @RequestBody UpdateUserRequest request,
+            @RequestParam Integer requestingUserId) {
+        // TODO: replace with current user from SecurityContext
+        return ResponseEntity.ok(userService.updateUser(requestingUserId, id, request));
     }
 }

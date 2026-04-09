@@ -25,6 +25,13 @@ public class UserController {
         this.userService = userService;
     }
 
+    @PostMapping("/admin/create")
+    public ResponseEntity<UserResponse> createAdmin(
+            @Valid @RequestBody RequestAssociateCreationRequest request,
+            @RequestParam Integer requestingSuperAdminId) {
+        return ResponseEntity.ok(userService.createAdmin(request, requestingSuperAdminId));
+    }
+
     @PostMapping("/admin/licensees")
     public ResponseEntity<LicenseeResponse> addLicensee(
             @Valid @RequestBody AddLicenseeRequest request,

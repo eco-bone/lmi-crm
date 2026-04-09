@@ -101,6 +101,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    public UserResponse createAdmin(RequestAssociateCreationRequest request, Integer requestingSuperAdminId) {
+        User requestingUser = userRepository.findById(requestingSuperAdminId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingSuperAdminId));
+        if (requestingUser.getRole() != UserRole.SUPER_ADMIN)
+            throw new RuntimeException("Access denied");
+
+        if (userRepository.findByEmail(request.getEmail()).isPresent())
+            throw new RuntimeException("A user with this email already exists");
+
+        String tempPassword = "Temp-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+
+        User user = userMapper.forAdmin(request.getFirstName(), request.getLastName(),
+                request.getEmail(), request.getPhone(), tempPassword);
+        User savedUser = userRepository.save(user);
+
+        // TODO: replace with real invitation token when auth is built
+        notificationService.sendInviteEmail(savedUser.getEmail(), baseUrl + "/register?token=PENDING", tempPassword);
+
+        log.info("Admin created — id: {}, email: {}, createdBy: {}", savedUser.getId(), savedUser.getEmail(), requestingSuperAdminId);
+
+        return userMapper.toResponse(savedUser);
+    }
+
+    @Override
     public String requestAssociateCreation(RequestAssociateCreationRequest request, Integer requestingLicenseeId) {
         User licensee = userRepository.findById(requestingLicenseeId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingLicenseeId));

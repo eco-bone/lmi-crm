@@ -15,6 +15,8 @@ public interface UserService {
 
     LicenseeResponse addLicensee(AddLicenseeRequest request, Integer requestingUserId);
 
+    UserResponse createAdmin(RequestAssociateCreationRequest request, Integer requestingSuperAdminId);
+
     String requestAssociateCreation(RequestAssociateCreationRequest request, Integer requestingLicenseeId);
 
     ApiResponse<UserResponse> approveRejectAssociateCreation(Integer alertId, boolean approve, Integer requestingAdminId);

@@ -3,6 +3,7 @@ package com.lmi.crm.controller;
 import com.lmi.crm.dto.request.AddLicenseeRequest;
 import com.lmi.crm.dto.request.RequestAssociateCreationRequest;
 import com.lmi.crm.dto.request.UpdateUserRequest;
+import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.LicenseeResponse;
 import com.lmi.crm.dto.response.UserResponse;
 import com.lmi.crm.enums.UserRole;
@@ -39,7 +40,7 @@ public class UserController {
     }
 
     @PutMapping("/admin/associates/{alertId}/decision")
-    public ResponseEntity<UserResponse> approveRejectAssociateCreation(
+    public ResponseEntity<ApiResponse<UserResponse>> approveRejectAssociateCreation(
             @PathVariable Integer alertId,
             @RequestParam boolean approve,
             @RequestParam Integer requestingAdminId) {
@@ -68,6 +69,23 @@ public class UserController {
             @RequestParam Integer requestingUserId) {
         // TODO: replace with current user from SecurityContext
         return ResponseEntity.ok(userService.deactivateUser(requestingUserId, id));
+    }
+
+    @PostMapping("/users/associates/{id}/deactivation-request")
+    public ResponseEntity<String> requestAssociateDeactivation(
+            @PathVariable Integer id,
+            @RequestParam Integer requestingLicenseeId) {
+        // TODO: replace with current user from SecurityContext
+        return ResponseEntity.ok(userService.requestAssociateDeactivation(requestingLicenseeId, id));
+    }
+
+    @PutMapping("/users/associates/deactivation-requests/{alertId}")
+    public ResponseEntity<ApiResponse<UserResponse>> approveRejectAssociateDeactivation(
+            @PathVariable Integer alertId,
+            @RequestParam boolean approve,
+            @RequestParam Integer requestingUserId) {
+        // TODO: replace with current user from SecurityContext
+        return ResponseEntity.ok(userService.approveRejectAssociateDeactivation(requestingUserId, alertId, approve));
     }
 
     @PutMapping("/users/{id}")

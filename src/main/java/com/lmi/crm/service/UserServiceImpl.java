@@ -7,8 +7,9 @@ import com.lmi.crm.dao.LicenseeCityRepository;
 import com.lmi.crm.dao.UserRepository;
 import com.lmi.crm.dto.request.AddLicenseeRequest;
 import com.lmi.crm.dto.request.RequestAssociateCreationRequest;
-import com.lmi.crm.dto.request.UpdateUserRequest;
 import com.lmi.crm.dto.request.UpdateCityRequest;
+import com.lmi.crm.dto.request.UpdateUserRequest;
+import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.LicenseeResponse;
 import com.lmi.crm.dto.response.UserResponse;
 import com.lmi.crm.entity.Alert;
@@ -136,7 +137,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse approveRejectAssociateCreation(Integer alertId, boolean approve, Integer requestingAdminId) {
+    public ApiResponse<UserResponse> approveRejectAssociateCreation(Integer alertId, boolean approve, Integer requestingAdminId) {
         Alert alert = alertRepository.findById(alertId)
                 .orElseThrow(() -> new RuntimeException("Alert not found with id: " + alertId));
         if (alert.getStatus() != AlertStatus.PENDING)
@@ -151,7 +152,7 @@ public class UserServiceImpl implements UserService {
             alert.setStatus(AlertStatus.REJECTED);
             alertRepository.save(alert);
             log.info("Associate creation request rejected — alertId: {}, adminId: {}", alertId, requestingAdminId);
-            return null;
+            return ApiResponse.rejected("Associate creation request rejected");
         }
 
         Map<String, String> details;
@@ -187,7 +188,7 @@ public class UserServiceImpl implements UserService {
         log.info("Associate created — id: {}, email: {}, licenseeId: {}, approvedBy: {}",
                 associate.getId(), associate.getEmail(), associate.getLicenseeId(), requestingAdminId);
 
-        return userMapper.toResponse(associate);
+        return ApiResponse.success("Associate created successfully", userMapper.toResponse(associate));
     }
 
     @Override
@@ -430,5 +431,72 @@ public class UserServiceImpl implements UserService {
         admins.forEach(admin -> notificationService.sendUserDeactivatedEmail(admin.getEmail(), fullName, role));
 
         return userMapper.toResponse(targetUser);
+    }
+
+    @Override
+    public String requestAssociateDeactivation(Integer requestingLicenseeId, Integer targetAssociateId) {
+        User requestingUser = userRepository.findById(requestingLicenseeId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingLicenseeId));
+        if (requestingUser.getRole() != UserRole.LICENSEE)
+            throw new RuntimeException("Access denied");
+
+        User targetUser = userRepository.findById(targetAssociateId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + targetAssociateId));
+        if (targetUser.getRole() != UserRole.ASSOCIATE)
+            throw new RuntimeException("Target user is not an Associate");
+        if (!requestingLicenseeId.equals(targetUser.getLicenseeId()))
+            throw new RuntimeException("This Associate does not belong to your licensee");
+        if (targetUser.getStatus() == UserStatus.INACTIVE)
+            throw new RuntimeException("User is already inactive");
+
+        alertRepository.findByAlertTypeAndRelatedEntityIdAndStatus(
+                AlertType.ASSOCIATE_DEACTIVATION_REQUEST, targetAssociateId, AlertStatus.PENDING
+        ).ifPresent(a -> { throw new RuntimeException("A deactivation request for this Associate is already pending"); });
+
+        alertService.createAlert(
+                AlertType.ASSOCIATE_DEACTIVATION_REQUEST,
+                "Associate Deactivation Request — " + targetUser.getFirstName() + " " + targetUser.getLastName(),
+                "Licensee id " + requestingLicenseeId + " has requested deactivation of Associate id " + targetAssociateId,
+                RelatedEntityType.USER,
+                targetAssociateId,
+                requestingLicenseeId,
+                true
+        );
+
+        log.info("Associate deactivation requested — associateId: {}, requestedBy licenseeId: {}", targetAssociateId, requestingLicenseeId);
+
+        return "Associate deactivation request submitted successfully";
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<UserResponse> approveRejectAssociateDeactivation(Integer requestingUserId, Integer alertId, boolean approve) {
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingUserId));
+        if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN)
+            throw new RuntimeException("Access denied");
+
+        Alert alert = alertRepository.findById(alertId)
+                .orElseThrow(() -> new RuntimeException("Alert not found"));
+        if (alert.getAlertType() != AlertType.ASSOCIATE_DEACTIVATION_REQUEST)
+            throw new RuntimeException("Alert is not of type ASSOCIATE_DEACTIVATION_REQUEST");
+        if (alert.getStatus() != AlertStatus.PENDING)
+            throw new RuntimeException("Alert is no longer pending");
+
+        if (!approve) {
+            alert.setStatus(AlertStatus.REJECTED);
+            alertRepository.save(alert);
+            log.info("Associate deactivation rejected — alertId: {}, rejectedBy: {}", alertId, requestingUserId);
+            return ApiResponse.rejected("Associate deactivation request rejected");
+        }
+
+        alert.setStatus(AlertStatus.RESOLVED);
+        alertRepository.save(alert);
+
+        UserResponse response = deactivateUser(requestingUserId, alert.getRelatedEntityId());
+
+        log.info("Associate deactivation approved — associateId: {}, approvedBy: {}", alert.getRelatedEntityId(), requestingUserId);
+
+        return ApiResponse.success("Associate deactivated successfully", response);
     }
 }

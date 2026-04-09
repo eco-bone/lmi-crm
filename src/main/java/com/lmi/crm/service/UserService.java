@@ -3,6 +3,7 @@ package com.lmi.crm.service;
 import com.lmi.crm.dto.request.AddLicenseeRequest;
 import com.lmi.crm.dto.request.RequestAssociateCreationRequest;
 import com.lmi.crm.dto.request.UpdateUserRequest;
+import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.LicenseeResponse;
 import com.lmi.crm.dto.response.UserResponse;
 import com.lmi.crm.enums.UserRole;
@@ -16,7 +17,7 @@ public interface UserService {
 
     String requestAssociateCreation(RequestAssociateCreationRequest request, Integer requestingLicenseeId);
 
-    UserResponse approveRejectAssociateCreation(Integer alertId, boolean approve, Integer requestingAdminId);
+    ApiResponse<UserResponse> approveRejectAssociateCreation(Integer alertId, boolean approve, Integer requestingAdminId);
 
     List<UserResponse> getUsers(Integer requestingUserId, UserRole roleFilter, UserStatus statusFilter, boolean includeAllStatuses);
 
@@ -25,4 +26,8 @@ public interface UserService {
     UserResponse updateUser(Integer requestingUserId, Integer targetUserId, UpdateUserRequest request);
 
     UserResponse deactivateUser(Integer requestingUserId, Integer targetUserId);
+
+    String requestAssociateDeactivation(Integer requestingLicenseeId, Integer targetAssociateId);
+
+    ApiResponse<UserResponse> approveRejectAssociateDeactivation(Integer requestingUserId, Integer alertId, boolean approve);
 }

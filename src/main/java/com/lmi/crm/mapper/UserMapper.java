@@ -1,6 +1,7 @@
 package com.lmi.crm.mapper;
 
 import com.lmi.crm.dto.request.AddLicenseeRequest;
+import com.lmi.crm.dto.response.UserResponse;
 import com.lmi.crm.entity.User;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.enums.UserStatus;
@@ -46,5 +47,19 @@ public class UserMapper {
                 .role(UserRole.ADMIN)
                 .status(UserStatus.ACTIVE)
                 .build();
+    }
+
+    public UserResponse toResponse(User user) {
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setEmail(user.getEmail());
+        response.setPhone(user.getPhone());
+        response.setRole(user.getRole());
+        response.setLicenseeId(user.getLicenseeId());
+        response.setStatus(user.getStatus());
+        response.setCreatedAt(user.getCreatedAt());
+        return response;
     }
 }

@@ -79,11 +79,26 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private void send(String toEmail, String subject, String body) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(fromEmail);
-        message.setTo(toEmail);
-        message.setSubject(subject);
-        message.setText(body);
-        mailSender.send(message);
+        long start = System.currentTimeMillis();
+
+        log.info("EMAIL START → to: {}, subject: {}", toEmail, subject);
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject(subject);
+            message.setText(body);
+
+            mailSender.send(message);
+
+            long end = System.currentTimeMillis();
+            log.info("EMAIL SUCCESS → took {} ms", (end - start));
+
+        } catch (Exception e) {
+            long end = System.currentTimeMillis();
+            log.error("EMAIL FAILED → took {} ms, error: {}", (end - start), e.getMessage());
+            throw e;
+        }
     }
 }

@@ -26,10 +26,4 @@ public class TestController {
         return ResponseEntity.ok("Invite email sent to " + to);
     }
 
-    @PostMapping("/licensees")
-    public ResponseEntity<LicenseeResponse> testAddLicensee(
-            @Valid @RequestBody AddLicenseeRequest request,
-            @RequestParam Integer requestingUserId) {
-        return ResponseEntity.ok(userService.addLicensee(request, requestingUserId));
-    }
 }

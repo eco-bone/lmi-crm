@@ -23,4 +23,6 @@ public interface UserService {
     UserResponse getUserDetail(Integer requestingUserId, Integer targetUserId);
 
     UserResponse updateUser(Integer requestingUserId, Integer targetUserId, UpdateUserRequest request);
+
+    UserResponse deactivateUser(Integer requestingUserId, Integer targetUserId);
 }

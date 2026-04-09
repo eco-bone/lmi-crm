@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -58,6 +59,9 @@ public class UserServiceImpl implements UserService {
 
     @Value("${app.base-url}")
     private String baseUrl;
+
+    @Value("${app.mlo-user-id}")
+    private Integer mloUserId;
 
     @Override
     @Transactional
@@ -378,5 +382,53 @@ public class UserServiceImpl implements UserService {
         log.info("User updated — targetId: {}, requestedBy: {}", targetUserId, requestingUserId);
 
         return userMapper.toResponse(savedUser);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse deactivateUser(Integer requestingUserId, Integer targetUserId) {
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingUserId));
+
+        UserRole requesterRole = requestingUser.getRole();
+        if (requesterRole != UserRole.ADMIN && requesterRole != UserRole.SUPER_ADMIN)
+            throw new RuntimeException("Access denied");
+
+        User targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + targetUserId));
+
+        if (targetUser.getStatus() == UserStatus.INACTIVE)
+            throw new RuntimeException("User is already inactive");
+
+        UserRole targetRole = targetUser.getRole();
+
+        if (requesterRole == UserRole.ADMIN && (targetRole == UserRole.ADMIN || targetRole == UserRole.SUPER_ADMIN))
+            throw new RuntimeException("Admin cannot deactivate another Admin");
+
+        switch (targetRole) {
+            case ASSOCIATE -> {
+                // TODO: transfer all prospects where associateId = targetUserId to associate's parent licensee — implement after ProspectService is built
+                targetUser.setStatus(UserStatus.INACTIVE);
+            }
+            case LICENSEE -> {
+                // TODO: transfer all prospect_licensees where licenseeId = targetUserId to MLO — implement after ProspectService is built
+                // TODO: reassign all associates under this licensee to MLO — implement after ProspectService is built
+                targetUser.setStatus(UserStatus.INACTIVE);
+            }
+            default -> targetUser.setStatus(UserStatus.INACTIVE);
+        }
+
+        userRepository.save(targetUser);
+
+        log.info("User deactivated — targetId: {}, requestedBy: {}", targetUserId, requestingUserId);
+
+        String fullName = targetUser.getFirstName() + " " + targetUser.getLastName();
+        String role = targetUser.getRole().name();
+        List<User> admins = new ArrayList<>();
+        admins.addAll(userRepository.findByRole(UserRole.ADMIN));
+        admins.addAll(userRepository.findByRole(UserRole.SUPER_ADMIN));
+        admins.forEach(admin -> notificationService.sendUserDeactivatedEmail(admin.getEmail(), fullName, role));
+
+        return userMapper.toResponse(targetUser);
     }
 }

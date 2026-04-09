@@ -62,6 +62,14 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserDetail(requestingUserId, id));
     }
 
+    @PutMapping("/users/{id}/deactivate")
+    public ResponseEntity<UserResponse> deactivateUser(
+            @PathVariable Integer id,
+            @RequestParam Integer requestingUserId) {
+        // TODO: replace with current user from SecurityContext
+        return ResponseEntity.ok(userService.deactivateUser(requestingUserId, id));
+    }
+
     @PutMapping("/users/{id}")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Integer id,

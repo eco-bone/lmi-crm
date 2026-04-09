@@ -78,6 +78,17 @@ public class NotificationServiceImpl implements NotificationService {
         send(toEmail, subject, body);
     }
 
+    @Override
+    public void sendUserDeactivatedEmail(String toEmail, String deactivatedUserName, String deactivatedUserRole) {
+        log.info("Sending deactivation notification to admin: {}", toEmail);
+        String subject = "User Deactivated: " + deactivatedUserName;
+        String body = "The following user has been deactivated in the LMI CRM portal:\n\n"
+                + "Name: " + deactivatedUserName + "\n"
+                + "Role: " + deactivatedUserRole + "\n\n"
+                + "No action is required. This is an informational notification.";
+        send(toEmail, subject, body);
+    }
+
     private void send(String toEmail, String subject, String body) {
         long start = System.currentTimeMillis();
 

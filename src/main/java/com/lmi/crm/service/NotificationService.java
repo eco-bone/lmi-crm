@@ -13,4 +13,6 @@ public interface NotificationService {
     void sendWeeklyReportEmail(String toEmail, String reportSummary);
 
     void sendOtpEmail(String toEmail, String otp);
+
+    void sendUserDeactivatedEmail(String toEmail, String deactivatedUserName, String deactivatedUserRole);
 }

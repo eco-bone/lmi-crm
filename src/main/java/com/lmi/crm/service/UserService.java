@@ -2,6 +2,7 @@ package com.lmi.crm.service;
 
 import com.lmi.crm.dto.request.AddLicenseeRequest;
 import com.lmi.crm.dto.request.RequestAssociateCreationRequest;
+import com.lmi.crm.dto.request.ResetPasswordRequest;
 import com.lmi.crm.dto.request.UpdateUserRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.LicenseeResponse;
@@ -26,6 +27,8 @@ public interface UserService {
     UserResponse getUserDetail(Integer requestingUserId, Integer targetUserId);
 
     UserResponse updateUser(Integer requestingUserId, Integer targetUserId, UpdateUserRequest request);
+
+    String resetPassword(Integer requestingUserId, Integer targetUserId, ResetPasswordRequest request);
 
     UserResponse deactivateUser(Integer requestingUserId, Integer targetUserId);
 

@@ -7,6 +7,7 @@ import com.lmi.crm.dao.LicenseeCityRepository;
 import com.lmi.crm.dao.UserRepository;
 import com.lmi.crm.dto.request.AddLicenseeRequest;
 import com.lmi.crm.dto.request.RequestAssociateCreationRequest;
+import com.lmi.crm.dto.request.ResetPasswordRequest;
 import com.lmi.crm.dto.request.UpdateCityRequest;
 import com.lmi.crm.dto.request.UpdateUserRequest;
 import com.lmi.crm.dto.response.ApiResponse;
@@ -408,6 +409,39 @@ public class UserServiceImpl implements UserService {
         log.info("User updated — targetId: {}, requestedBy: {}", targetUserId, requestingUserId);
 
         return userMapper.toResponse(savedUser);
+    }
+
+    @Override
+    public String resetPassword(Integer requestingUserId, Integer targetUserId, ResetPasswordRequest request) {
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingUserId));
+        User targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + targetUserId));
+
+        boolean isSelf = requestingUserId.equals(targetUserId);
+        boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
+
+        if (!isSelf && !isAdmin)
+            throw new RuntimeException("Access denied");
+
+        if (isSelf) {
+            if (!request.getCurrentPassword().equals(targetUser.getPassword()))
+                throw new RuntimeException("Current password is incorrect");
+        }
+
+        if (request.getNewPassword().equals(targetUser.getPassword()))
+            throw new RuntimeException("New password cannot be same as current password");
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword()))
+            throw new RuntimeException("Passwords do not match");
+
+        // TODO: hash password with BCrypt when auth is built
+        targetUser.setPassword(request.getNewPassword());
+        userRepository.save(targetUser);
+
+        log.info("Password reset — targetId: {}, requestedBy: {}", targetUserId, requestingUserId);
+
+        return "Password updated successfully";
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.lmi.crm.controller;
 
 import com.lmi.crm.dto.request.AddLicenseeRequest;
 import com.lmi.crm.dto.request.RequestAssociateCreationRequest;
+import com.lmi.crm.dto.request.ResetPasswordRequest;
 import com.lmi.crm.dto.request.UpdateUserRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.LicenseeResponse;
@@ -93,6 +94,15 @@ public class UserController {
             @RequestParam Integer requestingUserId) {
         // TODO: replace with current user from SecurityContext
         return ResponseEntity.ok(userService.approveRejectAssociateDeactivation(requestingUserId, alertId, approve));
+    }
+
+    @PutMapping("/users/{id}/password")
+    public ResponseEntity<String> resetPassword(
+            @PathVariable Integer id,
+            @Valid @RequestBody ResetPasswordRequest request,
+            @RequestParam Integer requestingUserId) {
+        // TODO: replace with current user from SecurityContext
+        return ResponseEntity.ok(userService.resetPassword(requestingUserId, id, request));
     }
 
     @PutMapping("/users/{id}")

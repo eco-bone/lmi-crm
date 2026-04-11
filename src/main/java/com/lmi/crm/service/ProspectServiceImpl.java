@@ -7,7 +7,9 @@ import com.lmi.crm.dao.ProspectRepository;
 import com.lmi.crm.dao.UserRepository;
 import com.lmi.crm.dto.request.AddProspectRequest;
 import com.lmi.crm.dto.request.UpdateProspectRequest;
+import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.ProspectResponse;
+import com.lmi.crm.entity.Alert;
 import com.lmi.crm.entity.Prospect;
 import com.lmi.crm.entity.ProspectLicensee;
 import com.lmi.crm.entity.User;
@@ -411,5 +413,114 @@ public class ProspectServiceImpl implements ProspectService {
         log.info("GET /api/prospects/{} — returned for userId: {}", prospectId, requestingUserId);
 
         return response;
+    }
+
+    @Override
+    public String requestConversion(Integer requestingUserId, Integer prospectId) {
+
+        // Step 1 — Validate requesting user and prospect
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (requestingUser.getRole() != UserRole.ASSOCIATE && requestingUser.getRole() != UserRole.LICENSEE) {
+            throw new RuntimeException("Access denied");
+        }
+
+        log.info("POST /api/prospects/{}/convert — requestingUserId: {}", prospectId, requestingUserId);
+
+        Prospect prospect = prospectRepository.findById(prospectId)
+                .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
+                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+
+        // Step 2 — Validate prospect state
+        if (prospect.getType() == ProspectType.CLIENT) {
+            throw new RuntimeException("Prospect is already a client");
+        }
+
+        // Step 3 — Ownership check
+        if (requestingUser.getRole() == UserRole.ASSOCIATE) {
+            if (!requestingUserId.equals(prospect.getAssociateId())) {
+                throw new RuntimeException("Access denied");
+            }
+        } else {
+            if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, requestingUserId)) {
+                throw new RuntimeException("Access denied");
+            }
+        }
+
+        // Step 4 — Check no existing pending conversion request
+        alertRepository.findByAlertTypeAndRelatedEntityIdAndStatus(
+                AlertType.PROSPECT_CONVERSION_REQUEST, prospectId, AlertStatus.PENDING)
+                .ifPresent(a -> {
+                    throw new RuntimeException("A conversion request for this prospect is already pending");
+                });
+
+        // Step 5 — Create alert
+        alertService.createAlert(
+                AlertType.PROSPECT_CONVERSION_REQUEST,
+                "Conversion Request — " + prospect.getCompanyName(),
+                "User id " + requestingUserId + " has requested conversion of prospect: "
+                        + prospect.getCompanyName() + " (id: " + prospectId + ") to Client",
+                RelatedEntityType.PROSPECT,
+                prospectId,
+                requestingUserId,
+                true
+        );
+
+        // Step 6 — Log and return
+        log.info("Conversion requested — prospectId: {}, requestedBy: {}", prospectId, requestingUserId);
+        return "Conversion request submitted successfully. Awaiting admin approval.";
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<ProspectResponse> approveRejectConversion(Integer requestingUserId, Integer alertId, boolean approve) {
+
+        // Step 1 — Validate requesting user
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
+            throw new RuntimeException("Access denied");
+        }
+
+        log.info("PUT /api/prospects/conversions/{} — requestingUserId: {}, approve: {}", alertId, requestingUserId, approve);
+
+        // Step 2 — Validate alert
+        Alert alert = alertRepository.findById(alertId)
+                .orElseThrow(() -> new RuntimeException("Alert not found"));
+
+        if (alert.getAlertType() != AlertType.PROSPECT_CONVERSION_REQUEST) {
+            throw new RuntimeException("Alert is not a conversion request");
+        }
+        if (alert.getStatus() != AlertStatus.PENDING) {
+            throw new RuntimeException("Alert is no longer pending");
+        }
+
+        // Step 3 — Reject path
+        if (!approve) {
+            alert.setStatus(AlertStatus.REJECTED);
+            alertRepository.save(alert);
+            log.info("Conversion rejected — alertId: {}, rejectedBy: {}", alertId, requestingUserId);
+            return ApiResponse.rejected("Conversion request rejected");
+        }
+
+        // Step 4 — Approve path
+        Prospect prospect = prospectRepository.findById(alert.getRelatedEntityId())
+                .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
+                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+
+        prospect.setType(ProspectType.CLIENT);
+        prospectRepository.save(prospect);
+
+        alert.setStatus(AlertStatus.RESOLVED);
+        alertRepository.save(alert);
+
+        Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospect.getId())
+                .map(ProspectLicensee::getLicenseeId)
+                .orElse(null);
+
+        log.info("Conversion approved — prospectId: {}, approvedBy: {}", prospect.getId(), requestingUserId);
+        return ApiResponse.success("Prospect converted to client successfully", prospectMapper.toResponse(prospect, licenseeId, null));
     }
 }

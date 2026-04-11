@@ -81,6 +81,23 @@ public class ProspectController {
         return ResponseEntity.ok(ApiResponse.success(result, null));
     }
 
+    @PostMapping("/{id}/convert")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE')")
+    public ResponseEntity<ApiResponse<String>> requestConversion(@PathVariable Integer id) {
+        Integer requestingUserId = SecurityUtils.getCurrentUserId();
+        String result = prospectService.requestConversion(requestingUserId, id);
+        return ResponseEntity.ok(ApiResponse.success(result, null));
+    }
+
+    @PutMapping("/conversions/{alertId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<ProspectResponse>> approveRejectConversion(
+            @PathVariable Integer alertId,
+            @RequestParam boolean approve) {
+        Integer requestingUserId = SecurityUtils.getCurrentUserId();
+        return ResponseEntity.ok(prospectService.approveRejectConversion(requestingUserId, alertId, approve));
+    }
+
     @PostMapping("/{id}/extension-request")
     @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE')")
     public ResponseEntity<ApiResponse<String>> requestProtectionExtension(

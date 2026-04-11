@@ -2,6 +2,7 @@ package com.lmi.crm.entity;
 
 import com.lmi.crm.enums.ClassificationType;
 import com.lmi.crm.enums.ProspectProgramType;
+import com.lmi.crm.enums.ProspectStatus;
 import com.lmi.crm.enums.ProspectType;
 import com.lmi.crm.enums.ProtectionStatus;
 import jakarta.persistence.*;
@@ -74,6 +75,10 @@ public class Prospect {
     @Enumerated(EnumType.STRING)
     @Column(name = "protection_status")
     private ProtectionStatus protectionStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private ProspectStatus status;
 
     @Column(name = "protection_period_months")
     private Integer protectionPeriodMonths;

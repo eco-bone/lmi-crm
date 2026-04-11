@@ -11,14 +11,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ApiResponse<T> {
 
-    private String message;
+    private boolean success;
     private T data;
+    private String message;
 
     public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(message, data);
+        return new ApiResponse<>(true, data, message);
     }
 
     public static <T> ApiResponse<T> rejected(String message) {
-        return new ApiResponse<>(message, null);
+        return new ApiResponse<>(false, null, message);
+    }
+
+    public static <T> ApiResponse<T> error(String message) {
+        return new ApiResponse<>(false, null, message);
     }
 }

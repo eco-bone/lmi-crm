@@ -31,9 +31,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
+        log.debug("JWT filter — {} {}", method, uri);
+
         String header = request.getHeader("Authorization");
-//        log.info("JWT Filter running for: {}", request.getRequestURI());
+
         if (header == null || !header.startsWith("Bearer ")) {
+            log.debug("JWT filter — no Bearer token, continuing as anonymous — {} {}", method, uri);
             filterChain.doFilter(request, response);
             return;
         }
@@ -41,6 +46,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = header.substring(7);
 
         if (!jwtUtil.isValid(token)) {
+            log.warn("JWT filter — invalid token rejected — {} {}", method, uri);
             filterChain.doFilter(request, response);
             return;
         }
@@ -49,6 +55,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         Optional<User> userOpt = userRepository.findById(userId);
 
         if (userOpt.isEmpty()) {
+            log.warn("JWT filter — token references non-existent userId: {} — {} {}", userId, method, uri);
             filterChain.doFilter(request, response);
             return;
         }
@@ -58,6 +65,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        log.debug("JWT filter — authenticated userId: {}, role: {} — {} {}", user.getId(), user.getRole(), method, uri);
 
         filterChain.doFilter(request, response);
     }

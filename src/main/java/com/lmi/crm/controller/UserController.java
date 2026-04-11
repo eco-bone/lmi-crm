@@ -12,12 +12,14 @@ import com.lmi.crm.enums.UserStatus;
 import com.lmi.crm.service.UserService;
 import com.lmi.crm.util.SecurityUtils;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -33,7 +35,10 @@ public class UserController {
     public ResponseEntity<UserResponse> createAdmin(
             @Valid @RequestBody RequestAssociateCreationRequest request) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(userService.createAdmin(request, requestingUserId));
+        log.info("POST /api/admin/create — requestingUserId: {}, newAdmin: {} {}", requestingUserId, request.getFirstName(), request.getLastName());
+        UserResponse response = userService.createAdmin(request, requestingUserId);
+        log.info("POST /api/admin/create — admin created — newUserId: {}", response.getId());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/admin/licensees")
@@ -41,7 +46,10 @@ public class UserController {
     public ResponseEntity<LicenseeResponse> addLicensee(
             @Valid @RequestBody AddLicenseeRequest request) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(userService.addLicensee(request, requestingUserId));
+        log.info("POST /api/admin/licensees — requestingUserId: {}, newLicensee: {} {}", requestingUserId, request.getFirstName(), request.getLastName());
+        LicenseeResponse response = userService.addLicensee(request, requestingUserId);
+        log.info("POST /api/admin/licensees — licensee created — newUserId: {}", response.getId());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/licensees/associates/request")
@@ -49,7 +57,10 @@ public class UserController {
     public ResponseEntity<String> requestAssociateCreation(
             @Valid @RequestBody RequestAssociateCreationRequest request) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(userService.requestAssociateCreation(request, requestingUserId));
+        log.info("POST /api/licensees/associates/request — requestingUserId: {}, associate: {} {}", requestingUserId, request.getFirstName(), request.getLastName());
+        String response = userService.requestAssociateCreation(request, requestingUserId);
+        log.info("POST /api/licensees/associates/request — request submitted — requestingUserId: {}", requestingUserId);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/admin/associates/{alertId}/decision")
@@ -58,7 +69,10 @@ public class UserController {
             @PathVariable Integer alertId,
             @RequestParam boolean approve) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(userService.approveRejectAssociateCreation(alertId, approve, requestingUserId));
+        log.info("PUT /api/admin/associates/{}/decision — requestingUserId: {}, approve: {}", alertId, requestingUserId, approve);
+        ApiResponse<UserResponse> response = userService.approveRejectAssociateCreation(alertId, approve, requestingUserId);
+        log.info("PUT /api/admin/associates/{}/decision — outcome: {} — requestingUserId: {}", alertId, approve ? "approved" : "rejected", requestingUserId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/users")
@@ -68,28 +82,40 @@ public class UserController {
             @RequestParam(required = false) UserStatus status,
             @RequestParam(defaultValue = "false") boolean includeAllStatuses) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(userService.getUsers(requestingUserId, role, status, includeAllStatuses));
+        log.info("GET /api/users — requestingUserId: {}, roleFilter: {}, statusFilter: {}, includeAllStatuses: {}", requestingUserId, role, status, includeAllStatuses);
+        List<UserResponse> response = userService.getUsers(requestingUserId, role, status, includeAllStatuses);
+        log.info("GET /api/users — returned {} records — requestingUserId: {}", response.size(), requestingUserId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/users/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserResponse> getUserDetail(@PathVariable Integer id) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(userService.getUserDetail(requestingUserId, id));
+        log.info("GET /api/users/{} — requestingUserId: {}", id, requestingUserId);
+        UserResponse response = userService.getUserDetail(requestingUserId, id);
+        log.info("GET /api/users/{} — returned userId: {} — requestingUserId: {}", id, response.getId(), requestingUserId);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/users/{id}/deactivate")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
     public ResponseEntity<UserResponse> deactivateUser(@PathVariable Integer id) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(userService.deactivateUser(requestingUserId, id));
+        log.info("PUT /api/users/{}/deactivate — requestingUserId: {}", id, requestingUserId);
+        UserResponse response = userService.deactivateUser(requestingUserId, id);
+        log.info("PUT /api/users/{}/deactivate — deactivated — requestingUserId: {}", id, requestingUserId);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/users/associates/{id}/deactivation-request")
     @PreAuthorize("hasRole('LICENSEE')")
     public ResponseEntity<String> requestAssociateDeactivation(@PathVariable Integer id) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(userService.requestAssociateDeactivation(requestingUserId, id));
+        log.info("POST /api/users/associates/{}/deactivation-request — requestingUserId: {}", id, requestingUserId);
+        String response = userService.requestAssociateDeactivation(requestingUserId, id);
+        log.info("POST /api/users/associates/{}/deactivation-request — request submitted — requestingUserId: {}", id, requestingUserId);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/users/associates/deactivation-requests/{alertId}")
@@ -98,7 +124,10 @@ public class UserController {
             @PathVariable Integer alertId,
             @RequestParam boolean approve) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(userService.approveRejectAssociateDeactivation(requestingUserId, alertId, approve));
+        log.info("PUT /api/users/associates/deactivation-requests/{} — requestingUserId: {}, approve: {}", alertId, requestingUserId, approve);
+        ApiResponse<UserResponse> response = userService.approveRejectAssociateDeactivation(requestingUserId, alertId, approve);
+        log.info("PUT /api/users/associates/deactivation-requests/{} — outcome: {} — requestingUserId: {}", alertId, approve ? "approved" : "rejected", requestingUserId);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/users/{id}/password")
@@ -107,7 +136,10 @@ public class UserController {
             @PathVariable Integer id,
             @Valid @RequestBody ResetPasswordRequest request) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(userService.resetPassword(requestingUserId, id, request));
+        log.info("PUT /api/users/{}/password — requestingUserId: {}", id, requestingUserId);
+        String response = userService.resetPassword(requestingUserId, id, request);
+        log.info("PUT /api/users/{}/password — password updated — requestingUserId: {}", id, requestingUserId);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/users/{id}")
@@ -116,6 +148,9 @@ public class UserController {
             @PathVariable Integer id,
             @Valid @RequestBody UpdateUserRequest request) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(userService.updateUser(requestingUserId, id, request));
+        log.info("PUT /api/users/{} — requestingUserId: {}", id, requestingUserId);
+        UserResponse response = userService.updateUser(requestingUserId, id, request);
+        log.info("PUT /api/users/{} — updated — requestingUserId: {}", id, requestingUserId);
+        return ResponseEntity.ok(response);
     }
 }

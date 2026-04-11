@@ -28,6 +28,9 @@ public class AlertServiceImpl implements AlertService {
                             RelatedEntityType relatedEntityType, Integer relatedEntityId,
                             Integer triggeredBy, boolean actionRequired) {
 
+        log.debug("createAlert — type: {}, relatedEntityType: {}, relatedEntityId: {}, triggeredBy: {}, actionRequired: {}",
+                alertType, relatedEntityType, relatedEntityId, triggeredBy, actionRequired);
+
         Alert alert = Alert.builder()
                 .alertType(alertType)
                 .title(title)
@@ -39,10 +42,10 @@ public class AlertServiceImpl implements AlertService {
                 .actionRequired(actionRequired)
                 .build();
 
-        alertRepository.save(alert);
+        Alert saved = alertRepository.save(alert);
+        log.info("createAlert — saved — alertId: {}, type: {}, title: {}, triggeredBy: {}", saved.getId(), alertType, title, triggeredBy);
 
-        log.info("Alert created — type: {}, title: {}, triggeredBy: {}", alertType, title, triggeredBy);
-
+        log.debug("createAlert — dispatching admin email notification — alertId: {}", saved.getId());
         notificationService.sendAdminAlertEmail(title, description, baseUrl + "/admin/alerts");
     }
 }

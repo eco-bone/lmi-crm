@@ -72,13 +72,19 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public LicenseeResponse addLicensee(AddLicenseeRequest request, Integer requestingUserId) {
+        log.debug("addLicensee — requestingUserId: {}, email: {}, cities: {}", requestingUserId, request.getEmail(), request.getCities().size());
+
         boolean hasPrimary = request.getCities().stream()
                 .anyMatch(c -> Boolean.TRUE.equals(c.getIsPrimary()));
-        if (!hasPrimary)
+        if (!hasPrimary) {
+            log.warn("addLicensee — rejected — no primary city provided — requestingUserId: {}", requestingUserId);
             throw new IllegalArgumentException("At least one city must be marked as primary");
+        }
 
-        if (userRepository.findByEmail(request.getEmail()).isPresent())
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            log.warn("addLicensee — rejected — email already exists: {} — requestingUserId: {}", request.getEmail(), requestingUserId);
             throw new IllegalArgumentException("A user with this email already exists");
+        }
 
         String tempPassword = "Temp-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
@@ -111,13 +117,19 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse createAdmin(RequestAssociateCreationRequest request, Integer requestingSuperAdminId) {
+        log.debug("createAdmin — requestingSuperAdminId: {}, email: {}", requestingSuperAdminId, request.getEmail());
+
         User requestingUser = userRepository.findById(requestingSuperAdminId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingSuperAdminId));
-        if (requestingUser.getRole() != UserRole.SUPER_ADMIN)
+        if (requestingUser.getRole() != UserRole.SUPER_ADMIN) {
+            log.warn("createAdmin — access denied — requestingUserId: {} is not SUPER_ADMIN (role: {})", requestingSuperAdminId, requestingUser.getRole());
             throw new RuntimeException("Access denied");
+        }
 
-        if (userRepository.findByEmail(request.getEmail()).isPresent())
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            log.warn("createAdmin — rejected — email already exists: {} — requestingUserId: {}", request.getEmail(), requestingSuperAdminId);
             throw new RuntimeException("A user with this email already exists");
+        }
 
         String tempPassword = "Temp-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
@@ -139,10 +151,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String requestAssociateCreation(RequestAssociateCreationRequest request, Integer requestingLicenseeId) {
+        log.debug("requestAssociateCreation — requestingLicenseeId: {}, associate: {} {}", requestingLicenseeId, request.getFirstName(), request.getLastName());
+
         User licensee = userRepository.findById(requestingLicenseeId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingLicenseeId));
-        if (licensee.getRole() != UserRole.LICENSEE)
+        if (licensee.getRole() != UserRole.LICENSEE) {
+            log.warn("requestAssociateCreation — rejected — userId: {} is not LICENSEE (role: {})", requestingLicenseeId, licensee.getRole());
             throw new RuntimeException("Only a Licensee can request associate creation");
+        }
 
         String descriptionJson;
         try {
@@ -175,22 +191,30 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ApiResponse<UserResponse> approveRejectAssociateCreation(Integer alertId, boolean approve, Integer requestingAdminId) {
+        log.debug("approveRejectAssociateCreation — alertId: {}, approve: {}, requestingAdminId: {}", alertId, approve, requestingAdminId);
+
         Alert alert = alertRepository.findById(alertId)
                 .orElseThrow(() -> new RuntimeException("Alert not found with id: " + alertId));
-        if (alert.getStatus() != AlertStatus.PENDING)
+        if (alert.getStatus() != AlertStatus.PENDING) {
+            log.warn("approveRejectAssociateCreation — alert already acted on — alertId: {}, status: {}", alertId, alert.getStatus());
             throw new RuntimeException("Alert has already been acted on");
+        }
 
         User admin = userRepository.findById(requestingAdminId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingAdminId));
-        if (admin.getRole() != UserRole.ADMIN && admin.getRole() != UserRole.SUPER_ADMIN)
+        if (admin.getRole() != UserRole.ADMIN && admin.getRole() != UserRole.SUPER_ADMIN) {
+            log.warn("approveRejectAssociateCreation — access denied — userId: {} role: {}", requestingAdminId, admin.getRole());
             throw new RuntimeException("Only an Admin can approve or reject associate creation requests");
+        }
 
         if (!approve) {
             alert.setStatus(AlertStatus.REJECTED);
             alertRepository.save(alert);
-            log.info("Associate creation request rejected — alertId: {}, adminId: {}", alertId, requestingAdminId);
+            log.info("approveRejectAssociateCreation — rejected — alertId: {}, adminId: {}", alertId, requestingAdminId);
             return ApiResponse.rejected("Associate creation request rejected");
         }
+
+        log.debug("approveRejectAssociateCreation — approving — alertId: {}", alertId);
 
         Map<String, String> details;
         try {
@@ -233,6 +257,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponse> getUsers(Integer requestingUserId, UserRole roleFilter, UserStatus statusFilter, boolean includeAllStatuses) {
+        log.debug("getUsers — requestingUserId: {}, roleFilter: {}, statusFilter: {}, includeAllStatuses: {}", requestingUserId, roleFilter, statusFilter, includeAllStatuses);
+
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingUserId));
 
@@ -242,6 +268,8 @@ public class UserServiceImpl implements UserService {
         } else {
             effectiveStatus = includeAllStatuses ? null : (statusFilter != null ? statusFilter : UserStatus.ACTIVE);
         }
+
+        log.debug("getUsers — role: {}, effectiveStatus: {}", requestingUser.getRole(), effectiveStatus);
 
         List<User> users;
         switch (requestingUser.getRole()) {
@@ -253,31 +281,39 @@ public class UserServiceImpl implements UserService {
                 users = userRepository.findByOptionalFilters(roleFilter, effectiveStatus);
                 break;
             default:
+                log.warn("getUsers — access denied — userId: {}, role: {}", requestingUserId, requestingUser.getRole());
                 throw new RuntimeException("Access denied");
         }
 
+        log.debug("getUsers — found {} users — requestingUserId: {}", users.size(), requestingUserId);
         return users.stream().map(userMapper::toResponse).toList();
     }
 
     @Override
     public UserResponse getUserDetail(Integer requestingUserId, Integer targetUserId) {
+        log.debug("getUserDetail — requestingUserId: {}, targetUserId: {}", requestingUserId, targetUserId);
+
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingUserId));
         User targetUser = userRepository.findById(targetUserId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + targetUserId));
 
         boolean isSelf = requestingUserId.equals(targetUserId);
+        log.debug("getUserDetail — isSelf: {}, requesterRole: {}", isSelf, requestingUser.getRole());
 
         if (!isSelf) {
             switch (requestingUser.getRole()) {
                 case LICENSEE:
-                    if (!requestingUserId.equals(targetUser.getLicenseeId()))
+                    if (!requestingUserId.equals(targetUser.getLicenseeId())) {
+                        log.warn("getUserDetail — access denied — licenseeId: {} tried to view userId: {} (licenseeId: {})", requestingUserId, targetUserId, targetUser.getLicenseeId());
                         throw new RuntimeException("Access denied");
+                    }
                     break;
                 case ADMIN:
                 case SUPER_ADMIN:
                     break;
                 default:
+                    log.warn("getUserDetail — access denied — userId: {}, role: {}", requestingUserId, requestingUser.getRole());
                     throw new RuntimeException("Access denied");
             }
         }
@@ -301,6 +337,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse updateUser(Integer requestingUserId, Integer targetUserId, UpdateUserRequest request) {
+        log.debug("updateUser — requestingUserId: {}, targetUserId: {}", requestingUserId, targetUserId);
+
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingUserId));
         User targetUser = userRepository.findById(targetUserId)
@@ -310,8 +348,12 @@ public class UserServiceImpl implements UserService {
         UserRole requesterRole = requestingUser.getRole();
         boolean isAdmin = requesterRole == UserRole.ADMIN || requesterRole == UserRole.SUPER_ADMIN;
 
-        if (!isSelf && !isAdmin)
+        log.debug("updateUser — isSelf: {}, requesterRole: {}, isAdmin: {}", isSelf, requesterRole, isAdmin);
+
+        if (!isSelf && !isAdmin) {
+            log.warn("updateUser — access denied — requestingUserId: {}, targetUserId: {}", requestingUserId, targetUserId);
             throw new RuntimeException("Access denied");
+        }
 
         UserRole originalRole = targetUser.getRole();
 
@@ -427,6 +469,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String resetPassword(Integer requestingUserId, Integer targetUserId, ResetPasswordRequest request) {
+        log.debug("resetPassword — requestingUserId: {}, targetUserId: {}", requestingUserId, targetUserId);
+
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingUserId));
         User targetUser = userRepository.findById(targetUserId)
@@ -435,19 +479,29 @@ public class UserServiceImpl implements UserService {
         boolean isSelf = requestingUserId.equals(targetUserId);
         boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
 
-        if (!isSelf && !isAdmin)
-            throw new RuntimeException("Access denied");
+        log.debug("resetPassword — isSelf: {}, isAdmin: {}", isSelf, isAdmin);
 
-        if (isSelf) {
-            if (!passwordEncoder.matches(request.getCurrentPassword(), targetUser.getPassword()))
-                throw new RuntimeException("Current password is incorrect");
+        if (!isSelf && !isAdmin) {
+            log.warn("resetPassword — access denied — requestingUserId: {}, targetUserId: {}", requestingUserId, targetUserId);
+            throw new RuntimeException("Access denied");
         }
 
-        if (passwordEncoder.matches(request.getNewPassword(), targetUser.getPassword()))
-            throw new RuntimeException("New password cannot be same as current password");
+        if (isSelf) {
+            if (!passwordEncoder.matches(request.getCurrentPassword(), targetUser.getPassword())) {
+                log.warn("resetPassword — wrong current password — userId: {}", targetUserId);
+                throw new RuntimeException("Current password is incorrect");
+            }
+        }
 
-        if (!request.getNewPassword().equals(request.getConfirmPassword()))
+        if (passwordEncoder.matches(request.getNewPassword(), targetUser.getPassword())) {
+            log.warn("resetPassword — new password same as current — userId: {}", targetUserId);
+            throw new RuntimeException("New password cannot be same as current password");
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            log.warn("resetPassword — passwords do not match — userId: {}", targetUserId);
             throw new RuntimeException("Passwords do not match");
+        }
 
         targetUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(targetUser);
@@ -460,23 +514,33 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse deactivateUser(Integer requestingUserId, Integer targetUserId) {
+        log.debug("deactivateUser — requestingUserId: {}, targetUserId: {}", requestingUserId, targetUserId);
+
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingUserId));
 
         UserRole requesterRole = requestingUser.getRole();
-        if (requesterRole != UserRole.ADMIN && requesterRole != UserRole.SUPER_ADMIN)
+        if (requesterRole != UserRole.ADMIN && requesterRole != UserRole.SUPER_ADMIN) {
+            log.warn("deactivateUser — access denied — requestingUserId: {}, role: {}", requestingUserId, requesterRole);
             throw new RuntimeException("Access denied");
+        }
 
         User targetUser = userRepository.findById(targetUserId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + targetUserId));
 
-        if (targetUser.getStatus() == UserStatus.INACTIVE)
+        log.debug("deactivateUser — target found — userId: {}, role: {}, status: {}", targetUserId, targetUser.getRole(), targetUser.getStatus());
+
+        if (targetUser.getStatus() == UserStatus.INACTIVE) {
+            log.warn("deactivateUser — already inactive — targetUserId: {}", targetUserId);
             throw new RuntimeException("User is already inactive");
+        }
 
         UserRole targetRole = targetUser.getRole();
 
-        if (requesterRole == UserRole.ADMIN && (targetRole == UserRole.ADMIN || targetRole == UserRole.SUPER_ADMIN))
+        if (requesterRole == UserRole.ADMIN && (targetRole == UserRole.ADMIN || targetRole == UserRole.SUPER_ADMIN)) {
+            log.warn("deactivateUser — admin cannot deactivate another admin — requestingUserId: {}, targetUserId: {}", requestingUserId, targetUserId);
             throw new RuntimeException("Admin cannot deactivate another Admin");
+        }
 
         switch (targetRole) {
             case ASSOCIATE -> {
@@ -507,23 +571,36 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String requestAssociateDeactivation(Integer requestingLicenseeId, Integer targetAssociateId) {
+        log.debug("requestAssociateDeactivation — requestingLicenseeId: {}, targetAssociateId: {}", requestingLicenseeId, targetAssociateId);
+
         User requestingUser = userRepository.findById(requestingLicenseeId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingLicenseeId));
-        if (requestingUser.getRole() != UserRole.LICENSEE)
+        if (requestingUser.getRole() != UserRole.LICENSEE) {
+            log.warn("requestAssociateDeactivation — access denied — userId: {}, role: {}", requestingLicenseeId, requestingUser.getRole());
             throw new RuntimeException("Access denied");
+        }
 
         User targetUser = userRepository.findById(targetAssociateId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + targetAssociateId));
-        if (targetUser.getRole() != UserRole.ASSOCIATE)
+        if (targetUser.getRole() != UserRole.ASSOCIATE) {
+            log.warn("requestAssociateDeactivation — target is not associate — targetUserId: {}, role: {}", targetAssociateId, targetUser.getRole());
             throw new RuntimeException("Target user is not an Associate");
-        if (!requestingLicenseeId.equals(targetUser.getLicenseeId()))
+        }
+        if (!requestingLicenseeId.equals(targetUser.getLicenseeId())) {
+            log.warn("requestAssociateDeactivation — associate does not belong to licensee — licenseeId: {}, associateId: {}, associateLicenseeId: {}", requestingLicenseeId, targetAssociateId, targetUser.getLicenseeId());
             throw new RuntimeException("This Associate does not belong to your licensee");
-        if (targetUser.getStatus() == UserStatus.INACTIVE)
+        }
+        if (targetUser.getStatus() == UserStatus.INACTIVE) {
+            log.warn("requestAssociateDeactivation — already inactive — targetAssociateId: {}", targetAssociateId);
             throw new RuntimeException("User is already inactive");
+        }
 
         alertRepository.findByAlertTypeAndRelatedEntityIdAndStatus(
                 AlertType.ASSOCIATE_DEACTIVATION_REQUEST, targetAssociateId, AlertStatus.PENDING
-        ).ifPresent(a -> { throw new RuntimeException("A deactivation request for this Associate is already pending"); });
+        ).ifPresent(a -> {
+            log.warn("requestAssociateDeactivation — duplicate request — targetAssociateId: {}", targetAssociateId);
+            throw new RuntimeException("A deactivation request for this Associate is already pending");
+        });
 
         alertService.createAlert(
                 AlertType.ASSOCIATE_DEACTIVATION_REQUEST,
@@ -543,24 +620,34 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ApiResponse<UserResponse> approveRejectAssociateDeactivation(Integer requestingUserId, Integer alertId, boolean approve) {
+        log.debug("approveRejectAssociateDeactivation — alertId: {}, approve: {}, requestingUserId: {}", alertId, approve, requestingUserId);
+
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingUserId));
-        if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN)
+        if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
+            log.warn("approveRejectAssociateDeactivation — access denied — userId: {}, role: {}", requestingUserId, requestingUser.getRole());
             throw new RuntimeException("Access denied");
+        }
 
         Alert alert = alertRepository.findById(alertId)
                 .orElseThrow(() -> new RuntimeException("Alert not found"));
-        if (alert.getAlertType() != AlertType.ASSOCIATE_DEACTIVATION_REQUEST)
+        if (alert.getAlertType() != AlertType.ASSOCIATE_DEACTIVATION_REQUEST) {
+            log.warn("approveRejectAssociateDeactivation — wrong alert type — alertId: {}, type: {}", alertId, alert.getAlertType());
             throw new RuntimeException("Alert is not of type ASSOCIATE_DEACTIVATION_REQUEST");
-        if (alert.getStatus() != AlertStatus.PENDING)
+        }
+        if (alert.getStatus() != AlertStatus.PENDING) {
+            log.warn("approveRejectAssociateDeactivation — alert no longer pending — alertId: {}, status: {}", alertId, alert.getStatus());
             throw new RuntimeException("Alert is no longer pending");
+        }
 
         if (!approve) {
             alert.setStatus(AlertStatus.REJECTED);
             alertRepository.save(alert);
-            log.info("Associate deactivation rejected — alertId: {}, rejectedBy: {}", alertId, requestingUserId);
+            log.info("approveRejectAssociateDeactivation — rejected — alertId: {}, rejectedBy: {}", alertId, requestingUserId);
             return ApiResponse.rejected("Associate deactivation request rejected");
         }
+
+        log.debug("approveRejectAssociateDeactivation — approving — alertId: {}, associateId: {}", alertId, alert.getRelatedEntityId());
 
         alert.setStatus(AlertStatus.RESOLVED);
         alertRepository.save(alert);

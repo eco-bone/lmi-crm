@@ -79,6 +79,11 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public void sendOtpSms(String phone, String otp) {
+        log.info("SMS OTP for {}: {}", phone, otp);
+    }
+
+    @Override
     public void sendUserDeactivatedEmail(String toEmail, String deactivatedUserName, String deactivatedUserRole) {
         log.info("Sending deactivation notification to admin: {}", toEmail);
         String subject = "User Deactivated: " + deactivatedUserName;

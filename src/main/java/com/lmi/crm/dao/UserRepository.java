@@ -16,6 +16,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByPhone(String phone);
+
+    Optional<User> findByInvitationToken(String invitationToken);
+
     List<User> findByRole(UserRole role);
 
     @Query("SELECT u FROM User u WHERE u.licenseeId = :licenseeId AND u.role = :role AND (:status IS NULL OR u.status = :status)")

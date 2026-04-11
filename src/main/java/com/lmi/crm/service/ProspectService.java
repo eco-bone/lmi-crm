@@ -1,6 +1,7 @@
 package com.lmi.crm.service;
 
 import com.lmi.crm.dto.request.AddProspectRequest;
+import com.lmi.crm.dto.request.UpdateProspectRequest;
 import com.lmi.crm.dto.response.ProspectResponse;
 import com.lmi.crm.enums.ProspectType;
 
@@ -16,4 +17,8 @@ public interface ProspectService {
                                         Integer licenseeIdFilter, Integer associateIdFilter);
 
     ProspectResponse getProspectDetail(Integer requestingUserId, Integer prospectId);
+
+    ProspectResponse updateProspect(Integer requestingUserId, Integer prospectId, UpdateProspectRequest request);
+
+    String softDeleteProspect(Integer requestingUserId, Integer prospectId);
 }

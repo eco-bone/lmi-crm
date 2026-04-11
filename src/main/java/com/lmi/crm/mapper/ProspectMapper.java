@@ -1,6 +1,7 @@
 package com.lmi.crm.mapper;
 
 import com.lmi.crm.dto.request.AddProspectRequest;
+import com.lmi.crm.dto.request.UpdateProspectRequest;
 import com.lmi.crm.dto.response.ProspectResponse;
 import com.lmi.crm.entity.Prospect;
 import com.lmi.crm.entity.ProspectLicensee;
@@ -56,6 +57,18 @@ public class ProspectMapper {
                 .isPrimary(true)
                 .assignedAt(LocalDateTime.now())
                 .build();
+    }
+
+    public void updateFromRequest(UpdateProspectRequest request, Prospect prospect) {
+        if (request.getCompanyName() != null) prospect.setCompanyName(request.getCompanyName());
+        if (request.getCity() != null) prospect.setCity(request.getCity());
+        if (request.getContactFirstName() != null) prospect.setContactFirstName(request.getContactFirstName());
+        if (request.getContactLastName() != null) prospect.setContactLastName(request.getContactLastName());
+        if (request.getDesignation() != null) prospect.setDesignation(request.getDesignation());
+        if (request.getEmail() != null) prospect.setEmail(request.getEmail());
+        if (request.getPhone() != null) prospect.setPhone(request.getPhone());
+        if (request.getReferredBy() != null) prospect.setReferredBy(request.getReferredBy());
+        if (request.getClassificationType() != null) prospect.setClassificationType(request.getClassificationType());
     }
 
     public ProspectResponse toLimitedResponse(Prospect prospect) {

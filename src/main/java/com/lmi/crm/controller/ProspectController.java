@@ -1,6 +1,7 @@
 package com.lmi.crm.controller;
 
 import com.lmi.crm.dto.request.AddProspectRequest;
+import com.lmi.crm.dto.request.UpdateProspectRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.ProspectResponse;
 import com.lmi.crm.enums.ProspectStatus;
@@ -60,6 +61,24 @@ public class ProspectController {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
         ProspectResponse response = prospectService.getProspectDetail(requestingUserId, id);
         return ResponseEntity.ok(ApiResponse.success("Prospect retrieved successfully", response));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<ProspectResponse>> updateProspect(
+            @PathVariable Integer id,
+            @Valid @RequestBody UpdateProspectRequest request) {
+        Integer requestingUserId = SecurityUtils.getCurrentUserId();
+        ProspectResponse response = prospectService.updateProspect(requestingUserId, id, request);
+        return ResponseEntity.ok(ApiResponse.success("Prospect updated successfully", response));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<String>> softDeleteProspect(@PathVariable Integer id) {
+        Integer requestingUserId = SecurityUtils.getCurrentUserId();
+        String result = prospectService.softDeleteProspect(requestingUserId, id);
+        return ResponseEntity.ok(ApiResponse.success(result, null));
     }
 
     @PostMapping("/{id}/extension-request")

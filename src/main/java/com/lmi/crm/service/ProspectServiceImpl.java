@@ -6,6 +6,7 @@ import com.lmi.crm.dao.ProspectLicenseeRepository;
 import com.lmi.crm.dao.ProspectRepository;
 import com.lmi.crm.dao.UserRepository;
 import com.lmi.crm.dto.request.AddProspectRequest;
+import com.lmi.crm.dto.request.UpdateProspectRequest;
 import com.lmi.crm.dto.response.ProspectResponse;
 import com.lmi.crm.entity.Prospect;
 import com.lmi.crm.entity.ProspectLicensee;
@@ -13,6 +14,7 @@ import com.lmi.crm.entity.User;
 import com.lmi.crm.enums.AlertStatus;
 import com.lmi.crm.enums.AlertType;
 import com.lmi.crm.enums.ProspectProgramType;
+import com.lmi.crm.enums.ProtectionStatus;
 import com.lmi.crm.enums.ProspectType;
 import com.lmi.crm.enums.RelatedEntityType;
 import com.lmi.crm.enums.UserRole;
@@ -280,6 +282,93 @@ public class ProspectServiceImpl implements ProspectService {
                     .map(p -> prospectMapper.toLimitedResponse(p))
                     .toList();
         }
+    }
+
+    @Override
+    @Transactional
+    public ProspectResponse updateProspect(Integer requestingUserId, Integer prospectId, UpdateProspectRequest request) {
+
+        // Step 1 — Validate requesting user and prospect
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Prospect prospect = prospectRepository.findById(prospectId)
+                .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
+                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+
+        log.info("PUT /api/prospects/{} — requestingUserId: {}, role: {}", prospectId, requestingUserId, requestingUser.getRole());
+
+        // Step 2 — Role and ownership check
+        if (requestingUser.getRole() == UserRole.ASSOCIATE) {
+            throw new RuntimeException("Access denied: Associates cannot update prospects");
+        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+            if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, requestingUserId)) {
+                throw new RuntimeException("Access denied");
+            }
+        } else if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
+            throw new RuntimeException("Access denied");
+        }
+
+        // Step 3 — Apply standard fields
+        prospectMapper.updateFromRequest(request, prospect);
+
+        // Step 4 — Apply admin-only fields
+        if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
+            if (request.getProtectionStatus() != null) prospect.setProtectionStatus(request.getProtectionStatus());
+            if (request.getProtectionPeriodMonths() != null) prospect.setProtectionPeriodMonths(request.getProtectionPeriodMonths());
+        }
+
+        // Step 5 — Licensee reassignment (Admin/Super Admin only)
+        if (request.getNewLicenseeId() != null
+                && (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN)) {
+            User newLicensee = userRepository.findById(request.getNewLicenseeId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            if (newLicensee.getRole() != UserRole.LICENSEE) {
+                throw new RuntimeException("Target user is not a licensee");
+            }
+            ProspectLicensee existing = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospectId)
+                    .orElse(null);
+            if (existing != null) {
+                existing.setLicenseeId(request.getNewLicenseeId());
+                prospectLicenseeRepository.save(existing);
+            } else {
+                prospectLicenseeRepository.save(prospectMapper.toProspectLicensee(prospectId, request.getNewLicenseeId()));
+            }
+        }
+
+        // Step 6 — Save and return
+        Prospect savedProspect = prospectRepository.save(prospect);
+        Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospectId)
+                .map(ProspectLicensee::getLicenseeId)
+                .orElse(null);
+        log.info("Prospect updated — id: {}, requestedBy: {}", prospectId, requestingUserId);
+        return prospectMapper.toResponse(savedProspect, licenseeId, null);
+    }
+
+    @Override
+    @Transactional
+    public String softDeleteProspect(Integer requestingUserId, Integer prospectId) {
+
+        // Step 1 — Validate
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
+            throw new RuntimeException("Access denied");
+        }
+
+        log.info("DELETE /api/prospects/{} — requestingUserId: {}", prospectId, requestingUserId);
+
+        Prospect prospect = prospectRepository.findById(prospectId)
+                .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
+                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+
+        // Step 2 — Soft delete
+        prospect.setDeletionStatus(true);
+        prospect.setProtectionStatus(ProtectionStatus.UNPROTECTED);
+        prospectRepository.save(prospect);
+        log.info("Prospect soft deleted — id: {}, deletedBy: {}", prospectId, requestingUserId);
+        return "Prospect deleted successfully";
     }
 
     @Override

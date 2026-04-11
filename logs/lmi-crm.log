@@ -1659,3 +1659,39 @@ Consider defining a bean of type 'com.lmi.crm.service.ProspectService' in your c
 2026-04-11 23:31:09 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/6
 2026-04-11 23:31:10 [http-nio-8080-exec-5] INFO  c.l.crm.service.ProspectServiceImpl - GET /api/prospects/6 — requestingUserId: 1, role: SUPER_ADMIN
 2026-04-11 23:31:10 [http-nio-8080-exec-5] INFO  c.l.crm.service.ProspectServiceImpl - GET /api/prospects/6 — returned for userId: 1
+2026-04-11 23:50:02 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 18.0.2 with PID 21244 (C:\Users\nagpa\Desktop\crm\target\classes started by nagpa in C:\Users\nagpa\Desktop\crm)
+2026-04-11 23:50:02 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-04-11 23:50:02 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-04-11 23:50:06 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-11 23:50:06 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-11 23:50:06 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-11 23:50:15 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-04-11 23:50:17 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-11 23:50:17 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 15.997 seconds (process running for 17.047)
+2026-04-11 23:50:17 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-04-11 23:50:17 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-04-11 23:52:26 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-11 23:52:26 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/4
+2026-04-11 23:52:26 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-11 23:52:26 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-11 23:52:26 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/4
+2026-04-11 23:52:27 [http-nio-8080-exec-2] INFO  c.l.crm.service.ProspectServiceImpl - PUT /api/prospects/4 — requestingUserId: 1, role: SUPER_ADMIN
+2026-04-11 23:52:27 [http-nio-8080-exec-2] INFO  c.l.crm.service.ProspectServiceImpl - Prospect updated — id: 4, requestedBy: 1
+2026-04-11 23:52:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/4
+2026-04-11 23:52:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-11 23:52:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-11 23:52:53 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/4
+2026-04-11 23:52:53 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - PUT /api/prospects/4 — requestingUserId: 1, role: SUPER_ADMIN
+2026-04-11 23:52:53 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - Prospect updated — id: 4, requestedBy: 1
+2026-04-11 23:53:10 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/4
+2026-04-11 23:53:10 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-11 23:53:10 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-11 23:53:10 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/4
+2026-04-11 23:53:10 [http-nio-8080-exec-4] INFO  c.l.crm.service.ProspectServiceImpl - PUT /api/prospects/4 — requestingUserId: 1, role: SUPER_ADMIN
+2026-04-11 23:53:11 [http-nio-8080-exec-4] INFO  c.l.crm.service.ProspectServiceImpl - Prospect updated — id: 4, requestedBy: 1
+2026-04-11 23:53:56 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — DELETE /api/prospects/5
+2026-04-11 23:53:56 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-11 23:53:56 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-11 23:53:57 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — DELETE /api/prospects/5
+2026-04-11 23:53:57 [http-nio-8080-exec-7] INFO  c.l.crm.service.ProspectServiceImpl - DELETE /api/prospects/5 — requestingUserId: 1
+2026-04-11 23:53:57 [http-nio-8080-exec-7] INFO  c.l.crm.service.ProspectServiceImpl - Prospect soft deleted — id: 5, deletedBy: 1

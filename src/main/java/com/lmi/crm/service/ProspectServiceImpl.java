@@ -281,4 +281,46 @@ public class ProspectServiceImpl implements ProspectService {
                     .toList();
         }
     }
+
+    @Override
+    public ProspectResponse getProspectDetail(Integer requestingUserId, Integer prospectId) {
+
+        // Step 1 — Validate requesting user and prospect
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Prospect prospect = prospectRepository.findById(prospectId)
+                .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
+                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+
+        log.info("GET /api/prospects/{} — requestingUserId: {}, role: {}", prospectId, requestingUserId, requestingUser.getRole());
+
+        // Step 2 — Ownership check for non-admin roles
+        if (requestingUser.getRole() == UserRole.ASSOCIATE) {
+            if (!requestingUserId.equals(prospect.getAssociateId())) {
+                throw new RuntimeException("Access denied");
+            }
+        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+            if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, requestingUserId)) {
+                throw new RuntimeException("Access denied");
+            }
+        } else if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
+            throw new RuntimeException("Access denied");
+        }
+
+        // Step 3 — Return response based on role
+        ProspectResponse response;
+        if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
+            Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospectId)
+                    .map(ProspectLicensee::getLicenseeId)
+                    .orElse(null);
+            response = prospectMapper.toResponse(prospect, licenseeId, null);
+        } else {
+            response = prospectMapper.toLimitedResponse(prospect);
+        }
+
+        log.info("GET /api/prospects/{} — returned for userId: {}", prospectId, requestingUserId);
+
+        return response;
+    }
 }

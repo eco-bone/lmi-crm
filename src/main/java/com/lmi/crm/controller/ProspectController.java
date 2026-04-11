@@ -54,6 +54,14 @@ public class ProspectController {
         return ResponseEntity.ok(ApiResponse.success(message, response));
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<ProspectResponse>> getProspectDetail(@PathVariable Integer id) {
+        Integer requestingUserId = SecurityUtils.getCurrentUserId();
+        ProspectResponse response = prospectService.getProspectDetail(requestingUserId, id);
+        return ResponseEntity.ok(ApiResponse.success("Prospect retrieved successfully", response));
+    }
+
     @PostMapping("/{id}/extension-request")
     @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE')")
     public ResponseEntity<ApiResponse<String>> requestProtectionExtension(

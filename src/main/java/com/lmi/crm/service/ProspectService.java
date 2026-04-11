@@ -14,4 +14,6 @@ public interface ProspectService {
 
     List<ProspectResponse> getProspects(Integer requestingUserId, ProspectType typeFilter,
                                         Integer licenseeIdFilter, Integer associateIdFilter);
+
+    ProspectResponse getProspectDetail(Integer requestingUserId, Integer prospectId);
 }

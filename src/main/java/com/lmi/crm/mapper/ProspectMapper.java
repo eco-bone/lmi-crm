@@ -8,7 +8,6 @@ import com.lmi.crm.entity.ProspectLicensee;
 import com.lmi.crm.enums.ProspectProgramType;
 import com.lmi.crm.enums.ProspectStatus;
 import com.lmi.crm.enums.ProspectType;
-import com.lmi.crm.enums.ProtectionStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -41,8 +40,7 @@ public class ProspectMapper {
                 .programType(request.getProgramType())
                 .type(ProspectType.PROSPECT)
                 .associateId(associateId)
-                .protectionStatus(ProtectionStatus.PROTECTED)
-                .status(isProvisional ? ProspectStatus.PROVISIONAL : ProspectStatus.NORMAL)
+                .status(isProvisional ? ProspectStatus.PROVISIONAL : ProspectStatus.PROTECTED)
                 .entryDate(LocalDate.now())
                 .deletionStatus(false)
                 .createdBy(requestingUserId)
@@ -80,8 +78,7 @@ public class ProspectMapper {
         response.setContactLastName(prospect.getContactLastName());
         response.setDesignation(prospect.getDesignation());
         response.setType(prospect.getType());
-        response.setProtectionStatus(prospect.getProtectionStatus());
-        response.setProspectStatus(prospect.getStatus());
+        response.setStatus(prospect.getStatus());
         return response;
     }
 
@@ -99,8 +96,7 @@ public class ProspectMapper {
         response.setClassificationType(prospect.getClassificationType());
         response.setProgramType(prospect.getProgramType());
         response.setType(prospect.getType());
-        response.setProtectionStatus(prospect.getProtectionStatus());
-        response.setProspectStatus(prospect.getStatus());
+        response.setStatus(prospect.getStatus());
         response.setProtectionPeriodMonths(prospect.getProtectionPeriodMonths());
         response.setEntryDate(prospect.getEntryDate());
         response.setAssociateId(prospect.getAssociateId());

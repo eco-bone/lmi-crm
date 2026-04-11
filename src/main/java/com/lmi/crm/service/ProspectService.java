@@ -5,6 +5,7 @@ import com.lmi.crm.dto.request.UpdateProspectRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.ProspectResponse;
 import com.lmi.crm.enums.ProspectType;
+import com.lmi.crm.enums.ProvisionalDecision;
 
 import java.util.List;
 
@@ -26,4 +27,6 @@ public interface ProspectService {
     String requestConversion(Integer requestingUserId, Integer prospectId);
 
     ApiResponse<ProspectResponse> approveRejectConversion(Integer requestingUserId, Integer alertId, boolean approve);
+
+    ApiResponse<ProspectResponse> approveRejectProvisional(Integer requestingUserId, Integer alertId, ProvisionalDecision decision);
 }

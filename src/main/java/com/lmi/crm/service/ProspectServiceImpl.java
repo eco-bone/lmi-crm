@@ -16,8 +16,9 @@ import com.lmi.crm.entity.User;
 import com.lmi.crm.enums.AlertStatus;
 import com.lmi.crm.enums.AlertType;
 import com.lmi.crm.enums.ProspectProgramType;
-import com.lmi.crm.enums.ProtectionStatus;
+import com.lmi.crm.enums.ProspectStatus;
 import com.lmi.crm.enums.ProspectType;
+import com.lmi.crm.enums.ProvisionalDecision;
 import com.lmi.crm.enums.RelatedEntityType;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.mapper.ProspectMapper;
@@ -316,7 +317,7 @@ public class ProspectServiceImpl implements ProspectService {
 
         // Step 4 — Apply admin-only fields
         if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
-            if (request.getProtectionStatus() != null) prospect.setProtectionStatus(request.getProtectionStatus());
+            if (request.getStatus() != null) prospect.setStatus(request.getStatus());
             if (request.getProtectionPeriodMonths() != null) prospect.setProtectionPeriodMonths(request.getProtectionPeriodMonths());
         }
 
@@ -367,7 +368,7 @@ public class ProspectServiceImpl implements ProspectService {
 
         // Step 2 — Soft delete
         prospect.setDeletionStatus(true);
-        prospect.setProtectionStatus(ProtectionStatus.UNPROTECTED);
+        prospect.setStatus(ProspectStatus.UNPROTECTED);
         prospectRepository.save(prospect);
         log.info("Prospect soft deleted — id: {}, deletedBy: {}", prospectId, requestingUserId);
         return "Prospect deleted successfully";
@@ -522,5 +523,70 @@ public class ProspectServiceImpl implements ProspectService {
 
         log.info("Conversion approved — prospectId: {}, approvedBy: {}", prospect.getId(), requestingUserId);
         return ApiResponse.success("Prospect converted to client successfully", prospectMapper.toResponse(prospect, licenseeId, null));
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<ProspectResponse> approveRejectProvisional(Integer requestingUserId, Integer alertId, ProvisionalDecision decision) {
+
+        // Step 1 — Validate requesting user
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
+            throw new RuntimeException("Access denied");
+        }
+
+        log.info("PUT /api/prospects/provisional/{} — requestingUserId: {}, decision: {}", alertId, requestingUserId, decision);
+
+        // Step 2 — Validate alert
+        Alert alert = alertRepository.findById(alertId)
+                .orElseThrow(() -> new RuntimeException("Alert not found"));
+
+        if (alert.getAlertType() != AlertType.DUPLICATE_PROSPECT) {
+            throw new RuntimeException("Alert is not a provisional prospect alert");
+        }
+        if (alert.getStatus() != AlertStatus.PENDING) {
+            throw new RuntimeException("Alert is no longer pending");
+        }
+
+        // Step 3 — Fetch prospect
+        Prospect prospect = prospectRepository.findById(alert.getRelatedEntityId())
+                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+
+        if (prospect.getStatus() != ProspectStatus.PROVISIONAL) {
+            throw new RuntimeException("Prospect is not provisional");
+        }
+
+        // Step 4 — Apply decision
+        if (decision == ProvisionalDecision.APPROVE) {
+            prospect.setStatus(ProspectStatus.PROTECTED);
+            prospectRepository.save(prospect);
+            alert.setStatus(AlertStatus.RESOLVED);
+            alertRepository.save(alert);
+            log.info("Provisional prospect approved — prospectId: {}, approvedBy: {}", prospect.getId(), requestingUserId);
+            Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospect.getId())
+                    .map(ProspectLicensee::getLicenseeId)
+                    .orElse(null);
+            return ApiResponse.success("Provisional prospect approved successfully", prospectMapper.toResponse(prospect, licenseeId, null));
+
+        } else if (decision == ProvisionalDecision.REJECT) {
+            prospect.setDeletionStatus(true);
+            prospect.setStatus(ProspectStatus.UNPROTECTED);
+            prospectRepository.save(prospect);
+            alert.setStatus(AlertStatus.REJECTED);
+            alertRepository.save(alert);
+            log.info("Provisional prospect rejected — prospectId: {}, rejectedBy: {}", prospect.getId(), requestingUserId);
+            return ApiResponse.rejected("Provisional prospect rejected and removed");
+
+        } else {
+            alert.setStatus(AlertStatus.RESOLVED);
+            alertRepository.save(alert);
+            log.info("Provisional prospect ignored — prospectId: {}, ignoredBy: {}", prospect.getId(), requestingUserId);
+            Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospect.getId())
+                    .map(ProspectLicensee::getLicenseeId)
+                    .orElse(null);
+            return ApiResponse.success("Provisional prospect left as-is", prospectMapper.toResponse(prospect, licenseeId, null));
+        }
     }
 }

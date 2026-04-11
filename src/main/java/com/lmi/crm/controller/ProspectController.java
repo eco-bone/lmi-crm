@@ -6,6 +6,7 @@ import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.ProspectResponse;
 import com.lmi.crm.enums.ProspectStatus;
 import com.lmi.crm.enums.ProspectType;
+import com.lmi.crm.enums.ProvisionalDecision;
 import com.lmi.crm.service.ProspectService;
 import com.lmi.crm.util.SecurityUtils;
 import jakarta.validation.Valid;
@@ -47,7 +48,7 @@ public class ProspectController {
         ProspectResponse response = prospectService.addProspect(request, requestingUserId);
         log.info("POST /api/prospects — created prospectId: {} — requestingUserId: {}", response.getId(), requestingUserId);
         String message;
-        if (response.getProspectStatus() == ProspectStatus.PROVISIONAL) {
+        if (response.getStatus() == ProspectStatus.PROVISIONAL) {
             message = "Prospect has been flagged as provisional and is awaiting admin approval before further actions can be taken. Reason: " + response.getProvisionReason();
         } else {
             message = "Prospect created successfully";
@@ -87,6 +88,15 @@ public class ProspectController {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
         String result = prospectService.requestConversion(requestingUserId, id);
         return ResponseEntity.ok(ApiResponse.success(result, null));
+    }
+
+    @PutMapping("/provisional/{alertId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<ProspectResponse>> approveRejectProvisional(
+            @PathVariable Integer alertId,
+            @RequestParam ProvisionalDecision decision) {
+        Integer requestingUserId = SecurityUtils.getCurrentUserId();
+        return ResponseEntity.ok(prospectService.approveRejectProvisional(requestingUserId, alertId, decision));
     }
 
     @PutMapping("/conversions/{alertId}")

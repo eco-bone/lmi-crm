@@ -4,7 +4,6 @@ import com.lmi.crm.enums.ClassificationType;
 import com.lmi.crm.enums.ProspectProgramType;
 import com.lmi.crm.enums.ProspectStatus;
 import com.lmi.crm.enums.ProspectType;
-import com.lmi.crm.enums.ProtectionStatus;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -25,8 +24,7 @@ public class ProspectResponse {
     private ClassificationType classificationType;
     private ProspectProgramType programType;
     private ProspectType type;
-    private ProtectionStatus protectionStatus;
-    private ProspectStatus prospectStatus;
+    private ProspectStatus status;
     private Integer protectionPeriodMonths;
     private LocalDate entryDate;
     private Integer associateId;

@@ -1,7 +1,7 @@
 package com.lmi.crm.dto.request;
 
 import com.lmi.crm.enums.ClassificationType;
-import com.lmi.crm.enums.ProtectionStatus;
+import com.lmi.crm.enums.ProspectStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -32,7 +32,7 @@ public class UpdateProspectRequest {
 
     private ClassificationType classificationType;
 
-    private ProtectionStatus protectionStatus;
+    private ProspectStatus status;
 
     private Integer protectionPeriodMonths;
 

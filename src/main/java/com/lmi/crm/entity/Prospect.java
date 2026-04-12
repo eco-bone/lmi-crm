@@ -2,8 +2,8 @@ package com.lmi.crm.entity;
 
 import com.lmi.crm.enums.ClassificationType;
 import com.lmi.crm.enums.ProspectProgramType;
+import com.lmi.crm.enums.ProspectStatus;
 import com.lmi.crm.enums.ProspectType;
-import com.lmi.crm.enums.ProtectionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Table(name = "prospects", indexes = {
         @Index(columnList = "company_name, city"),
         @Index(columnList = "associate_id"),
-        @Index(columnList = "protection_status"),
+        @Index(columnList = "status"),
         @Index(columnList = "type"),
         @Index(columnList = "created_at")
 })
@@ -72,8 +72,8 @@ public class Prospect {
     private LocalDate entryDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "protection_status")
-    private ProtectionStatus protectionStatus;
+    @Column(name = "status")
+    private ProspectStatus status;
 
     @Column(name = "protection_period_months")
     private Integer protectionPeriodMonths;

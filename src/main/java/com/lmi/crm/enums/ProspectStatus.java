@@ -1,6 +1,7 @@
 package com.lmi.crm.enums;
 
 public enum ProspectStatus {
-    NORMAL,
+    PROTECTED,
+    UNPROTECTED,
     PROVISIONAL
 }

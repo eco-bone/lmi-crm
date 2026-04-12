@@ -26,6 +26,7 @@ import com.lmi.crm.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +58,9 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Value("${app.base-url}")
@@ -79,6 +83,9 @@ public class UserServiceImpl implements UserService {
         String tempPassword = "Temp-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         User user = userMapper.fromAddLicenseeRequest(request, tempPassword);
+        String invitationToken = UUID.randomUUID().toString();
+        user.setStatus(UserStatus.PENDING);
+        user.setInvitationToken(invitationToken);
         user = userRepository.save(user);
         final Integer userId = user.getId();
 
@@ -92,8 +99,8 @@ public class UserServiceImpl implements UserService {
 
         List<LicenseeCity> savedCities = licenseeCityRepository.saveAll(cities);
 
-        // TODO: replace with real invitation token when auth is built
-        String inviteLink = baseUrl + "/register?token=PENDING";
+        // TODO: replace with frontend URL when frontend is set up: baseUrl + "/setup-account?token=" + invitationToken
+        String inviteLink = baseUrl + "/api/auth/setup/password?token=" + invitationToken;
         notificationService.sendInviteEmail(user.getEmail(), inviteLink, tempPassword);
 
         log.info("Licensee created — id: {}, email: {}, createdBy: {}", userId, user.getEmail(), requestingUserId);
@@ -116,10 +123,14 @@ public class UserServiceImpl implements UserService {
 
         User user = userMapper.forAdmin(request.getFirstName(), request.getLastName(),
                 request.getEmail(), request.getPhone(), tempPassword);
+        String invitationToken = UUID.randomUUID().toString();
+        user.setStatus(UserStatus.PENDING);
+        user.setInvitationToken(invitationToken);
         User savedUser = userRepository.save(user);
 
-        // TODO: replace with real invitation token when auth is built
-        notificationService.sendInviteEmail(savedUser.getEmail(), baseUrl + "/register?token=PENDING", tempPassword);
+        // TODO: replace with frontend URL when frontend is set up: baseUrl + "/setup-account?token=" + invitationToken
+        String inviteLink = baseUrl + "/api/auth/setup/password?token=" + invitationToken;
+        notificationService.sendInviteEmail(savedUser.getEmail(), inviteLink, tempPassword);
 
         log.info("Admin created — id: {}, email: {}, createdBy: {}", savedUser.getId(), savedUser.getEmail(), requestingSuperAdminId);
 
@@ -202,13 +213,16 @@ public class UserServiceImpl implements UserService {
                 tempPassword,
                 alert.getRelatedEntityId()
         );
+        String invitationToken = UUID.randomUUID().toString();
+        associate.setStatus(UserStatus.PENDING);
+        associate.setInvitationToken(invitationToken);
         associate = userRepository.save(associate);
 
         alert.setStatus(AlertStatus.RESOLVED);
         alertRepository.save(alert);
 
-        // TODO: replace with real invitation token when auth is built
-        String inviteLink = baseUrl + "/register?token=PENDING";
+        // TODO: replace with frontend URL when frontend is set up: baseUrl + "/setup-account?token=" + invitationToken
+        String inviteLink = baseUrl + "/api/auth/setup/password?token=" + invitationToken;
         notificationService.sendInviteEmail(associate.getEmail(), inviteLink, tempPassword);
 
         log.info("Associate created — id: {}, email: {}, licenseeId: {}, approvedBy: {}",
@@ -425,18 +439,17 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Access denied");
 
         if (isSelf) {
-            if (!request.getCurrentPassword().equals(targetUser.getPassword()))
+            if (!passwordEncoder.matches(request.getCurrentPassword(), targetUser.getPassword()))
                 throw new RuntimeException("Current password is incorrect");
         }
 
-        if (request.getNewPassword().equals(targetUser.getPassword()))
+        if (passwordEncoder.matches(request.getNewPassword(), targetUser.getPassword()))
             throw new RuntimeException("New password cannot be same as current password");
 
         if (!request.getNewPassword().equals(request.getConfirmPassword()))
             throw new RuntimeException("Passwords do not match");
 
-        // TODO: hash password with BCrypt when auth is built
-        targetUser.setPassword(request.getNewPassword());
+        targetUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(targetUser);
 
         log.info("Password reset — targetId: {}, requestedBy: {}", targetUserId, requestingUserId);

@@ -14,5 +14,7 @@ public interface NotificationService {
 
     void sendOtpEmail(String toEmail, String otp);
 
+    void sendOtpSms(String phone, String otp);
+
     void sendUserDeactivatedEmail(String toEmail, String deactivatedUserName, String deactivatedUserRole);
 }

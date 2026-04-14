@@ -11,9 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "groups", indexes = {
-        @Index(columnList = "licensee_id")
-})
+@Table(name = "groups")
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class Group {
 

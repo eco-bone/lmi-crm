@@ -1,152 +1,274 @@
-2026-04-12 00:04:35 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 18.0.2 with PID 9892 (C:\Users\nagpa\Desktop\crm\target\classes started by nagpa in C:\Users\nagpa\Desktop\crm)
-2026-04-12 00:04:35 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
-2026-04-12 00:04:35 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
-2026-04-12 00:04:37 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-04-12 00:04:37 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-04-12 00:04:37 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
-2026-04-12 00:04:45 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
-2026-04-12 00:04:47 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
-2026-04-12 00:04:47 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 12.241 seconds (process running for 12.777)
-2026-04-12 00:04:47 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
-2026-04-12 00:04:47 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
-2026-04-12 00:06:04 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-04-12 00:06:04 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
-2026-04-12 00:06:04 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
-2026-04-12 00:06:04 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
-2026-04-12 00:06:04 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
-2026-04-12 00:06:04 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 2, role: LICENSEE, status: ACTIVE
-2026-04-12 00:06:05 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 2, role: LICENSEE, expiresAt: Mon Apr 13 00:06:05 IST 2026
-2026-04-12 00:06:05 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 2, role: LICENSEE
-2026-04-12 00:06:05 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 2, role: LICENSEE
-2026-04-12 00:06:24 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/prospects/4/convert
-2026-04-12 00:06:24 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-04-12 00:06:24 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
-2026-04-12 00:06:24 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — POST /api/prospects/4/convert
-2026-04-12 00:06:24 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - POST /api/prospects/4/convert — requestingUserId: 2
-2026-04-12 00:06:25 [http-nio-8080-exec-3] DEBUG c.lmi.crm.service.AlertServiceImpl - createAlert — type: PROSPECT_CONVERSION_REQUEST, relatedEntityType: PROSPECT, relatedEntityId: 4, triggeredBy: 2, actionRequired: true
-2026-04-12 00:06:25 [http-nio-8080-exec-3] INFO  c.lmi.crm.service.AlertServiceImpl - createAlert — saved — alertId: 11, type: PROSPECT_CONVERSION_REQUEST, title: Conversion Request — Tata Consultancy Services, triggeredBy: 2
-2026-04-12 00:06:25 [http-nio-8080-exec-3] DEBUG c.lmi.crm.service.AlertServiceImpl - createAlert — dispatching admin email notification — alertId: 11
-2026-04-12 00:06:25 [http-nio-8080-exec-3] INFO  c.l.c.s.NotificationServiceImpl - Sending admin alert email — subject: Conversion Request — Tata Consultancy Services
-2026-04-12 00:06:25 [http-nio-8080-exec-3] INFO  c.l.c.s.NotificationServiceImpl - EMAIL START → to: 3ad660f15e4e36, subject: New Alert: Conversion Request — Tata Consultancy Services
-2026-04-12 00:06:30 [http-nio-8080-exec-3] INFO  c.l.c.s.NotificationServiceImpl - EMAIL SUCCESS → took 4962 ms
-2026-04-12 00:06:30 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - Conversion requested — prospectId: 4, requestedBy: 2
-2026-04-12 00:06:53 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/prospects/4/convert
-2026-04-12 00:06:53 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-04-12 00:06:53 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
-2026-04-12 00:06:53 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — POST /api/prospects/4/convert
-2026-04-12 00:06:54 [http-nio-8080-exec-6] INFO  c.l.crm.service.ProspectServiceImpl - POST /api/prospects/4/convert — requestingUserId: 2
-2026-04-12 00:06:54 [http-nio-8080-exec-6] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: A conversion request for this prospect is already pending
-2026-04-12 00:06:54 [http-nio-8080-exec-6] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [java.lang.RuntimeException: A conversion request for this prospect is already pending]
-2026-04-12 00:07:48 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/conversions/11
-2026-04-12 00:07:48 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-04-12 00:07:48 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-04-12 00:07:49 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/conversions/11
-2026-04-12 00:07:49 [http-nio-8080-exec-4] INFO  c.l.crm.service.ProspectServiceImpl - PUT /api/prospects/conversions/11 — requestingUserId: 1, approve: true
-2026-04-12 00:07:50 [http-nio-8080-exec-4] INFO  c.l.crm.service.ProspectServiceImpl - Conversion approved — prospectId: 4, approvedBy: 1
-2026-04-12 00:16:16 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 18.0.2 with PID 16428 (C:\Users\nagpa\Desktop\crm\target\classes started by nagpa in C:\Users\nagpa\Desktop\crm)
-2026-04-12 00:16:16 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
-2026-04-12 00:16:16 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
-2026-04-12 00:16:19 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-04-12 00:16:19 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-04-12 00:16:19 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
-2026-04-12 00:16:27 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
-2026-04-12 00:16:29 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
-2026-04-12 00:16:29 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 13.502 seconds (process running for 14.054)
-2026-04-12 00:16:29 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
-2026-04-12 00:16:29 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
-2026-04-12 00:19:43 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-04-12 00:19:43 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/provisional/6
-2026-04-12 00:19:43 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-04-12 00:19:43 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-04-12 00:19:44 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/provisional/6
-2026-04-12 00:19:44 [http-nio-8080-exec-1] INFO  c.l.crm.service.ProspectServiceImpl - PUT /api/prospects/provisional/6 — requestingUserId: 1, decision: APPROVE
-2026-04-12 00:19:44 [http-nio-8080-exec-1] INFO  c.l.crm.service.ProspectServiceImpl - Provisional prospect approved — prospectId: 5, approvedBy: 1
-2026-04-12 00:20:06 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/provisional/7
-2026-04-12 00:20:06 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-04-12 00:20:06 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-04-12 00:20:06 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/provisional/7
-2026-04-12 00:20:06 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - PUT /api/prospects/provisional/7 — requestingUserId: 1, decision: REJECT
-2026-04-12 00:20:07 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - Provisional prospect rejected — prospectId: 6, rejectedBy: 1
-2026-04-12 00:29:08 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 18.0.2 with PID 28876 (C:\Users\nagpa\Desktop\crm\target\classes started by nagpa in C:\Users\nagpa\Desktop\crm)
-2026-04-12 00:29:08 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
-2026-04-12 00:29:08 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
-2026-04-12 00:29:14 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-04-12 00:29:14 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-04-12 00:29:14 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
-2026-04-12 00:29:30 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
-2026-04-12 00:29:35 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
-2026-04-12 00:29:35 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 27.615 seconds (process running for 28.893)
-2026-04-12 00:29:35 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
-2026-04-12 00:29:35 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
-2026-04-12 00:29:38 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-04-12 00:29:38 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/prospects
-2026-04-12 00:29:39 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-04-12 00:29:39 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
-2026-04-12 00:29:39 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — POST /api/prospects
-2026-04-12 00:29:40 [http-nio-8080-exec-1] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.lmi.crm.dto.response.ApiResponse<com.lmi.crm.dto.response.ProspectResponse>> com.lmi.crm.controller.ProspectController.addProspect(com.lmi.crm.dto.request.AddProspectRequest) with 4 errors: [Field error in object 'addProspectRequest' on field 'phone': rejected value [null]; codes [NotBlank.addProspectRequest.phone,NotBlank.phone,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [addProspectRequest.phone,phone]; arguments []; default message [phone]]; default message [must not be blank]] [Field error in object 'addProspectRequest' on field 'referredBy': rejected value [null]; codes [NotBlank.addProspectRequest.referredBy,NotBlank.referredBy,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [addProspectRequest.referredBy,referredBy]; arguments []; default message [referredBy]]; default message [must not be blank]] [Field error in object 'addProspectRequest' on field 'classificationType': rejected value [null]; codes [NotNull.addProspectRequest.classificationType,NotNull.classificationType,NotNull.com.lmi.crm.enums.ClassificationType,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [addProspectRequest.classificationType,classificationType]; arguments []; default message [classificationType]]; default message [must not be null]] [Field error in object 'addProspectRequest' on field 'email': rejected value [null]; codes [NotBlank.addProspectRequest.email,NotBlank.email,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [addProspectRequest.email,email]; arguments []; default message [email]]; default message [must not be blank]] ]
-2026-04-12 00:30:16 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/index.html
-2026-04-12 00:30:16 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/index.html
-2026-04-12 00:30:16 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/swagger-initializer.js
-2026-04-12 00:30:16 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/swagger-initializer.js
-2026-04-12 00:30:17 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /v3/api-docs/swagger-config
-2026-04-12 00:30:17 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /v3/api-docs/swagger-config
-2026-04-12 00:30:17 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /v3/api-docs
-2026-04-12 00:30:17 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /v3/api-docs
-2026-04-12 00:30:18 [http-nio-8080-exec-6] INFO  o.s.api.AbstractOpenApiResource - Init duration for springdoc-openapi is: 1399 ms
-2026-04-12 00:31:12 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/prospects
-2026-04-12 00:31:12 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-04-12 00:31:12 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
-2026-04-12 00:31:12 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — POST /api/prospects
-2026-04-12 00:31:12 [http-nio-8080-exec-10] INFO  c.l.c.controller.ProspectController - POST /api/prospects — requestingUserId: 2, company: TechNova Solutions Pvt Ltd
-2026-04-12 00:31:14 [http-nio-8080-exec-10] INFO  c.l.crm.service.ProspectServiceImpl - Prospect created — id: 8, company: TechNova Solutions Pvt Ltd, licenseeId: 2, associateId: null, provisional: false
-2026-04-12 00:31:14 [http-nio-8080-exec-10] INFO  c.l.c.controller.ProspectController - POST /api/prospects — created prospectId: 8 — requestingUserId: 2
-2026-04-12 00:31:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/prospects
-2026-04-12 00:31:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-04-12 00:31:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
-2026-04-12 00:31:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — POST /api/prospects
-2026-04-12 00:31:31 [http-nio-8080-exec-2] INFO  c.l.c.controller.ProspectController - POST /api/prospects — requestingUserId: 2, company: TechNova
-2026-04-12 00:31:31 [http-nio-8080-exec-2] DEBUG c.l.crm.service.ProspectServiceImpl - Fuzzy match score for 'TechNova' vs 'TechNova Solutions Pvt Ltd': 0.3076923076923077
-2026-04-12 00:31:32 [http-nio-8080-exec-2] INFO  c.l.crm.service.ProspectServiceImpl - Prospect created — id: 9, company: TechNova, licenseeId: 2, associateId: null, provisional: false
-2026-04-12 00:31:32 [http-nio-8080-exec-2] INFO  c.l.c.controller.ProspectController - POST /api/prospects — created prospectId: 9 — requestingUserId: 2
-2026-04-12 00:31:46 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/prospects
-2026-04-12 00:31:46 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-04-12 00:31:46 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
-2026-04-12 00:31:47 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — POST /api/prospects
-2026-04-12 00:31:47 [http-nio-8080-exec-1] INFO  c.l.c.controller.ProspectController - POST /api/prospects — requestingUserId: 2, company: TechNo
-2026-04-12 00:31:48 [http-nio-8080-exec-1] DEBUG c.l.crm.service.ProspectServiceImpl - Fuzzy match score for 'TechNo' vs 'TechNova Solutions Pvt Ltd': 0.23076923076923073
-2026-04-12 00:31:48 [http-nio-8080-exec-1] DEBUG c.l.crm.service.ProspectServiceImpl - Fuzzy match score for 'TechNo' vs 'TechNova': 0.75
-2026-04-12 00:31:48 [http-nio-8080-exec-1] WARN  c.l.crm.service.ProspectServiceImpl - Prospect flagged as provisional — company: TechNo, reasons: Company name similar to existing prospect: TechNova
-2026-04-12 00:31:48 [http-nio-8080-exec-1] WARN  org.hibernate.orm.jdbc.error - HHH000247: ErrorCode: 0, SQLState: 23505
-2026-04-12 00:31:48 [http-nio-8080-exec-1] WARN  org.hibernate.orm.jdbc.error - ERROR: duplicate key value violates unique constraint "ukk05o3w7gnbgocksmpi45ojq32"
-  Detail: Key (email)=(jhewbf.mehta@technova.com) already exists.
-2026-04-12 00:31:48 [http-nio-8080-exec-1] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: could not execute statement [ERROR: duplicate key value violates unique constraint "ukk05o3w7gnbgocksmpi45ojq32"
-  Detail: Key (email)=(jhewbf.mehta@technova.com) already exists.] [insert into prospects (associate_id,city,classification_type,company_name,contact_first_name,contact_last_name,created_at,created_by,deletion_status,designation,email,entry_date,first_meeting_date,last_meeting_date,phone,program_type,protection_period_months,referred_by,status,type,updated_at) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)]; SQL [insert into prospects (associate_id,city,classification_type,company_name,contact_first_name,contact_last_name,created_at,created_by,deletion_status,designation,email,entry_date,first_meeting_date,last_meeting_date,phone,program_type,protection_period_months,referred_by,status,type,updated_at) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)]; constraint [ukk05o3w7gnbgocksmpi45ojq32]
-2026-04-12 00:31:48 [http-nio-8080-exec-1] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [org.springframework.dao.DataIntegrityViolationException: could not execute statement [ERROR: duplicate key value violates unique constraint "ukk05o3w7gnbgocksmpi45ojq32"<EOL>  Detail: Key (email)=(jhewbf.mehta@technova.com) already exists.] [insert into prospects (associate_id,city,classification_type,company_name,contact_first_name,contact_last_name,created_at,created_by,deletion_status,designation,email,entry_date,first_meeting_date,last_meeting_date,phone,program_type,protection_period_months,referred_by,status,type,updated_at) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)]; SQL [insert into prospects (associate_id,city,classification_type,company_name,contact_first_name,contact_last_name,created_at,created_by,deletion_status,designation,email,entry_date,first_meeting_date,last_meeting_date,phone,program_type,protection_period_months,referred_by,status,type,updated_at) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)]; constraint [ukk05o3w7gnbgocksmpi45ojq32]]
-2026-04-12 00:32:04 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/prospects
-2026-04-12 00:32:04 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-04-12 00:32:04 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
-2026-04-12 00:32:04 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — POST /api/prospects
-2026-04-12 00:32:04 [http-nio-8080-exec-3] INFO  c.l.c.controller.ProspectController - POST /api/prospects — requestingUserId: 2, company: TechNo
-2026-04-12 00:32:05 [http-nio-8080-exec-3] DEBUG c.l.crm.service.ProspectServiceImpl - Fuzzy match score for 'TechNo' vs 'TechNova Solutions Pvt Ltd': 0.23076923076923073
-2026-04-12 00:32:05 [http-nio-8080-exec-3] DEBUG c.l.crm.service.ProspectServiceImpl - Fuzzy match score for 'TechNo' vs 'TechNova': 0.75
-2026-04-12 00:32:05 [http-nio-8080-exec-3] WARN  c.l.crm.service.ProspectServiceImpl - Prospect flagged as provisional — company: TechNo, reasons: Company name similar to existing prospect: TechNova
-2026-04-12 00:32:05 [http-nio-8080-exec-3] DEBUG c.lmi.crm.service.AlertServiceImpl - createAlert — type: DUPLICATE_PROSPECT, relatedEntityType: PROSPECT, relatedEntityId: 11, triggeredBy: 2, actionRequired: true
-2026-04-12 00:32:06 [http-nio-8080-exec-3] INFO  c.lmi.crm.service.AlertServiceImpl - createAlert — saved — alertId: 12, type: DUPLICATE_PROSPECT, title: Provisional Prospect — TechNo, triggeredBy: 2
-2026-04-12 00:32:06 [http-nio-8080-exec-3] DEBUG c.lmi.crm.service.AlertServiceImpl - createAlert — dispatching admin email notification — alertId: 12
-2026-04-12 00:32:06 [http-nio-8080-exec-3] INFO  c.l.c.s.NotificationServiceImpl - Sending admin alert email — subject: Provisional Prospect — TechNo
-2026-04-12 00:32:06 [http-nio-8080-exec-3] INFO  c.l.c.s.NotificationServiceImpl - EMAIL START → to: 3ad660f15e4e36, subject: New Alert: Provisional Prospect — TechNo
-2026-04-12 00:32:10 [http-nio-8080-exec-3] INFO  c.l.c.s.NotificationServiceImpl - EMAIL SUCCESS → took 4665 ms
-2026-04-12 00:32:10 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - Prospect created — id: 11, company: TechNo, licenseeId: 2, associateId: null, provisional: true
-2026-04-12 00:32:10 [http-nio-8080-exec-3] INFO  c.l.c.controller.ProspectController - POST /api/prospects — created prospectId: 11 — requestingUserId: 2
-2026-04-12 00:32:49 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/provisional/12
-2026-04-12 00:32:49 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-04-12 00:32:49 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-04-12 00:32:49 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/provisional/12
-2026-04-12 00:32:49 [http-nio-8080-exec-5] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: Method parameter 'decision': Failed to convert value of type 'java.lang.String' to required type 'com.lmi.crm.enums.ProvisionalDecision'; Failed to convert from type [java.lang.String] to type [@org.springframework.web.bind.annotation.RequestParam com.lmi.crm.enums.ProvisionalDecision] for value [ACCEPT]
-2026-04-12 00:32:49 [http-nio-8080-exec-5] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'decision': Failed to convert value of type 'java.lang.String' to required type 'com.lmi.crm.enums.ProvisionalDecision'; Failed to convert from type [java.lang.String] to type [@org.springframework.web.bind.annotation.RequestParam com.lmi.crm.enums.ProvisionalDecision] for value [ACCEPT]]
-2026-04-12 00:34:17 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/provisional/12
-2026-04-12 00:34:17 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-04-12 00:34:17 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-04-12 00:34:18 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/provisional/12
-2026-04-12 00:34:18 [http-nio-8080-exec-7] INFO  c.l.crm.service.ProspectServiceImpl - PUT /api/prospects/provisional/12 — requestingUserId: 1, decision: APPROVE
-2026-04-12 00:34:18 [http-nio-8080-exec-7] INFO  c.l.crm.service.ProspectServiceImpl - Provisional prospect approved — prospectId: 11, approvedBy: 1
+2026-04-13 20:10:46 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 18.0.2 with PID 468 (C:\Users\nagpa\Desktop\crm\target\classes started by nagpa in C:\Users\nagpa\Desktop\crm)
+2026-04-13 20:10:46 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-04-13 20:10:46 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-04-13 20:10:51 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-13 20:10:51 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-13 20:10:51 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-13 20:11:04 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-04-13 20:11:08 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-13 20:11:08 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 24.238 seconds (process running for 25.739)
+2026-04-13 20:11:08 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-04-13 20:11:08 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-04-13 20:11:41 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-13 20:11:41 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-04-13 20:11:41 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-04-13 20:11:41 [http-nio-8080-exec-1] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
+2026-04-13 20:11:41 [http-nio-8080-exec-1] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
+2026-04-13 20:11:42 [http-nio-8080-exec-1] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 2, role: LICENSEE, status: ACTIVE
+2026-04-13 20:11:43 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 2, role: LICENSEE, expiresAt: Tue Apr 14 20:11:42 IST 2026
+2026-04-13 20:11:43 [http-nio-8080-exec-1] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 2, role: LICENSEE
+2026-04-13 20:11:43 [http-nio-8080-exec-1] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 2, role: LICENSEE
+2026-04-13 20:13:10 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/groups
+2026-04-13 20:13:10 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/groups
+2026-04-13 20:13:21 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/groups
+2026-04-13 20:13:21 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-13 20:13:21 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-04-13 20:13:22 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — POST /api/groups
+2026-04-13 20:13:22 [http-nio-8080-exec-6] INFO  c.lmi.crm.controller.GroupController - POST /api/groups — requestingUserId: 2
+2026-04-13 20:13:24 [http-nio-8080-exec-6] INFO  c.lmi.crm.service.GroupServiceImpl - Group created — id: 1, licenseeId: 2, createdBy: 2
+2026-04-13 20:13:25 [http-nio-8080-exec-6] INFO  c.lmi.crm.controller.GroupController - POST /api/groups — created groupId: 1 — requestingUserId: 2
+2026-04-13 20:14:44 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/groups
+2026-04-13 20:14:44 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-13 20:14:44 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-04-13 20:14:44 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — POST /api/groups
+2026-04-13 20:14:44 [http-nio-8080-exec-9] INFO  c.lmi.crm.controller.GroupController - POST /api/groups — requestingUserId: 2
+2026-04-13 20:14:45 [http-nio-8080-exec-9] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: Prospect 11 is not a client
+2026-04-13 20:14:45 [http-nio-8080-exec-9] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [java.lang.RuntimeException: Prospect 11 is not a client]
+2026-04-13 20:15:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/groups
+2026-04-13 20:15:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-13 20:15:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-04-13 20:15:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — GET /api/groups
+2026-04-13 20:15:31 [http-nio-8080-exec-2] INFO  c.lmi.crm.service.GroupServiceImpl - GET /api/groups — returning 1 groups for userId: 2
+2026-04-13 20:16:32 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/groups/1
+2026-04-13 20:16:32 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-13 20:16:32 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-04-13 20:16:33 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — GET /api/groups/1
+2026-04-13 20:16:33 [http-nio-8080-exec-3] INFO  c.lmi.crm.service.GroupServiceImpl - GET /api/groups/1 — requestingUserId: 2
+2026-04-13 20:17:45 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/groups/1
+2026-04-13 20:17:45 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-13 20:17:45 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-04-13 20:17:45 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — PUT /api/groups/1
+2026-04-13 20:17:47 [http-nio-8080-exec-7] INFO  c.lmi.crm.service.GroupServiceImpl - Group updated — id: 1, updatedBy: 2
+2026-04-13 20:17:58 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/groups/1
+2026-04-13 20:17:58 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-13 20:17:58 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-04-13 20:17:59 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — PUT /api/groups/1
+2026-04-13 20:18:00 [http-nio-8080-exec-8] INFO  c.lmi.crm.service.GroupServiceImpl - Group updated — id: 1, updatedBy: 2
+2026-04-13 20:19:04 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6e5e73bf (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-13 20:19:11 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6bbffdc1 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-13 20:19:24 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — DELETE /api/groups/1/deletion-request
+2026-04-13 20:19:24 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-13 20:19:24 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-04-13 20:19:24 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@133d18dc (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-13 20:19:24 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6e061115 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-13 20:19:24 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@5d082e64 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-13 20:19:24 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@268836e1 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-13 20:19:24 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2d9631a1 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-13 20:19:24 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@734603bf (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-13 20:19:24 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6fa178bd (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-13 20:19:24 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@8796496 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-13 20:19:54 [http-nio-8080-exec-2] WARN  org.hibernate.orm.jdbc.error - HHH000247: ErrorCode: 0, SQLState: 08001
+2026-04-13 20:19:54 [http-nio-8080-exec-2] WARN  org.hibernate.orm.jdbc.error - HikariPool-1 - Connection is not available, request timed out after 30017ms (total=0, active=0, idle=0, waiting=0)
+2026-04-13 20:19:54 [http-nio-8080-exec-2] WARN  org.hibernate.orm.jdbc.error - HHH000247: ErrorCode: 0, SQLState: 08001
+2026-04-13 20:19:54 [http-nio-8080-exec-2] WARN  org.hibernate.orm.jdbc.error - HikariPool-1 - Connection is not available, request timed out after 30017ms (total=0, active=0, idle=0, waiting=0)
+2026-04-13 20:19:54 [http-nio-8080-exec-2] ERROR o.a.c.c.C.[.[.[.[dispatcherServlet] - Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception
+org.springframework.transaction.CannotCreateTransactionException: Could not open JPA EntityManager for transaction
+	at org.springframework.orm.jpa.JpaTransactionManager.doBegin(JpaTransactionManager.java:457)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.startTransaction(AbstractPlatformTransactionManager.java:532)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.getTransaction(AbstractPlatformTransactionManager.java:405)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.createTransactionIfNecessary(TransactionAspectSupport.java:628)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:365)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:166)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:222)
+	at jdk.proxy4/jdk.proxy4.$Proxy150.findById(Unknown Source)
+	at com.lmi.crm.config.JwtAuthFilter.doFilterInternal(JwtAuthFilter.java:55)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:492)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1779)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
+	at java.base/java.lang.Thread.run(Thread.java:833)
+Caused by: org.hibernate.exception.JDBCConnectionException: Unable to acquire JDBC Connection [HikariPool-1 - Connection is not available, request timed out after 30017ms (total=0, active=0, idle=0, waiting=0)] [n/a]
+	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:49)
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:101)
+	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquire(LogicalConnectionManagedImpl.java:190)
+	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquireConnectionIfNeeded(LogicalConnectionManagedImpl.java:87)
+	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.getPhysicalConnection(LogicalConnectionManagedImpl.java:126)
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.beginTransaction(HibernateJpaDialect.java:135)
+	at org.springframework.orm.jpa.JpaTransactionManager.doBegin(JpaTransactionManager.java:411)
+	... 66 common frames omitted
+Caused by: java.sql.SQLTransientConnectionException: HikariPool-1 - Connection is not available, request timed out after 30017ms (total=0, active=0, idle=0, waiting=0)
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:714)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:184)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:142)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:127)
+	at org.hibernate.engine.jdbc.connections.internal.DataSourceConnectionProvider.getConnection(DataSourceConnectionProvider.java:137)
+	at org.hibernate.internal.NonContextualJdbcConnectionAccess.obtainConnection(NonContextualJdbcConnectionAccess.java:47)
+	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquire(LogicalConnectionManagedImpl.java:187)
+	... 70 common frames omitted
+Caused by: org.postgresql.util.PSQLException: The connection attempt failed.
+	at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:385)
+	at org.postgresql.core.ConnectionFactory.openConnection(ConnectionFactory.java:57)
+	at org.postgresql.jdbc.PgConnection.<init>(PgConnection.java:290)
+	at org.postgresql.Driver.makeConnection(Driver.java:448)
+	at org.postgresql.Driver.connect(Driver.java:298)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:144)
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:373)
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:210)
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:488)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:752)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:731)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	... 1 common frames omitted
+Caused by: java.net.UnknownHostException: db.pitjixglbimefmncrihg.supabase.co
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:564)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
+	at java.base/java.net.Socket.connect(Socket.java:633)
+	at org.postgresql.core.PGStream.createSocket(PGStream.java:261)
+	at org.postgresql.core.PGStream.<init>(PGStream.java:122)
+	at org.postgresql.core.v3.ConnectionFactoryImpl.tryConnect(ConnectionFactoryImpl.java:146)
+	at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:289)
+	... 14 common frames omitted
+2026-04-13 20:20:04 [HikariPool-1:connection-adder] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Pool is empty, failed to create/setup connection (a4cd58f1-3d87-4ebc-8cc2-c6f9cf7f861b)
+org.postgresql.util.PSQLException: The connection attempt failed.
+	at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:385)
+	at org.postgresql.core.ConnectionFactory.openConnection(ConnectionFactory.java:57)
+	at org.postgresql.jdbc.PgConnection.<init>(PgConnection.java:290)
+	at org.postgresql.Driver.makeConnection(Driver.java:448)
+	at org.postgresql.Driver.connect(Driver.java:298)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:144)
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:373)
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:210)
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:488)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:752)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:731)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:833)
+Caused by: java.net.UnknownHostException: db.pitjixglbimefmncrihg.supabase.co
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:564)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
+	at java.base/java.net.Socket.connect(Socket.java:633)
+	at org.postgresql.core.PGStream.createSocket(PGStream.java:261)
+	at org.postgresql.core.PGStream.<init>(PGStream.java:122)
+	at org.postgresql.core.v3.ConnectionFactoryImpl.tryConnect(ConnectionFactoryImpl.java:146)
+	at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:289)
+	... 14 common frames omitted
+2026-04-13 20:23:34 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 18.0.2 with PID 31128 (C:\Users\nagpa\Desktop\crm\target\classes started by nagpa in C:\Users\nagpa\Desktop\crm)
+2026-04-13 20:23:34 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-04-13 20:23:34 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-04-13 20:23:39 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-13 20:23:39 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-13 20:23:39 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-13 20:23:51 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-04-13 20:23:55 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-13 20:23:55 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 22.535 seconds (process running for 24.219)
+2026-04-13 20:23:55 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-04-13 20:23:55 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-04-13 20:24:26 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-13 20:24:26 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — DELETE /api/groups/1/deletion-request
+2026-04-13 20:24:27 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-13 20:24:27 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-04-13 20:24:27 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — DELETE /api/groups/1/deletion-request
+2026-04-13 20:24:27 [http-nio-8080-exec-1] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'DELETE' is not supported]
+2026-04-13 20:25:24 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — DELETE /api/groups/1/deletion-request
+2026-04-13 20:25:24 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-13 20:25:24 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-04-13 20:25:25 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — DELETE /api/groups/1/deletion-request
+2026-04-13 20:25:25 [http-nio-8080-exec-3] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'DELETE' is not supported]
+2026-04-13 20:25:45 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/groups/1/deletion-request
+2026-04-13 20:25:45 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-13 20:25:45 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-04-13 20:25:45 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — POST /api/groups/1/deletion-request
+2026-04-13 20:25:46 [http-nio-8080-exec-4] INFO  c.lmi.crm.controller.GroupController - POST /api/groups/1/deletion-request — requestingUserId: 2
+2026-04-13 20:25:46 [http-nio-8080-exec-4] DEBUG c.lmi.crm.service.AlertServiceImpl - createAlert — type: GROUP_DELETION_REQUEST, relatedEntityType: GROUP, relatedEntityId: 1, triggeredBy: 2, actionRequired: true
+2026-04-13 20:25:46 [http-nio-8080-exec-4] INFO  c.lmi.crm.service.AlertServiceImpl - createAlert — saved — alertId: 13, type: GROUP_DELETION_REQUEST, title: Group Deletion Request — Group id: 1, triggeredBy: 2
+2026-04-13 20:25:46 [http-nio-8080-exec-4] DEBUG c.lmi.crm.service.AlertServiceImpl - createAlert — dispatching admin email notification — alertId: 13
+2026-04-13 20:25:46 [http-nio-8080-exec-4] INFO  c.l.c.s.NotificationServiceImpl - Sending admin alert email — subject: Group Deletion Request — Group id: 1
+2026-04-13 20:25:46 [http-nio-8080-exec-4] INFO  c.l.c.s.NotificationServiceImpl - EMAIL START → to: 3ad660f15e4e36, subject: New Alert: Group Deletion Request — Group id: 1
+2026-04-13 20:25:54 [http-nio-8080-exec-4] INFO  c.l.c.s.NotificationServiceImpl - EMAIL SUCCESS → took 7117 ms
+2026-04-13 20:25:54 [http-nio-8080-exec-4] INFO  c.lmi.crm.controller.GroupController - POST /api/groups/1/deletion-request — submitted — requestingUserId: 2
+2026-04-13 20:32:48 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 18.0.2 with PID 8908 (C:\Users\nagpa\Desktop\crm\target\classes started by nagpa in C:\Users\nagpa\Desktop\crm)
+2026-04-13 20:32:48 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-04-13 20:32:48 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-04-13 20:32:53 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-13 20:32:53 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-13 20:32:53 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-13 20:33:06 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-04-13 20:33:10 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-13 20:33:10 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 23.285 seconds (process running for 24.628)
+2026-04-13 20:33:10 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-04-13 20:33:10 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-04-13 20:42:34 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-13 20:42:34 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-04-13 20:42:34 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-04-13 20:42:35 [http-nio-8080-exec-1] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: nagpalajay01@gmail.com
+2026-04-13 20:42:35 [http-nio-8080-exec-1] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: nagpalajay01@gmail.com
+2026-04-13 20:42:35 [http-nio-8080-exec-1] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 1, role: SUPER_ADMIN, status: ACTIVE
+2026-04-13 20:42:36 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 1, role: SUPER_ADMIN, expiresAt: Tue Apr 14 20:42:36 IST 2026
+2026-04-13 20:42:36 [http-nio-8080-exec-1] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 1, role: SUPER_ADMIN
+2026-04-13 20:42:36 [http-nio-8080-exec-1] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 1, role: SUPER_ADMIN
+2026-04-13 20:43:35 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/groups/deletion-requests/13
+2026-04-13 20:43:35 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-13 20:43:35 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-13 20:43:36 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/groups/deletion-requests/13
+2026-04-13 20:43:36 [http-nio-8080-exec-3] INFO  c.lmi.crm.controller.GroupController - PUT /api/groups/deletion-requests/13 — requestingUserId: 1, approve: true
+2026-04-13 20:43:37 [http-nio-8080-exec-3] INFO  c.lmi.crm.service.GroupServiceImpl - Group soft deleted — id: 1, deletedBy: 1
+2026-04-13 20:43:37 [http-nio-8080-exec-3] INFO  c.lmi.crm.service.GroupServiceImpl - Group deletion approved — groupId: 1, approvedBy: 1

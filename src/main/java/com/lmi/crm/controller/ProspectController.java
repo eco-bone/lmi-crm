@@ -33,9 +33,10 @@ public class ProspectController {
     public ResponseEntity<ApiResponse<List<ProspectResponse>>> getProspects(
             @RequestParam(required = false) ProspectType type,
             @RequestParam(required = false) Integer licenseeId,
-            @RequestParam(required = false) Integer associateId) {
+            @RequestParam(required = false) Integer associateId,
+            @RequestParam(required = false, defaultValue = "false") boolean getAll) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        List<ProspectResponse> response = prospectService.getProspects(requestingUserId, type, licenseeId, associateId);
+        List<ProspectResponse> response = prospectService.getProspects(requestingUserId, type, licenseeId, associateId, getAll);
         return ResponseEntity.ok(ApiResponse.success("Prospects retrieved successfully", response));
     }
 

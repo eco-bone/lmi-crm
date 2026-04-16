@@ -202,36 +202,48 @@ public class ProspectServiceImpl implements ProspectService {
 
     @Override
     public List<ProspectResponse> getProspects(Integer requestingUserId, ProspectType typeFilter,
-                                               Integer licenseeIdFilter, Integer associateIdFilter) {
+                                               Integer licenseeIdFilter, Integer associateIdFilter, boolean getAll) {
 
         // Step 1 — Validate requesting user
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        log.info("GET /api/prospects — requestingUserId: {}, role: {}, typeFilter: {}, licenseeIdFilter: {}, associateIdFilter: {}",
-                requestingUserId, requestingUser.getRole(), typeFilter, licenseeIdFilter, associateIdFilter);
+        log.info("GET /api/prospects — requestingUserId: {}, role: {}, typeFilter: {}, licenseeIdFilter: {}, associateIdFilter: {}, getAll: {}",
+                requestingUserId, requestingUser.getRole(), typeFilter, licenseeIdFilter, associateIdFilter, getAll);
 
         List<Prospect> prospects;
 
         // Step 2 — Role-scoped visibility
         if (requestingUser.getRole() == UserRole.ASSOCIATE) {
-            prospects = prospectRepository.findByAssociateIdAndDeletionStatusFalse(requestingUserId);
-            if (typeFilter != null) {
-                prospects = prospects.stream()
-                        .filter(p -> p.getType() == typeFilter)
-                        .toList();
+            if (getAll) {
+                prospects = typeFilter != null
+                        ? prospectRepository.findByDeletionStatusFalseAndType(typeFilter)
+                        : prospectRepository.findByDeletionStatusFalse();
+            } else {
+                prospects = prospectRepository.findByAssociateIdAndDeletionStatusFalse(requestingUserId);
+                if (typeFilter != null) {
+                    prospects = prospects.stream()
+                            .filter(p -> p.getType() == typeFilter)
+                            .toList();
+                }
             }
 
         } else if (requestingUser.getRole() == UserRole.LICENSEE) {
-            List<Integer> prospectIds = prospectLicenseeRepository.findByLicenseeId(requestingUserId)
-                    .stream()
-                    .map(ProspectLicensee::getProspectId)
-                    .toList();
-            prospects = prospectRepository.findByIdInAndDeletionStatusFalse(prospectIds);
-            if (typeFilter != null) {
-                prospects = prospects.stream()
-                        .filter(p -> p.getType() == typeFilter)
+            if (getAll) {
+                prospects = typeFilter != null
+                        ? prospectRepository.findByDeletionStatusFalseAndType(typeFilter)
+                        : prospectRepository.findByDeletionStatusFalse();
+            } else {
+                List<Integer> prospectIds = prospectLicenseeRepository.findByLicenseeId(requestingUserId)
+                        .stream()
+                        .map(ProspectLicensee::getProspectId)
                         .toList();
+                prospects = prospectRepository.findByIdInAndDeletionStatusFalse(prospectIds);
+                if (typeFilter != null) {
+                    prospects = prospects.stream()
+                            .filter(p -> p.getType() == typeFilter)
+                            .toList();
+                }
             }
 
         } else if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
@@ -271,7 +283,11 @@ public class ProspectServiceImpl implements ProspectService {
         log.info("GET /api/prospects — returning {} prospects for userId: {}", prospects.size(), requestingUserId);
 
         // Step 4 — Field visibility by role
-        if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
+        boolean useFullResponse = requestingUser.getRole() == UserRole.ADMIN
+                || requestingUser.getRole() == UserRole.SUPER_ADMIN
+                || getAll;
+
+        if (useFullResponse) {
             List<Integer> prospectIds = prospects.stream().map(Prospect::getId).toList();
             Map<Integer, Integer> licenseeMap = prospectLicenseeRepository
                     .findByProspectIdInAndIsPrimaryTrue(prospectIds)

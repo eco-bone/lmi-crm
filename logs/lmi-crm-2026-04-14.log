@@ -1,0 +1,31 @@
+2026-04-14 00:07:15 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@422e4272 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-14 00:07:15 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@1c8322ea (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-14 00:07:15 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=21m35s220ms467µs500ns).
+2026-04-14 00:07:15 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@70789a3 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-14 00:07:15 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@1bf82978 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-14 00:07:15 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6bfa664d (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-14 00:07:15 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6eeb9daa (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-14 00:07:15 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@551a4b45 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-14 00:07:24 [HikariPool-1:connection-adder] WARN  o.postgresql.core.ConnectionFactory - Failed to closed stream with error: {0}
+java.net.SocketException: Connection or outbound has closed
+	at java.base/sun.security.ssl.SSLSocketImpl$AppOutputStream.write(SSLSocketImpl.java:1296)
+	at org.postgresql.util.internal.PgBufferedOutputStream.flushBuffer(PgBufferedOutputStream.java:41)
+	at org.postgresql.util.internal.PgBufferedOutputStream.flush(PgBufferedOutputStream.java:48)
+	at java.base/java.io.FilterOutputStream.close(FilterOutputStream.java:182)
+	at org.postgresql.core.PGStream.close(PGStream.java:737)
+	at org.postgresql.core.ConnectionFactory.closeStream(ConnectionFactory.java:92)
+	at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:388)
+	at org.postgresql.core.ConnectionFactory.openConnection(ConnectionFactory.java:57)
+	at org.postgresql.jdbc.PgConnection.<init>(PgConnection.java:290)
+	at org.postgresql.Driver.makeConnection(Driver.java:448)
+	at org.postgresql.Driver.connect(Driver.java:298)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:144)
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:373)
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:210)
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:488)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:752)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:731)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:833)

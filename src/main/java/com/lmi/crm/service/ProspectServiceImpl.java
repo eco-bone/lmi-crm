@@ -201,6 +201,7 @@ public class ProspectServiceImpl implements ProspectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProspectResponse> getProspects(Integer requestingUserId, ProspectType typeFilter,
                                                Integer licenseeIdFilter, Integer associateIdFilter, boolean getAll) {
 
@@ -391,6 +392,7 @@ public class ProspectServiceImpl implements ProspectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProspectResponse getProspectDetail(Integer requestingUserId, Integer prospectId) {
 
         // Step 1 — Validate requesting user and prospect

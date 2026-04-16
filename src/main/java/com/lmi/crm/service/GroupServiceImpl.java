@@ -127,6 +127,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<GroupResponse> getGroups(Integer requestingUserId, Integer licenseeIdFilter) {
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -164,6 +165,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public GroupResponse getGroupDetail(Integer requestingUserId, Integer groupId) {
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));

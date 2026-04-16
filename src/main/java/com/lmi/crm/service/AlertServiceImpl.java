@@ -1,13 +1,22 @@
 package com.lmi.crm.service;
 
 import com.lmi.crm.dao.AlertRepository;
+import com.lmi.crm.dao.UserRepository;
+import com.lmi.crm.dto.response.AlertResponse;
 import com.lmi.crm.entity.Alert;
+import com.lmi.crm.entity.User;
 import com.lmi.crm.enums.AlertStatus;
 import com.lmi.crm.enums.AlertType;
 import com.lmi.crm.enums.RelatedEntityType;
+import com.lmi.crm.enums.UserRole;
+import com.lmi.crm.mapper.AlertMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -16,6 +25,12 @@ public class AlertServiceImpl implements AlertService {
 
     @Autowired
     private AlertRepository alertRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AlertMapper alertMapper;
 
     @Autowired
     private NotificationService notificationService;
@@ -47,5 +62,48 @@ public class AlertServiceImpl implements AlertService {
 
         log.debug("createAlert — dispatching admin email notification — alertId: {}", saved.getId());
         notificationService.sendAdminAlertEmail(title, description, baseUrl + "/admin/alerts");
+    }
+
+    @Override
+    public Page<AlertResponse> getAlerts(Integer requestingUserId, AlertType typeFilter, AlertStatus statusFilter, int page, int size) {
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
+            throw new RuntimeException("Access denied");
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        Page<Alert> alerts;
+        if (typeFilter != null && statusFilter != null) {
+            alerts = alertRepository.findByAlertTypeAndStatus(typeFilter, statusFilter, pageable);
+        } else if (typeFilter != null) {
+            alerts = alertRepository.findByAlertType(typeFilter, pageable);
+        } else if (statusFilter != null) {
+            alerts = alertRepository.findByStatus(statusFilter, pageable);
+        } else {
+            alerts = alertRepository.findAll(pageable);
+        }
+
+        log.info("GET /api/admin/alerts — requestingUserId: {}, typeFilter: {}, statusFilter: {}, page: {}, size: {}", requestingUserId, typeFilter, statusFilter, page, size);
+        log.info("GET /api/admin/alerts — returning {} total alerts", alerts.getTotalElements());
+
+        return alerts.map(alertMapper::toResponse);
+    }
+
+    @Override
+    public AlertResponse getAlertDetail(Integer requestingUserId, Integer alertId) {
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
+            throw new RuntimeException("Access denied");
+        }
+
+        Alert alert = alertRepository.findById(alertId)
+                .orElseThrow(() -> new RuntimeException("Alert not found"));
+
+        log.info("GET /api/admin/alerts/{} — requestingUserId: {}", alertId, requestingUserId);
+
+        return alertMapper.toResponse(alert);
     }
 }

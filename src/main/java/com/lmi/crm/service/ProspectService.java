@@ -16,7 +16,7 @@ public interface ProspectService {
     String requestProtectionExtension(Integer prospectId, Integer requestingUserId);
 
     List<ProspectResponse> getProspects(Integer requestingUserId, ProspectType typeFilter,
-                                        Integer licenseeIdFilter, Integer associateIdFilter);
+                                        Integer licenseeIdFilter, Integer associateIdFilter, boolean getAll);
 
     ProspectResponse getProspectDetail(Integer requestingUserId, Integer prospectId);
 

@@ -8,6 +8,7 @@ import com.lmi.crm.dao.UserRepository;
 import com.lmi.crm.dto.request.AddProspectRequest;
 import com.lmi.crm.dto.request.UpdateProspectRequest;
 import com.lmi.crm.dto.response.ApiResponse;
+import com.lmi.crm.dto.response.DuplicateCheckResponse;
 import com.lmi.crm.dto.response.ProspectResponse;
 import com.lmi.crm.entity.Alert;
 import com.lmi.crm.entity.Prospect;
@@ -84,14 +85,28 @@ public class ProspectServiceImpl implements ProspectService {
             associateId = requestingUserId;
         }
 
-        // Step 2 — Hard duplicate check
+        // Step 2 — Email uniqueness check
+        prospectRepository.findByEmailIgnoreCaseAndDeletionStatusFalse(request.getEmail())
+                .ifPresent(p -> {
+                    throw new RuntimeException(
+                        "A prospect with email '" + request.getEmail() + "' already exists in the system"
+                    );
+                });
+
+        // Step 3 — Hard duplicate check (name + company)
         prospectRepository.findByContactFirstNameIgnoreCaseAndContactLastNameIgnoreCaseAndCompanyNameIgnoreCaseAndDeletionStatusFalse(
                 request.getContactFirstName(), request.getContactLastName(), request.getCompanyName())
                 .ifPresent(p -> {
-                    throw new RuntimeException("A prospect with this contact already exists at this company");
+                    String errorMessage = String.format(
+                        "Duplicate Prospect Detected: %s %s at %s already exists in the system",
+                        p.getContactFirstName(),
+                        p.getContactLastName(),
+                        p.getCompanyName()
+                    );
+                    throw new RuntimeException(errorMessage);
                 });
 
-        // Step 3 — Fuzzy match + city check
+        // Step 4 — Fuzzy match + city check
         boolean isProvisional = false;
         List<String> provisionalReasons = new ArrayList<>();
 
@@ -125,14 +140,14 @@ public class ProspectServiceImpl implements ProspectService {
             log.warn("Prospect flagged as provisional — company: {}, reasons: {}", request.getCompanyName(), combinedDescription);
         }
 
-        // Step 4 — Build and save Prospect entity
+        // Step 5 — Build and save Prospect entity
         Prospect prospect = prospectMapper.fromAddProspectRequest(request, associateId, requestingUserId, isProvisional);
         Prospect savedProspect = prospectRepository.save(prospect);
 
-        // Step 5 — Save ProspectLicensee
+        // Step 6 — Save ProspectLicensee
         prospectLicenseeRepository.save(prospectMapper.toProspectLicensee(savedProspect.getId(), effectiveLicenseeId));
 
-        // Step 6 — Create Alert if provisional
+        // Step 7 — Create Alert if provisional
         if (isProvisional) {
             alertService.createAlert(
                     AlertType.DUPLICATE_PROSPECT,
@@ -606,5 +621,32 @@ public class ProspectServiceImpl implements ProspectService {
                     .orElse(null);
             return ApiResponse.success("Provisional prospect left as-is", prospectMapper.toResponse(prospect, licenseeId, null));
         }
+    }
+
+    @Override
+    public List<DuplicateCheckResponse> checkDuplicateProspects(String companyName) {
+        if (companyName == null || companyName.trim().length() < 2) {
+            return List.of();
+        }
+
+        String prefix = companyName.trim().substring(0, Math.min(2, companyName.trim().length()));
+        List<Prospect> activeProspects = prospectRepository.findByCompanyNameStartingWithIgnoreCaseAndDeletionStatusFalse(prefix);
+
+        List<DuplicateCheckResponse> duplicates = new ArrayList<>();
+        for (Prospect existing : activeProspects) {
+            double similarity = FuzzyMatchUtil.similarity(existing.getCompanyName(), companyName.trim());
+            if (similarity >= 0.65) {
+                DuplicateCheckResponse response = new DuplicateCheckResponse();
+                response.setId(existing.getId().longValue());
+                response.setCompanyName(existing.getCompanyName());
+                response.setCity(existing.getCity());
+                response.setStatus(existing.getStatus());
+                response.setSimilarity(similarity);
+                duplicates.add(response);
+            }
+        }
+
+        log.debug("Duplicate check for '{}' found {} matches", companyName, duplicates.size());
+        return duplicates;
     }
 }

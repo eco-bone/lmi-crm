@@ -406,6 +406,16 @@ public class ProspectServiceImpl implements ProspectService {
         return "Prospect deleted successfully";
     }
 
+    /**
+     * Returns full prospect information for all authenticated users.
+     * No ownership restrictions apply to viewing prospects.
+     * Ownership validation is performed at action endpoints (update, delete, convert, extend protection).
+     *
+     * @param requestingUserId The ID of the user requesting prospect details
+     * @param prospectId The ID of the prospect to retrieve
+     * @return Full prospect details including all fields
+     * @throws RuntimeException if user or prospect not found
+     */
     @Override
     @Transactional(readOnly = true)
     public ProspectResponse getProspectDetail(Integer requestingUserId, Integer prospectId) {
@@ -420,31 +430,13 @@ public class ProspectServiceImpl implements ProspectService {
 
         log.info("GET /api/prospects/{} — requestingUserId: {}, role: {}", prospectId, requestingUserId, requestingUser.getRole());
 
-        // Step 2 — Ownership check for non-admin roles
-        if (requestingUser.getRole() == UserRole.ASSOCIATE) {
-            if (!requestingUserId.equals(prospect.getAssociateId())) {
-                throw new RuntimeException("Access denied");
-            }
-        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
-            if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, requestingUserId)) {
-                throw new RuntimeException("Access denied");
-            }
-        } else if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
-            throw new RuntimeException("Access denied");
-        }
+        // Step 2 — Return full prospect details for all authenticated users
+        Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospectId)
+                .map(ProspectLicensee::getLicenseeId)
+                .orElse(null);
+        ProspectResponse response = prospectMapper.toResponse(prospect, licenseeId, null);
 
-        // Step 3 — Return response based on role
-        ProspectResponse response;
-        if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
-            Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospectId)
-                    .map(ProspectLicensee::getLicenseeId)
-                    .orElse(null);
-            response = prospectMapper.toResponse(prospect, licenseeId, null);
-        } else {
-            response = prospectMapper.toLimitedResponse(prospect);
-        }
-
-        log.info("GET /api/prospects/{} — returned for userId: {}", prospectId, requestingUserId);
+        log.info("GET /api/prospects/{} — returned full details for userId: {}", prospectId, requestingUserId);
 
         return response;
     }

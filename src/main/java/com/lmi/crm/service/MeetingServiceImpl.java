@@ -69,7 +69,12 @@ public class MeetingServiceImpl implements MeetingService {
         Meeting meeting = meetingMapper.toEntity(request, requestingUserId);
         Meeting saved = meetingRepository.save(meeting);
 
-        prospect.setLastMeetingDate(request.getMeetingAt().toLocalDate());
+        Meeting latestMeeting = meetingRepository
+                .findTopByProspectIdOrderByMeetingAtDesc(prospect.getId())
+                .orElse(null);
+        if (latestMeeting != null) {
+            prospect.setLastMeetingDate(latestMeeting.getMeetingAt().toLocalDate());
+        }
         if (prospect.getFirstMeetingDate() == null) {
             prospect.setFirstMeetingDate(request.getMeetingAt().toLocalDate());
         }
@@ -148,6 +153,7 @@ public class MeetingServiceImpl implements MeetingService {
         if (request.getMeetingAt() != null) meeting.setMeetingAt(request.getMeetingAt());
 
         Meeting saved = meetingRepository.save(meeting);
+        meetingRepository.flush();
 
         if (request.getMeetingAt() != null) {
             Meeting latestMeeting = meetingRepository

@@ -99,6 +99,8 @@ public class ProspectMapper {
         response.setStatus(prospect.getStatus());
         response.setProtectionPeriodMonths(prospect.getProtectionPeriodMonths());
         response.setEntryDate(prospect.getEntryDate());
+        response.setFirstMeetingDate(prospect.getFirstMeetingDate());
+        response.setLastMeetingDate(prospect.getLastMeetingDate());
         response.setAssociateId(prospect.getAssociateId());
         response.setLicenseeId(licenseeId);
         response.setCreatedBy(prospect.getCreatedBy());

@@ -1,0 +1,50 @@
+2026-04-16 02:04:57 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=20h28m29s332ms596µs100ns).
+2026-04-16 02:04:58 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@383a042a (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-16 02:04:58 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@4978d797 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-16 02:04:58 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@7912a6f5 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-16 02:04:58 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@1161f6a9 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-16 02:04:58 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@72ae6dfd (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-16 02:30:19 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 18.0.2 with PID 33428 (C:\Users\nagpa\Desktop\crm\target\classes started by nagpa in C:\Users\nagpa\Desktop\crm)
+2026-04-16 02:30:19 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-04-16 02:30:19 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-04-16 02:30:21 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-16 02:30:21 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-16 02:30:21 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-16 02:30:30 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-04-16 02:30:32 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-16 02:30:32 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 13.885 seconds (process running for 14.532)
+2026-04-16 02:30:32 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-04-16 02:30:32 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-04-16 02:31:29 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-16 02:31:29 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-04-16 02:31:29 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-16 02:31:29 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-16 02:31:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — POST /api/auth/login
+2026-04-16 02:31:30 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: nagpalajay01@gmail.com
+2026-04-16 02:31:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: nagpalajay01@gmail.com
+2026-04-16 02:31:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 1, role: SUPER_ADMIN, status: ACTIVE
+2026-04-16 02:31:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 1, role: SUPER_ADMIN, expiresAt: Fri Apr 17 02:31:31 IST 2026
+2026-04-16 02:31:31 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 1, role: SUPER_ADMIN
+2026-04-16 02:31:31 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 1, role: SUPER_ADMIN
+2026-04-16 02:32:00 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/tasks
+2026-04-16 02:32:00 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-16 02:32:00 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-16 02:32:00 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — POST /api/tasks
+2026-04-16 02:32:00 [http-nio-8080-exec-3] INFO  c.l.crm.service.TaskNoteServiceImpl - Task created — id: 1, userId: 1, dueDate: 2026-05-01T10:00
+2026-04-16 02:32:48 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/tasks
+2026-04-16 02:32:49 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-16 02:32:49 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-16 02:32:49 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/tasks
+2026-04-16 02:33:35 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/tasks/1
+2026-04-16 02:33:35 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-16 02:33:35 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-16 02:33:35 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/tasks/1
+2026-04-16 02:33:35 [http-nio-8080-exec-5] INFO  c.l.crm.service.TaskNoteServiceImpl - Task updated — id: 1, userId: 1
+2026-04-16 02:33:42 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/tasks
+2026-04-16 02:33:42 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-16 02:33:42 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-16 02:33:43 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/tasks
+2026-04-16 02:34:33 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/tasks
+2026-04-16 02:34:33 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-16 02:34:33 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-16 02:34:34 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/tasks

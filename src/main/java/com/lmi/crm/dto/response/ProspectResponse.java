@@ -27,6 +27,8 @@ public class ProspectResponse {
     private ProspectStatus status;
     private Integer protectionPeriodMonths;
     private LocalDate entryDate;
+    private LocalDate firstMeetingDate;
+    private LocalDate lastMeetingDate;
     private Integer associateId;
     private Integer licenseeId;
     private Integer createdBy;

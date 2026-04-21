@@ -3,6 +3,7 @@ package com.lmi.crm.controller;
 import com.lmi.crm.dto.request.AddProspectRequest;
 import com.lmi.crm.dto.request.UpdateProspectRequest;
 import com.lmi.crm.dto.response.ApiResponse;
+import com.lmi.crm.dto.response.DuplicateCheckResponse;
 import com.lmi.crm.dto.response.ProspectResponse;
 import com.lmi.crm.enums.ProspectStatus;
 import com.lmi.crm.enums.ProspectType;
@@ -38,6 +39,18 @@ public class ProspectController {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
         List<ProspectResponse> response = prospectService.getProspects(requestingUserId, type, licenseeId, associateId, getAll);
         return ResponseEntity.ok(ApiResponse.success("Prospects retrieved successfully", response));
+    }
+
+    @GetMapping("/duplicate-check")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<List<DuplicateCheckResponse>>> checkDuplicate(
+            @RequestParam String companyName) {
+        log.info("GET /api/prospects/duplicate-check — companyName: {}", companyName);
+        List<DuplicateCheckResponse> duplicates = prospectService.checkDuplicateProspects(companyName);
+        String message = duplicates.isEmpty()
+            ? "No similar prospects found"
+            : String.format("Found %d similar prospect(s)", duplicates.size());
+        return ResponseEntity.ok(ApiResponse.success(message, duplicates));
     }
 
     @PostMapping

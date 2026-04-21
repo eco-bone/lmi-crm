@@ -88,7 +88,15 @@ public class AlertServiceImpl implements AlertService {
         log.info("GET /api/admin/alerts — requestingUserId: {}, typeFilter: {}, statusFilter: {}, page: {}, size: {}", requestingUserId, typeFilter, statusFilter, page, size);
         log.info("GET /api/admin/alerts — returning {} total alerts", alerts.getTotalElements());
 
-        return alerts.map(alertMapper::toResponse);
+        return alerts.map(alert -> {
+            String name = null;
+            if (alert.getTriggeredBy() != null) {
+                name = userRepository.findById(alert.getTriggeredBy())
+                        .map(u -> u.getFirstName() + " " + u.getLastName())
+                        .orElse("Unknown");
+            }
+            return alertMapper.toResponse(alert, name);
+        });
     }
 
     @Override
@@ -104,6 +112,12 @@ public class AlertServiceImpl implements AlertService {
 
         log.info("GET /api/admin/alerts/{} — requestingUserId: {}", alertId, requestingUserId);
 
-        return alertMapper.toResponse(alert);
+        String name = null;
+        if (alert.getTriggeredBy() != null) {
+            name = userRepository.findById(alert.getTriggeredBy())
+                    .map(u -> u.getFirstName() + " " + u.getLastName())
+                    .orElse("Unknown");
+        }
+        return alertMapper.toResponse(alert, name);
     }
 }

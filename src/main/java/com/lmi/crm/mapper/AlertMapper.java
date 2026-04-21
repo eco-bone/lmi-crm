@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AlertMapper {
 
-    public AlertResponse toResponse(Alert alert) {
+    public AlertResponse toResponse(Alert alert, String triggeredByName) {
         return AlertResponse.builder()
                 .id(alert.getId())
                 .alertType(alert.getAlertType())
@@ -16,9 +16,14 @@ public class AlertMapper {
                 .relatedEntityType(alert.getRelatedEntityType())
                 .relatedEntityId(alert.getRelatedEntityId())
                 .triggeredBy(alert.getTriggeredBy())
+                .triggeredByName(triggeredByName)
                 .status(alert.getStatus())
                 .actionRequired(Boolean.TRUE.equals(alert.getActionRequired()))
                 .createdAt(alert.getCreatedAt())
                 .build();
+    }
+
+    public AlertResponse toResponse(Alert alert) {
+        return toResponse(alert, null);
     }
 }

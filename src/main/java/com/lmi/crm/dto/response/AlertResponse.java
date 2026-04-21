@@ -23,6 +23,7 @@ public class AlertResponse {
     private RelatedEntityType relatedEntityType;
     private Integer relatedEntityId;
     private Integer triggeredBy;
+    private String triggeredByName;
     private AlertStatus status;
     private boolean actionRequired;
     private LocalDateTime createdAt;

@@ -1,18 +1,11 @@
 package com.lmi.crm.scheduler;
 
-import com.lmi.crm.dao.AlertRepository;
 import com.lmi.crm.dao.ProspectLicenseeRepository;
 import com.lmi.crm.dao.ProspectRepository;
 import com.lmi.crm.dao.UserRepository;
 import com.lmi.crm.entity.Prospect;
-import com.lmi.crm.entity.ProspectLicensee;
-import com.lmi.crm.entity.User;
-import com.lmi.crm.enums.AlertStatus;
-import com.lmi.crm.enums.AlertType;
 import com.lmi.crm.enums.ProspectProgramType;
 import com.lmi.crm.enums.ProspectStatus;
-import com.lmi.crm.enums.RelatedEntityType;
-import com.lmi.crm.service.AlertService;
 import com.lmi.crm.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +30,7 @@ public class ProtectionScheduler {
     private UserRepository userRepository;
 
     @Autowired
-    private AlertService alertService;
-
-    @Autowired
     private NotificationService notificationService;
-
-    @Autowired
-    private AlertRepository alertRepository;
 
     // -------------------------------------------------------------------------
     // Job 2 runs before Job 1 (same cron) so that prospects reaching day 75
@@ -62,23 +49,21 @@ public class ProtectionScheduler {
                 prospect.setStatus(ProspectStatus.UNPROTECTED);
                 prospectRepository.save(prospect);
 
-                alertRepository.findByAlertTypeAndRelatedEntityIdAndStatus(
-                        AlertType.PROSPECT_PROTECTION_WARNING, prospect.getId(), AlertStatus.PENDING)
-                        .ifPresent(a -> {
-                            a.setStatus(AlertStatus.RESOLVED);
-                            alertRepository.save(a);
-                        });
+                String message = "Prospect " + prospect.getCompanyName()
+                        + " has become unprotected. No first meeting was recorded within 75 days.";
 
-                alertService.createAlert(
-                        AlertType.PROSPECT_UNPROTECTED,
-                        "Prospect Unprotected — " + prospect.getCompanyName(),
-                        "Prospect " + prospect.getCompanyName() + " (id: " + prospect.getId()
-                                + ") has become unprotected. No first meeting was recorded within 75 days.",
-                        RelatedEntityType.PROSPECT,
-                        prospect.getId(),
-                        null,
-                        false
-                );
+                prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospect.getId())
+                        .ifPresent(pl -> userRepository.findById(pl.getLicenseeId()).ifPresent(licensee ->
+                                notificationService.sendProtectionWarningEmail(
+                                        licensee.getEmail(), prospect.getCompanyName(), message)
+                        ));
+
+                if (prospect.getAssociateId() != null) {
+                    userRepository.findById(prospect.getAssociateId()).ifPresent(associate ->
+                            notificationService.sendProtectionWarningEmail(
+                                    associate.getEmail(), prospect.getCompanyName(), message)
+                    );
+                }
 
                 log.warn("Prospect unprotected (no first meeting) — prospectId: {}, company: {}",
                         prospect.getId(), prospect.getCompanyName());
@@ -105,25 +90,14 @@ public class ProtectionScheduler {
                     continue;
                 }
 
-                boolean warningExists = alertRepository.findByAlertTypeAndRelatedEntityIdAndStatus(
-                        AlertType.PROSPECT_PROTECTION_WARNING, prospect.getId(), AlertStatus.PENDING)
-                        .isPresent();
-                if (warningExists) {
-                    log.debug("checkFirstMeetingDeadlines — skipping prospectId: {} (warning already pending)",
-                            prospect.getId());
-                    continue;
-                }
-
                 prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospect.getId())
-                        .ifPresent(pl -> {
-                            userRepository.findById(pl.getLicenseeId()).ifPresent(licensee ->
-                                    notificationService.sendProtectionWarningEmail(
-                                            licensee.getEmail(),
-                                            prospect.getCompanyName(),
-                                            "Day 45 — first meeting not recorded. Prospect will become unprotected at day 75."
-                                    )
-                            );
-                        });
+                        .ifPresent(pl -> userRepository.findById(pl.getLicenseeId()).ifPresent(licensee ->
+                                notificationService.sendProtectionWarningEmail(
+                                        licensee.getEmail(),
+                                        prospect.getCompanyName(),
+                                        "Day 45 — first meeting not recorded. Prospect will become unprotected at day 75."
+                                )
+                        ));
 
                 if (prospect.getAssociateId() != null) {
                     userRepository.findById(prospect.getAssociateId()).ifPresent(associate ->
@@ -134,17 +108,6 @@ public class ProtectionScheduler {
                             )
                     );
                 }
-
-                alertService.createAlert(
-                        AlertType.PROSPECT_PROTECTION_WARNING,
-                        "Protection Warning — " + prospect.getCompanyName(),
-                        "No first meeting recorded within 45 days for prospect: " + prospect.getCompanyName()
-                                + " (id: " + prospect.getId() + ")",
-                        RelatedEntityType.PROSPECT,
-                        prospect.getId(),
-                        null,
-                        false
-                );
 
                 log.warn("Protection warning fired — prospectId: {}, company: {}, entryDate: {}",
                         prospect.getId(), prospect.getCompanyName(), prospect.getEntryDate());
@@ -178,23 +141,21 @@ public class ProtectionScheduler {
                 prospect.setStatus(ProspectStatus.UNPROTECTED);
                 prospectRepository.save(prospect);
 
-                alertRepository.findByAlertTypeAndRelatedEntityIdAndStatus(
-                        AlertType.PROSPECT_PROTECTION_WARNING, prospect.getId(), AlertStatus.PENDING)
-                        .ifPresent(a -> {
-                            a.setStatus(AlertStatus.RESOLVED);
-                            alertRepository.save(a);
-                        });
+                String message = "Prospect " + prospect.getCompanyName()
+                        + " has become unprotected after the grace period expired with no activity.";
 
-                alertService.createAlert(
-                        AlertType.PROSPECT_UNPROTECTED,
-                        "Prospect Unprotected — " + prospect.getCompanyName(),
-                        "Prospect " + prospect.getCompanyName() + " (id: " + prospect.getId()
-                                + ") has become unprotected after grace period expired with no activity.",
-                        RelatedEntityType.PROSPECT,
-                        prospect.getId(),
-                        null,
-                        false
-                );
+                prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospect.getId())
+                        .ifPresent(pl -> userRepository.findById(pl.getLicenseeId()).ifPresent(licensee ->
+                                notificationService.sendProtectionWarningEmail(
+                                        licensee.getEmail(), prospect.getCompanyName(), message)
+                        ));
+
+                if (prospect.getAssociateId() != null) {
+                    userRepository.findById(prospect.getAssociateId()).ifPresent(associate ->
+                            notificationService.sendProtectionWarningEmail(
+                                    associate.getEmail(), prospect.getCompanyName(), message)
+                    );
+                }
 
                 log.warn("Prospect unprotected (grace period expired) — prospectId: {}, company: {}, programType: {}",
                         prospect.getId(), prospect.getCompanyName(), prospect.getProgramType());
@@ -231,25 +192,14 @@ public class ProtectionScheduler {
                     continue;
                 }
 
-                boolean warningExists = alertRepository.findByAlertTypeAndRelatedEntityIdAndStatus(
-                        AlertType.PROSPECT_PROTECTION_WARNING, prospect.getId(), AlertStatus.PENDING)
-                        .isPresent();
-                if (warningExists) {
-                    log.debug("checkActivityDeadlines — skipping prospectId: {} (warning already pending)",
-                            prospect.getId());
-                    continue;
-                }
-
                 prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospect.getId())
-                        .ifPresent(pl -> {
-                            userRepository.findById(pl.getLicenseeId()).ifPresent(licensee ->
-                                    notificationService.sendProtectionWarningEmail(
-                                            licensee.getEmail(),
-                                            prospect.getCompanyName(),
-                                            "No activity recorded within the base protection period. Grace period of 3 months has started."
-                                    )
-                            );
-                        });
+                        .ifPresent(pl -> userRepository.findById(pl.getLicenseeId()).ifPresent(licensee ->
+                                notificationService.sendProtectionWarningEmail(
+                                        licensee.getEmail(),
+                                        prospect.getCompanyName(),
+                                        "No activity recorded within the base protection period. Grace period of 3 months has started."
+                                )
+                        ));
 
                 if (prospect.getAssociateId() != null) {
                     userRepository.findById(prospect.getAssociateId()).ifPresent(associate ->
@@ -260,17 +210,6 @@ public class ProtectionScheduler {
                             )
                     );
                 }
-
-                alertService.createAlert(
-                        AlertType.PROSPECT_PROTECTION_WARNING,
-                        "Grace Period Started — " + prospect.getCompanyName(),
-                        "Prospect " + prospect.getCompanyName() + " (id: " + prospect.getId()
-                                + ") has entered the grace period due to inactivity.",
-                        RelatedEntityType.PROSPECT,
-                        prospect.getId(),
-                        null,
-                        false
-                );
 
                 log.warn("Grace period started — prospectId: {}, company: {}, programType: {}, lastMeeting: {}",
                         prospect.getId(), prospect.getCompanyName(),

@@ -3,6 +3,7 @@ package com.lmi.crm.auth;
 import com.lmi.crm.auth.dto.LoginRequest;
 import com.lmi.crm.auth.dto.LoginResponse;
 import com.lmi.crm.auth.dto.SetupPasswordRequest;
+import com.lmi.crm.auth.dto.TokenValidationResponse;
 import com.lmi.crm.auth.dto.VerifyOtpRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import jakarta.validation.Valid;
@@ -62,10 +63,10 @@ public class AuthController {
     }
 
     @GetMapping("/setup/validate-token")
-    public ResponseEntity<ApiResponse<Boolean>> validateToken(@RequestParam String token) {
+    public ResponseEntity<TokenValidationResponse> validateToken(@RequestParam String token) {
         log.debug("GET /api/auth/setup/validate-token — token: {}...{}", token.substring(0, 6), token.substring(token.length() - 4));
-        Boolean valid = authService.validateInviteToken(token);
-        log.debug("GET /api/auth/setup/validate-token — valid: {}", valid);
-        return ResponseEntity.ok(ApiResponse.success("Token validation result", valid));
+        TokenValidationResponse response = authService.validateInviteToken(token);
+        log.debug("GET /api/auth/setup/validate-token — valid: {}", response.getValid());
+        return ResponseEntity.ok(response);
     }
 }

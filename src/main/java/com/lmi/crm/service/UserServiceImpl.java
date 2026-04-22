@@ -66,6 +66,9 @@ public class UserServiceImpl implements UserService {
     @Value("${app.base-url}")
     private String baseUrl;
 
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
+
     @Value("${app.mlo-user-id}")
     private Integer mloUserId;
 
@@ -105,8 +108,7 @@ public class UserServiceImpl implements UserService {
 
         List<LicenseeCity> savedCities = licenseeCityRepository.saveAll(cities);
 
-        // TODO: replace with frontend URL when frontend is set up: baseUrl + "/setup-account?token=" + invitationToken
-        String inviteLink = baseUrl + "/api/auth/setup/password?token=" + invitationToken;
+        String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
         notificationService.sendInviteEmail(user.getEmail(), inviteLink, tempPassword);
 
         log.info("Licensee created — id: {}, email: {}, createdBy: {}", userId, user.getEmail(), requestingUserId);
@@ -140,8 +142,7 @@ public class UserServiceImpl implements UserService {
         user.setInvitationToken(invitationToken);
         User savedUser = userRepository.save(user);
 
-        // TODO: replace with frontend URL when frontend is set up: baseUrl + "/setup-account?token=" + invitationToken
-        String inviteLink = baseUrl + "/api/auth/setup/password?token=" + invitationToken;
+        String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
         notificationService.sendInviteEmail(savedUser.getEmail(), inviteLink, tempPassword);
 
         log.info("Admin created — id: {}, email: {}, createdBy: {}", savedUser.getId(), savedUser.getEmail(), requestingSuperAdminId);
@@ -245,8 +246,7 @@ public class UserServiceImpl implements UserService {
         alert.setStatus(AlertStatus.RESOLVED);
         alertRepository.save(alert);
 
-        // TODO: replace with frontend URL when frontend is set up: baseUrl + "/setup-account?token=" + invitationToken
-        String inviteLink = baseUrl + "/api/auth/setup/password?token=" + invitationToken;
+        String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
         notificationService.sendInviteEmail(associate.getEmail(), inviteLink, tempPassword);
 
         log.info("Associate created — id: {}, email: {}, licenseeId: {}, approvedBy: {}",

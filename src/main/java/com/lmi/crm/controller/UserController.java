@@ -1,5 +1,6 @@
 package com.lmi.crm.controller;
 
+import com.lmi.crm.dto.request.AddAssociateRequest;
 import com.lmi.crm.dto.request.AddLicenseeRequest;
 import com.lmi.crm.dto.request.RequestAssociateCreationRequest;
 import com.lmi.crm.dto.request.ResetPasswordRequest;
@@ -49,6 +50,17 @@ public class UserController {
         log.info("POST /api/admin/licensees — requestingUserId: {}, newLicensee: {} {}", requestingUserId, request.getFirstName(), request.getLastName());
         LicenseeResponse response = userService.addLicensee(request, requestingUserId);
         log.info("POST /api/admin/licensees — licensee created — newUserId: {}", response.getId());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/admin/associates")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<UserResponse> addAssociate(
+            @Valid @RequestBody AddAssociateRequest request) {
+        Integer requestingUserId = SecurityUtils.getCurrentUserId();
+        log.info("POST /api/admin/associates — requestingUserId: {}, associate: {} {}, licenseeId: {}", requestingUserId, request.getFirstName(), request.getLastName(), request.getLicenseeId());
+        UserResponse response = userService.addAssociate(request, requestingUserId);
+        log.info("POST /api/admin/associates — associate created — newUserId: {}", response.getId());
         return ResponseEntity.ok(response);
     }
 

@@ -301,3 +301,32 @@ Caused by: org.hibernate.HibernateException: Unable to determine Dialect without
 	at org.hibernate.boot.registry.internal.StandardServiceRegistryImpl.initiateService(StandardServiceRegistryImpl.java:133)
 	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:260)
 	... 105 common frames omitted
+2026-04-26 00:15:07 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 18.0.2 with PID 1728 (C:\Users\nagpa\Desktop\crm\target\classes started by nagpa in C:\Users\nagpa\Desktop\crm)
+2026-04-26 00:15:07 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-04-26 00:15:07 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-04-26 00:15:12 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-26 00:15:12 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-26 00:15:12 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-26 00:15:26 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-04-26 00:15:30 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-26 00:15:30 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 23.888 seconds (process running for 24.828)
+2026-04-26 00:15:30 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-04-26 00:15:30 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-04-26 00:15:34 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-26 00:15:34 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-04-26 00:15:34 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-04-26 00:15:35 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: nagpalajay@gmail.com
+2026-04-26 00:15:35 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: nagpalajay@gmail.com
+2026-04-26 00:15:36 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 1, role: SUPER_ADMIN, status: ACTIVE
+2026-04-26 00:15:36 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 1, role: SUPER_ADMIN, expiresAt: Mon Apr 27 00:15:36 IST 2026
+2026-04-26 00:15:36 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 1, role: SUPER_ADMIN
+2026-04-26 00:15:36 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 1, role: SUPER_ADMIN
+2026-04-26 00:15:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/users
+2026-04-26 00:15:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-26 00:15:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-26 00:15:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/users
+2026-04-26 00:15:52 [http-nio-8080-exec-3] INFO  c.lmi.crm.controller.UserController - GET /api/users — requestingUserId: 1, roleFilter: LICENSEE, statusFilter: null, includeAllStatuses: false
+2026-04-26 00:15:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.service.UserServiceImpl - getUsers — requestingUserId: 1, roleFilter: LICENSEE, statusFilter: null, includeAllStatuses: false
+2026-04-26 00:15:53 [http-nio-8080-exec-3] DEBUG com.lmi.crm.service.UserServiceImpl - getUsers — role: SUPER_ADMIN, effectiveStatus: ACTIVE
+2026-04-26 00:15:53 [http-nio-8080-exec-3] DEBUG com.lmi.crm.service.UserServiceImpl - getUsers — found 7 users — requestingUserId: 1
+2026-04-26 00:15:54 [http-nio-8080-exec-3] INFO  c.lmi.crm.controller.UserController - GET /api/users — returned 7 records — requestingUserId: 1

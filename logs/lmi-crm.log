@@ -330,3 +330,93 @@ Caused by: org.hibernate.HibernateException: Unable to determine Dialect without
 2026-04-26 00:15:53 [http-nio-8080-exec-3] DEBUG com.lmi.crm.service.UserServiceImpl - getUsers — role: SUPER_ADMIN, effectiveStatus: ACTIVE
 2026-04-26 00:15:53 [http-nio-8080-exec-3] DEBUG com.lmi.crm.service.UserServiceImpl - getUsers — found 7 users — requestingUserId: 1
 2026-04-26 00:15:54 [http-nio-8080-exec-3] INFO  c.lmi.crm.controller.UserController - GET /api/users — returned 7 records — requestingUserId: 1
+2026-04-26 00:23:34 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 18.0.2 with PID 2280 (C:\Users\nagpa\Desktop\crm\target\classes started by nagpa in C:\Users\nagpa\Desktop\crm)
+2026-04-26 00:23:34 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-04-26 00:23:34 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-04-26 00:23:40 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-26 00:23:40 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-26 00:23:40 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-26 00:23:59 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-04-26 00:24:04 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-26 00:24:04 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 31.626 seconds (process running for 33.058)
+2026-04-26 00:24:04 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-04-26 00:24:04 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-04-26 00:25:24 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-26 00:25:24 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/admin/associates
+2026-04-26 00:25:24 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-26 00:25:24 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-26 00:25:25 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — POST /api/admin/associates
+2026-04-26 00:25:25 [http-nio-8080-exec-2] INFO  c.lmi.crm.controller.UserController - POST /api/admin/associates — requestingUserId: 1, associate: Rahul Verma, licenseeId: 2
+2026-04-26 00:25:25 [http-nio-8080-exec-2] DEBUG com.lmi.crm.service.UserServiceImpl - addAssociate — requestingAdminId: 1, email: rahul.verma@test.com, licenseeId: 2
+2026-04-26 00:25:26 [http-nio-8080-exec-2] INFO  c.l.c.s.NotificationServiceImpl - Sending invite email to: rahul.verma@test.com
+2026-04-26 00:25:26 [http-nio-8080-exec-2] INFO  c.l.c.s.NotificationServiceImpl - EMAIL START → to: rahul.verma@test.com, subject: You've been invited to LMI CRM
+2026-04-26 00:25:31 [http-nio-8080-exec-2] INFO  c.l.c.s.NotificationServiceImpl - EMAIL SUCCESS → took 4916 ms
+2026-04-26 00:25:31 [http-nio-8080-exec-2] INFO  com.lmi.crm.service.UserServiceImpl - Associate created directly by admin — id: 27, email: rahul.verma@test.com, licenseeId: 2, createdBy: 1
+2026-04-26 00:25:31 [http-nio-8080-exec-2] INFO  c.lmi.crm.controller.UserController - POST /api/admin/associates — associate created — newUserId: 27
+2026-04-26 00:28:43 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@32442614 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:28:54 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@568bf0a5 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:28:57 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@758d5351 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:29:09 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2e05042a (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:29:12 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@28c40a9 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:29:14 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@1d048c72 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:29:15 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@1b26efac (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:29:19 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2aa92d30 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:29:22 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@4a40b9c4 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:29:54 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@739edbe2 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:30:31 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@3c4a77c2 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:30:34 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@76cff35e (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:30:55 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@613c08a4 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:30:56 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@263c7233 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:31:00 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2f6020a9 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:31:00 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2e1874c9 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:31:08 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@1c34589b (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:31:10 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@77170a2e (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:31:24 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@1a448639 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:31:39 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@1d09e713 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:35:11 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/summary
+2026-04-26 00:35:11 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /api/admin/alerts/summary
+2026-04-26 00:35:19 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-04-26 00:35:19 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-04-26 00:35:19 [http-nio-8080-exec-6] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: nagpalajay@gmail.com
+2026-04-26 00:35:19 [http-nio-8080-exec-6] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: nagpalajay@gmail.com
+2026-04-26 00:35:20 [http-nio-8080-exec-6] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 1, role: SUPER_ADMIN, status: ACTIVE
+2026-04-26 00:35:20 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 1, role: SUPER_ADMIN, expiresAt: Mon Apr 27 00:35:20 IST 2026
+2026-04-26 00:35:20 [http-nio-8080-exec-6] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 1, role: SUPER_ADMIN
+2026-04-26 00:35:20 [http-nio-8080-exec-6] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 1, role: SUPER_ADMIN
+2026-04-26 00:35:42 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/summary
+2026-04-26 00:35:42 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-26 00:35:42 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-26 00:35:43 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/summary
+2026-04-26 00:35:43 [http-nio-8080-exec-7] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer'; For input string: "summary"
+2026-04-26 00:35:43 [http-nio-8080-exec-7] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer'; For input string: "summary"]
+2026-04-26 00:36:26 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/summary
+2026-04-26 00:36:26 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-26 00:36:26 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-26 00:36:27 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/summary
+2026-04-26 00:36:27 [http-nio-8080-exec-9] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer'; For input string: "summary"
+2026-04-26 00:36:27 [http-nio-8080-exec-9] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer'; For input string: "summary"]
+2026-04-26 00:37:51 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 18.0.2 with PID 30680 (C:\Users\nagpa\Desktop\crm\target\classes started by nagpa in C:\Users\nagpa\Desktop\crm)
+2026-04-26 00:37:51 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-04-26 00:37:51 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-04-26 00:38:00 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-26 00:38:00 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-26 00:38:00 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-26 00:38:16 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-04-26 00:38:24 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-26 00:38:24 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 34.851 seconds (process running for 36.469)
+2026-04-26 00:38:24 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-04-26 00:38:24 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-04-26 00:38:28 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-26 00:38:28 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/summary
+2026-04-26 00:38:29 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-26 00:38:29 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-26 00:38:31 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@707a47f1 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:38:31 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@31b219c5 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:38:31 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@135585cd (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:38:31 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@58fad2cc (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:38:31 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6710b70 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:38:31 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@272c564a (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:38:31 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@18e8d48f (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:38:31 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@160a09ec (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:38:31 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@182ebad6 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:38:31 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@5d75319f (This connection has been closed.). Possibly consider using a shorter maxLifetime value.

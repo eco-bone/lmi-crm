@@ -1,6 +1,7 @@
 package com.lmi.crm.service;
 
 import com.lmi.crm.dto.response.AlertResponse;
+import com.lmi.crm.dto.response.AlertSummaryResponse;
 import com.lmi.crm.enums.AlertStatus;
 import com.lmi.crm.enums.AlertType;
 import com.lmi.crm.enums.RelatedEntityType;
@@ -15,4 +16,6 @@ public interface AlertService {
     Page<AlertResponse> getAlerts(Integer requestingUserId, AlertType typeFilter, AlertStatus statusFilter, int page, int size);
 
     AlertResponse getAlertDetail(Integer requestingUserId, Integer alertId);
+
+    AlertSummaryResponse getAlertSummary(Integer requestingUserId);
 }

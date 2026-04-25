@@ -286,7 +286,20 @@ public class UserServiceImpl implements UserService {
         }
 
         log.debug("getUsers — found {} users — requestingUserId: {}", users.size(), requestingUserId);
-        return users.stream().map(userMapper::toResponse).toList();
+        return users.stream().map(user -> {
+            UserResponse response = userMapper.toResponse(user);
+            if (user.getRole() == UserRole.LICENSEE) {
+                List<LicenseeCity> cities = licenseeCityRepository.findByLicenseeId(user.getId());
+                response.setCities(cities.stream().map(c -> {
+                    LicenseeResponse.CityInfo info = new LicenseeResponse.CityInfo();
+                    info.setId(c.getId());
+                    info.setCity(c.getCity());
+                    info.setIsPrimary(c.getIsPrimary());
+                    return info;
+                }).toList());
+            }
+            return response;
+        }).toList();
     }
 
     @Override

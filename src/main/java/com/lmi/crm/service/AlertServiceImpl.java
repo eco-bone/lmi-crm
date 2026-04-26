@@ -3,7 +3,10 @@ package com.lmi.crm.service;
 import com.lmi.crm.dao.AlertRepository;
 import com.lmi.crm.dao.UserRepository;
 import com.lmi.crm.dto.response.AlertResponse;
+import com.lmi.crm.dto.response.AlertSummaryEntry;
 import com.lmi.crm.dto.response.AlertSummaryResponse;
+import com.lmi.crm.dto.response.AlertsOverviewResponse;
+import com.lmi.crm.dto.response.AlertsPageResponse;
 import com.lmi.crm.entity.Alert;
 import com.lmi.crm.entity.User;
 import com.lmi.crm.enums.AlertStatus;
@@ -15,15 +18,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -71,38 +74,80 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
-    public Page<AlertResponse> getAlerts(Integer requestingUserId, AlertType typeFilter, AlertStatus statusFilter, int page, int size) {
+    public Object getAlerts(Integer requestingUserId, boolean getAll, AlertType typeFilter, AlertStatus statusFilter, int page, int limit) {
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
+        if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN)
             throw new RuntimeException("Access denied");
-        }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        log.info("GET /api/admin/alerts — requestingUserId: {}, getAll: {}, typeFilter: {}, statusFilter: {}, page: {}, limit: {}",
+                requestingUserId, getAll, typeFilter, statusFilter, page, limit);
 
-        Page<Alert> alerts;
-        if (typeFilter != null && statusFilter != null) {
-            alerts = alertRepository.findByAlertTypeAndStatus(typeFilter, statusFilter, pageable);
-        } else if (typeFilter != null) {
-            alerts = alertRepository.findByAlertType(typeFilter, pageable);
-        } else if (statusFilter != null) {
-            alerts = alertRepository.findByStatus(statusFilter, pageable);
+        if (getAll) {
+            long overallTotal = alertRepository.count();
+            long overallPending = alertRepository.countByStatus(AlertStatus.PENDING);
+
+            List<AlertSummaryEntry> summaries = Arrays.stream(AlertType.values())
+                    .map(type -> {
+                        long total = alertRepository.countByAlertType(type);
+                        long pending = alertRepository.countByAlertTypeAndStatus(type, AlertStatus.PENDING);
+                        Pageable firstPage = PageRequest.of(0, limit, Sort.by("createdAt").descending());
+                        Page<Alert> alerts = alertRepository.findByAlertType(type, firstPage);
+                        return AlertSummaryEntry.builder()
+                                .alertType(type)
+                                .totalCount(total)
+                                .pendingCount(pending)
+                                .firstPage(alerts.map(this::mapWithName))
+                                .build();
+                    })
+                    .toList();
+
+            log.info("GET /api/admin/alerts — getAll mode — overallTotal: {}, overallPending: {}", overallTotal, overallPending);
+
+            return AlertsOverviewResponse.builder()
+                    .overallTotal(overallTotal)
+                    .overallPending(overallPending)
+                    .summaries(summaries)
+                    .build();
+
         } else {
-            alerts = alertRepository.findAll(pageable);
-        }
+            Pageable pageable = PageRequest.of(page, limit, Sort.by("createdAt").descending());
 
-        log.info("GET /api/admin/alerts — requestingUserId: {}, typeFilter: {}, statusFilter: {}, page: {}, size: {}", requestingUserId, typeFilter, statusFilter, page, size);
-        log.info("GET /api/admin/alerts — returning {} total alerts", alerts.getTotalElements());
-
-        return alerts.map(alert -> {
-            String name = null;
-            if (alert.getTriggeredBy() != null) {
-                name = userRepository.findById(alert.getTriggeredBy())
-                        .map(u -> u.getFirstName() + " " + u.getLastName())
-                        .orElse("Unknown");
+            Page<Alert> alerts;
+            if (typeFilter != null && statusFilter != null) {
+                alerts = alertRepository.findByAlertTypeAndStatus(typeFilter, statusFilter, pageable);
+            } else if (typeFilter != null) {
+                alerts = alertRepository.findByAlertType(typeFilter, pageable);
+            } else if (statusFilter != null) {
+                alerts = alertRepository.findByStatus(statusFilter, pageable);
+            } else {
+                alerts = alertRepository.findAll(pageable);
             }
-            return alertMapper.toResponse(alert, name);
-        });
+
+            long overallTotal = alertRepository.count();
+            long overallPending = alertRepository.countByStatus(AlertStatus.PENDING);
+
+            log.info("GET /api/admin/alerts — paginated mode — typeFilter: {}, statusFilter: {}, page: {}, limit: {}, total: {}",
+                    typeFilter, statusFilter, page, limit, alerts.getTotalElements());
+
+            return AlertsPageResponse.builder()
+                    .overallTotal(overallTotal)
+                    .overallPending(overallPending)
+                    .alertType(typeFilter)
+                    .statusFilter(statusFilter)
+                    .alerts(alerts.map(this::mapWithName))
+                    .build();
+        }
+    }
+
+    private AlertResponse mapWithName(Alert alert) {
+        String name = null;
+        if (alert.getTriggeredBy() != null) {
+            name = userRepository.findById(alert.getTriggeredBy())
+                    .map(u -> u.getFirstName() + " " + u.getLastName())
+                    .orElse("Unknown");
+        }
+        return alertMapper.toResponse(alert, name);
     }
 
     @Override

@@ -23,6 +23,12 @@ public interface AlertRepository extends JpaRepository<Alert, Integer> {
 
     Page<Alert> findByStatus(AlertStatus status, Pageable pageable);
 
+    long countByAlertType(AlertType alertType);
+
+    long countByAlertTypeAndStatus(AlertType alertType, AlertStatus status);
+
+    long countByStatus(AlertStatus status);
+
     @Query("SELECT a.alertType, COUNT(a) FROM Alert a GROUP BY a.alertType")
     List<Object[]> countByAlertType();
 }

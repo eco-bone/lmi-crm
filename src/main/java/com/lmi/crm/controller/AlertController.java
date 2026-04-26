@@ -9,7 +9,6 @@ import com.lmi.crm.service.AlertService;
 import com.lmi.crm.util.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,13 +23,14 @@ public class AlertController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
-    public ResponseEntity<ApiResponse<Page<AlertResponse>>> getAlerts(
+    public ResponseEntity<ApiResponse<?>> getAlerts(
+            @RequestParam(defaultValue = "false") boolean getAll,
             @RequestParam(required = false) AlertType type,
             @RequestParam(required = false) AlertStatus status,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "5") int limit) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        Page<AlertResponse> response = alertService.getAlerts(requestingUserId, type, status, page, size);
+        Object response = alertService.getAlerts(requestingUserId, getAll, type, status, page, limit);
         return ResponseEntity.ok(ApiResponse.success("Alerts retrieved successfully", response));
     }
 

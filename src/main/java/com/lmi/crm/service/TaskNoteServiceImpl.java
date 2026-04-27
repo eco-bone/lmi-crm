@@ -7,13 +7,20 @@ import com.lmi.crm.dto.request.CreateTaskRequest;
 import com.lmi.crm.dto.request.UpdateNoteRequest;
 import com.lmi.crm.dto.request.UpdateTaskRequest;
 import com.lmi.crm.dto.response.NoteResponse;
+import com.lmi.crm.dto.response.NotesPageResponse;
+import com.lmi.crm.dto.response.NotesSummaryResponse;
 import com.lmi.crm.dto.response.TaskResponse;
+import com.lmi.crm.dto.response.TasksPageResponse;
+import com.lmi.crm.dto.response.TasksSummaryResponse;
 import com.lmi.crm.entity.UserItem;
 import com.lmi.crm.enums.TaskStatus;
 import com.lmi.crm.enums.UserItemType;
 import com.lmi.crm.mapper.TaskNoteMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -101,17 +108,60 @@ public class TaskNoteServiceImpl implements TaskNoteService {
     }
 
     @Override
-    public List<TaskResponse> getTasks(Integer requestingUserId, TaskStatus statusFilter) {
+    public Object getTasks(Integer requestingUserId, boolean getAll, TaskStatus statusFilter, int page, int limit) {
         userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<UserItem> tasks;
-        if (statusFilter != null) {
-            tasks = userItemRepository.findByUserIdAndTypeAndTaskStatusOrderByDueDateAsc(requestingUserId, UserItemType.TASK, statusFilter);
+        List<UserItem> allTasks = userItemRepository.findByUserIdAndTypeOrderByDueDateAsc(requestingUserId, UserItemType.TASK);
+
+        long totalCount = allTasks.size();
+        long pendingCount = allTasks.stream().filter(t -> t.getTaskStatus() == TaskStatus.PENDING).count();
+        long completedCount = allTasks.stream().filter(t -> t.getTaskStatus() == TaskStatus.COMPLETED).count();
+
+        log.info("getTasks — requestingUserId: {}, getAll: {}, statusFilter: {}, page: {}, limit: {}, totalCount: {}",
+                requestingUserId, getAll, statusFilter, page, limit, totalCount);
+
+        if (getAll) {
+            List<TaskResponse> allResponses = allTasks.stream().map(taskNoteMapper::toTaskResponse).toList();
+            int end = Math.min(limit, allResponses.size());
+            Page<TaskResponse> firstPage = new PageImpl<>(
+                    end > 0 ? allResponses.subList(0, end) : List.of(),
+                    PageRequest.of(0, limit),
+                    allResponses.size());
+
+            log.info("getTasks — getAll mode — requestingUserId: {}, totalCount: {}, pendingCount: {}, completedCount: {}",
+                    requestingUserId, totalCount, pendingCount, completedCount);
+
+            return TasksSummaryResponse.builder()
+                    .totalCount(totalCount)
+                    .pendingCount(pendingCount)
+                    .completedCount(completedCount)
+                    .firstPage(firstPage)
+                    .build();
         } else {
-            tasks = userItemRepository.findByUserIdAndTypeOrderByDueDateAsc(requestingUserId, UserItemType.TASK);
+            List<UserItem> filteredTasks = statusFilter != null
+                    ? allTasks.stream().filter(t -> t.getTaskStatus() == statusFilter).toList()
+                    : allTasks;
+
+            List<TaskResponse> filteredResponses = filteredTasks.stream().map(taskNoteMapper::toTaskResponse).toList();
+
+            int start = page * limit;
+            int end = Math.min(start + limit, filteredResponses.size());
+            List<TaskResponse> pageContent = start < filteredResponses.size()
+                    ? filteredResponses.subList(start, end)
+                    : List.of();
+            Page<TaskResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), filteredResponses.size());
+
+            log.info("getTasks — paginated mode — requestingUserId: {}, totalCount: {}, filteredTotal: {}, page: {}, limit: {}",
+                    requestingUserId, totalCount, filteredResponses.size(), page, limit);
+
+            return TasksPageResponse.builder()
+                    .totalCount(totalCount)
+                    .pendingCount(pendingCount)
+                    .completedCount(completedCount)
+                    .tasks(pageResult)
+                    .build();
         }
-        return tasks.stream().map(taskNoteMapper::toTaskResponse).toList();
     }
 
     @Override
@@ -178,9 +228,44 @@ public class TaskNoteServiceImpl implements TaskNoteService {
     }
 
     @Override
-    public List<NoteResponse> getNotes(Integer requestingUserId) {
-        return userItemRepository.findByUserIdAndTypeOrderByUpdatedAtDesc(requestingUserId, UserItemType.NOTE)
-                .stream().map(taskNoteMapper::toNoteResponse).toList();
+    public Object getNotes(Integer requestingUserId, boolean getAll, int page, int limit) {
+        List<UserItem> allNotes = userItemRepository.findByUserIdAndTypeOrderByUpdatedAtDesc(requestingUserId, UserItemType.NOTE);
+        long totalCount = allNotes.size();
+
+        log.info("getNotes — requestingUserId: {}, getAll: {}, page: {}, limit: {}, totalCount: {}",
+                requestingUserId, getAll, page, limit, totalCount);
+
+        List<NoteResponse> allResponses = allNotes.stream().map(taskNoteMapper::toNoteResponse).toList();
+
+        if (getAll) {
+            int end = Math.min(limit, allResponses.size());
+            Page<NoteResponse> firstPage = new PageImpl<>(
+                    end > 0 ? allResponses.subList(0, end) : List.of(),
+                    PageRequest.of(0, limit),
+                    allResponses.size());
+
+            log.info("getNotes — getAll mode — requestingUserId: {}, totalCount: {}", requestingUserId, totalCount);
+
+            return NotesSummaryResponse.builder()
+                    .totalCount(totalCount)
+                    .firstPage(firstPage)
+                    .build();
+        } else {
+            int start = page * limit;
+            int end = Math.min(start + limit, allResponses.size());
+            List<NoteResponse> pageContent = start < allResponses.size()
+                    ? allResponses.subList(start, end)
+                    : List.of();
+            Page<NoteResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
+
+            log.info("getNotes — paginated mode — requestingUserId: {}, totalCount: {}, page: {}, limit: {}",
+                    requestingUserId, totalCount, page, limit);
+
+            return NotesPageResponse.builder()
+                    .totalCount(totalCount)
+                    .notes(pageResult)
+                    .build();
+        }
     }
 
     @Override

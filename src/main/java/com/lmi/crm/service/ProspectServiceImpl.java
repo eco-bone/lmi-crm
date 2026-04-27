@@ -10,6 +10,8 @@ import com.lmi.crm.dto.request.UpdateProspectRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.DuplicateCheckResponse;
 import com.lmi.crm.dto.response.ProspectResponse;
+import com.lmi.crm.dto.response.ProspectsPageResponse;
+import com.lmi.crm.dto.response.ProspectsSummaryResponse;
 import com.lmi.crm.entity.Alert;
 import com.lmi.crm.entity.Prospect;
 import com.lmi.crm.entity.ProspectLicensee;
@@ -28,6 +30,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -217,74 +223,48 @@ public class ProspectServiceImpl implements ProspectService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProspectResponse> getProspects(Integer requestingUserId, ProspectType typeFilter,
-                                               Integer licenseeIdFilter, Integer associateIdFilter, boolean getAll) {
+    public Object getProspects(Integer requestingUserId, boolean getAll, ProspectType typeFilter,
+                               Integer licenseeIdFilter, Integer associateIdFilter, int page, int limit) {
 
-        // Step 1 — Validate requesting user
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        log.info("GET /api/prospects — requestingUserId: {}, role: {}, typeFilter: {}, licenseeIdFilter: {}, associateIdFilter: {}, getAll: {}",
-                requestingUserId, requestingUser.getRole(), typeFilter, licenseeIdFilter, associateIdFilter, getAll);
+        log.info("getProspects — requestingUserId: {}, role: {}, getAll: {}, typeFilter: {}, licenseeIdFilter: {}, associateIdFilter: {}, page: {}, limit: {}",
+                requestingUserId, requestingUser.getRole(), getAll, typeFilter, licenseeIdFilter, associateIdFilter, page, limit);
 
+        boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
+
+        // Fetch scoped list — always scoped to caller's visibility
         List<Prospect> prospects;
-
-        // Step 2 — Role-scoped visibility
         if (requestingUser.getRole() == UserRole.ASSOCIATE) {
-            if (getAll) {
-                prospects = typeFilter != null
-                        ? prospectRepository.findByDeletionStatusFalseAndType(typeFilter)
-                        : prospectRepository.findByDeletionStatusFalse();
-            } else {
-                prospects = prospectRepository.findByAssociateIdAndDeletionStatusFalse(requestingUserId);
-                if (typeFilter != null) {
-                    prospects = prospects.stream()
-                            .filter(p -> p.getType() == typeFilter)
-                            .toList();
-                }
+            prospects = prospectRepository.findByAssociateIdAndDeletionStatusFalse(requestingUserId);
+            if (typeFilter != null) {
+                prospects = prospects.stream().filter(p -> p.getType() == typeFilter).toList();
             }
 
         } else if (requestingUser.getRole() == UserRole.LICENSEE) {
-            if (getAll) {
-                prospects = typeFilter != null
-                        ? prospectRepository.findByDeletionStatusFalseAndType(typeFilter)
-                        : prospectRepository.findByDeletionStatusFalse();
-            } else {
-                List<Integer> prospectIds = prospectLicenseeRepository.findByLicenseeId(requestingUserId)
-                        .stream()
-                        .map(ProspectLicensee::getProspectId)
-                        .toList();
-                prospects = prospectRepository.findByIdInAndDeletionStatusFalse(prospectIds);
-                if (typeFilter != null) {
-                    prospects = prospects.stream()
-                            .filter(p -> p.getType() == typeFilter)
-                            .toList();
-                }
+            List<Integer> prospectIds = prospectLicenseeRepository.findByLicenseeId(requestingUserId)
+                    .stream().map(ProspectLicensee::getProspectId).toList();
+            prospects = prospectRepository.findByIdInAndDeletionStatusFalse(prospectIds);
+            if (typeFilter != null) {
+                prospects = prospects.stream().filter(p -> p.getType() == typeFilter).toList();
             }
 
-        } else if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
+        } else if (isAdmin) {
             if (licenseeIdFilter != null) {
                 List<Integer> prospectIds = prospectLicenseeRepository.findByLicenseeId(licenseeIdFilter)
-                        .stream()
-                        .map(ProspectLicensee::getProspectId)
-                        .toList();
+                        .stream().map(ProspectLicensee::getProspectId).toList();
                 prospects = prospectRepository.findByIdInAndDeletionStatusFalse(prospectIds);
                 if (associateIdFilter != null) {
-                    prospects = prospects.stream()
-                            .filter(p -> associateIdFilter.equals(p.getAssociateId()))
-                            .toList();
+                    prospects = prospects.stream().filter(p -> associateIdFilter.equals(p.getAssociateId())).toList();
                 }
                 if (typeFilter != null) {
-                    prospects = prospects.stream()
-                            .filter(p -> p.getType() == typeFilter)
-                            .toList();
+                    prospects = prospects.stream().filter(p -> p.getType() == typeFilter).toList();
                 }
             } else if (associateIdFilter != null) {
                 prospects = prospectRepository.findByAssociateIdAndDeletionStatusFalse(associateIdFilter);
                 if (typeFilter != null) {
-                    prospects = prospects.stream()
-                            .filter(p -> p.getType() == typeFilter)
-                            .toList();
+                    prospects = prospects.stream().filter(p -> p.getType() == typeFilter).toList();
                 }
             } else if (typeFilter != null) {
                 prospects = prospectRepository.findByDeletionStatusFalseAndType(typeFilter);
@@ -296,26 +276,76 @@ public class ProspectServiceImpl implements ProspectService {
             throw new RuntimeException("Access denied");
         }
 
-        log.info("GET /api/prospects — returning {} prospects for userId: {}", prospects.size(), requestingUserId);
+        // Summary counts from scoped list
+        long overallTotal = prospects.size();
+        long prospectCount = prospects.stream().filter(p -> p.getType() == ProspectType.PROSPECT).count();
+        long clientCount = prospects.stream().filter(p -> p.getType() == ProspectType.CLIENT).count();
+        long provisionalCount = prospects.stream().filter(p -> p.getStatus() == ProspectStatus.PROVISIONAL).count();
+        long unprotectedCount = prospects.stream().filter(p -> p.getStatus() == ProspectStatus.UNPROTECTED).count();
 
-        // Step 4 — Field visibility by role
-        boolean useFullResponse = requestingUser.getRole() == UserRole.ADMIN
-                || requestingUser.getRole() == UserRole.SUPER_ADMIN
-                || getAll;
+        Long globalTotal = null;
+        Long globalPending = null;
+        if (isAdmin) {
+            globalTotal = prospectRepository.countByDeletionStatusFalse();
+            globalPending = prospectRepository.countByStatusAndDeletionStatusFalse(ProspectStatus.PROVISIONAL);
+        }
 
-        if (useFullResponse) {
-            List<Integer> prospectIds = prospects.stream().map(Prospect::getId).toList();
-            Map<Integer, Integer> licenseeMap = prospectLicenseeRepository
-                    .findByProspectIdInAndIsPrimaryTrue(prospectIds)
-                    .stream()
-                    .collect(Collectors.toMap(ProspectLicensee::getProspectId, ProspectLicensee::getLicenseeId));
-            return prospects.stream()
-                    .map(p -> prospectMapper.toResponse(p, licenseeMap.get(p.getId()), null))
-                    .toList();
+        // Build licensee map and map to responses
+        boolean useFullResponse = isAdmin;
+        List<Integer> allProspectIds = prospects.stream().map(Prospect::getId).toList();
+        Map<Integer, Integer> licenseeMap = (useFullResponse && !allProspectIds.isEmpty())
+                ? prospectLicenseeRepository.findByProspectIdInAndIsPrimaryTrue(allProspectIds)
+                        .stream().collect(Collectors.toMap(ProspectLicensee::getProspectId, ProspectLicensee::getLicenseeId))
+                : Map.of();
+
+        List<ProspectResponse> allResponses = prospects.stream()
+                .map(p -> useFullResponse
+                        ? prospectMapper.toResponse(p, licenseeMap.get(p.getId()), null)
+                        : prospectMapper.toLimitedResponse(p))
+                .toList();
+
+        log.info("getProspects — requestingUserId: {}, overallTotal: {}, prospectCount: {}, clientCount: {}",
+                requestingUserId, overallTotal, prospectCount, clientCount);
+
+        if (getAll) {
+            int end = Math.min(limit, allResponses.size());
+            Page<ProspectResponse> firstPage = new PageImpl<>(
+                    end > 0 ? allResponses.subList(0, end) : List.of(),
+                    PageRequest.of(0, limit),
+                    allResponses.size());
+
+            log.info("getProspects — getAll mode — requestingUserId: {}", requestingUserId);
+
+            return ProspectsSummaryResponse.builder()
+                    .overallTotal(overallTotal)
+                    .prospectCount(prospectCount)
+                    .clientCount(clientCount)
+                    .provisionalCount(provisionalCount)
+                    .unprotectedCount(unprotectedCount)
+                    .globalTotal(globalTotal)
+                    .globalPending(globalPending)
+                    .firstPage(firstPage)
+                    .build();
         } else {
-            return prospects.stream()
-                    .map(p -> prospectMapper.toLimitedResponse(p))
-                    .toList();
+            int start = page * limit;
+            int end = Math.min(start + limit, allResponses.size());
+            List<ProspectResponse> pageContent = start < allResponses.size()
+                    ? allResponses.subList(start, end)
+                    : List.of();
+            Page<ProspectResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
+
+            log.info("getProspects — paginated mode — requestingUserId: {}, page: {}, limit: {}", requestingUserId, page, limit);
+
+            return ProspectsPageResponse.builder()
+                    .overallTotal(overallTotal)
+                    .prospectCount(prospectCount)
+                    .clientCount(clientCount)
+                    .provisionalCount(provisionalCount)
+                    .unprotectedCount(unprotectedCount)
+                    .globalTotal(globalTotal)
+                    .globalPending(globalPending)
+                    .prospects(pageResult)
+                    .build();
         }
     }
 

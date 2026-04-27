@@ -17,8 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequestMapping("/api")
@@ -59,10 +57,13 @@ public class TaskNoteController {
 
     @GetMapping("/tasks")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<TaskResponse>>> getTasks(
-            @RequestParam(required = false) TaskStatus status) {
+    public ResponseEntity<ApiResponse<?>> getTasks(
+            @RequestParam(defaultValue = "false") boolean getAll,
+            @RequestParam(required = false) TaskStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int limit) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        List<TaskResponse> response = taskNoteService.getTasks(requestingUserId, status);
+        Object response = taskNoteService.getTasks(requestingUserId, getAll, status, page, limit);
         return ResponseEntity.ok(ApiResponse.success("Tasks retrieved successfully", response));
     }
 
@@ -106,9 +107,12 @@ public class TaskNoteController {
 
     @GetMapping("/notes")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<NoteResponse>>> getNotes() {
+    public ResponseEntity<ApiResponse<?>> getNotes(
+            @RequestParam(defaultValue = "false") boolean getAll,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int limit) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        List<NoteResponse> response = taskNoteService.getNotes(requestingUserId);
+        Object response = taskNoteService.getNotes(requestingUserId, getAll, page, limit);
         return ResponseEntity.ok(ApiResponse.success("Notes retrieved successfully", response));
     }
 

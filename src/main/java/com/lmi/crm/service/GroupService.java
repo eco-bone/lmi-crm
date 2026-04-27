@@ -5,13 +5,11 @@ import com.lmi.crm.dto.request.UpdateGroupRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.GroupResponse;
 
-import java.util.List;
-
 public interface GroupService {
 
     GroupResponse addGroup(AddGroupRequest request, Integer requestingUserId);
 
-    List<GroupResponse> getGroups(Integer requestingUserId, Integer licenseeIdFilter);
+    Object getGroups(Integer requestingUserId, boolean getAll, Integer licenseeIdFilter, int page, int limit);
 
     GroupResponse getGroupDetail(Integer requestingUserId, Integer groupId);
 

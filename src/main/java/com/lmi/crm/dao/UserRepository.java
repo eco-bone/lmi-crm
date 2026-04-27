@@ -30,4 +30,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT u FROM User u WHERE (:role IS NULL OR u.role = :role) AND (:status IS NULL OR u.status = :status)")
     List<User> findByOptionalFilters(@Param("role") UserRole role,
                                      @Param("status") UserStatus status);
+
+    long countByRole(UserRole role);
+
+    long countByRoleAndStatus(UserRole role, UserStatus status);
+
+    long countByLicenseeIdAndRole(Integer licenseeId, UserRole role);
+
+    long countByLicenseeIdAndRoleAndStatus(Integer licenseeId, UserRole role, UserStatus status);
 }

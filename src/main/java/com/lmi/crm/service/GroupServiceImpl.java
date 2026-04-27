@@ -10,6 +10,8 @@ import com.lmi.crm.dto.request.AddGroupRequest;
 import com.lmi.crm.dto.request.UpdateGroupRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.GroupResponse;
+import com.lmi.crm.dto.response.GroupsPageResponse;
+import com.lmi.crm.dto.response.GroupsSummaryResponse;
 import com.lmi.crm.dto.response.ProspectResponse;
 import com.lmi.crm.entity.Alert;
 import com.lmi.crm.entity.Group;
@@ -28,6 +30,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -128,9 +134,12 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<GroupResponse> getGroups(Integer requestingUserId, Integer licenseeIdFilter) {
+    public Object getGroups(Integer requestingUserId, boolean getAll, Integer licenseeIdFilter, int page, int limit) {
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        log.info("getGroups — requestingUserId: {}, getAll: {}, licenseeIdFilter: {}, page: {}, limit: {}",
+                requestingUserId, getAll, licenseeIdFilter, page, limit);
 
         List<Group> groups;
         if (requestingUser.getRole() == UserRole.ASSOCIATE) {
@@ -148,20 +157,52 @@ public class GroupServiceImpl implements GroupService {
             throw new RuntimeException("Access denied");
         }
 
-        log.info("GET /api/groups — returning {} groups for userId: {}", groups.size(), requestingUserId);
-
         List<Integer> userIds = groups.stream()
                 .flatMap(g -> Stream.of(g.getLicenseeId(), g.getFacilitatorId()))
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
-
         Map<Integer, User> userCache = new HashMap<>();
         userRepository.findAllById(userIds).forEach(u -> userCache.put(u.getId(), u));
 
-        return groups.stream()
+        List<GroupResponse> allResponses = groups.stream()
                 .map(g -> buildGroupResponse(g, userCache))
                 .toList();
+
+        long overallTotal = allResponses.size();
+        long activeCount = overallTotal; // all fetched groups have deletionStatus = false
+
+        if (getAll) {
+            int end = Math.min(limit, allResponses.size());
+            Page<GroupResponse> firstPage = new PageImpl<>(
+                    end > 0 ? allResponses.subList(0, end) : List.of(),
+                    PageRequest.of(0, limit),
+                    allResponses.size());
+
+            log.info("getGroups — getAll mode — requestingUserId: {}, overallTotal: {}", requestingUserId, overallTotal);
+
+            return GroupsSummaryResponse.builder()
+                    .overallTotal(overallTotal)
+                    .activeCount(activeCount)
+                    .firstPage(firstPage)
+                    .build();
+        } else {
+            int start = page * limit;
+            int end = Math.min(start + limit, allResponses.size());
+            List<GroupResponse> pageContent = start < allResponses.size()
+                    ? allResponses.subList(start, end)
+                    : List.of();
+            Page<GroupResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
+
+            log.info("getGroups — paginated mode — requestingUserId: {}, overallTotal: {}, page: {}, limit: {}",
+                    requestingUserId, overallTotal, page, limit);
+
+            return GroupsPageResponse.builder()
+                    .overallTotal(overallTotal)
+                    .activeCount(activeCount)
+                    .groups(pageResult)
+                    .build();
+        }
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.lmi.crm.dao.UserRepository;
 import com.lmi.crm.dto.request.AddProspectRequest;
 import com.lmi.crm.dto.request.UpdateProspectRequest;
 import com.lmi.crm.dto.response.ApiResponse;
+import com.lmi.crm.dto.response.DuplicateCheckResponse;
 import com.lmi.crm.dto.response.ProspectResponse;
 import com.lmi.crm.entity.Alert;
 import com.lmi.crm.entity.Prospect;
@@ -84,14 +85,28 @@ public class ProspectServiceImpl implements ProspectService {
             associateId = requestingUserId;
         }
 
-        // Step 2 — Hard duplicate check
+        // Step 2 — Email uniqueness check
+        prospectRepository.findByEmailIgnoreCaseAndDeletionStatusFalse(request.getEmail())
+                .ifPresent(p -> {
+                    throw new RuntimeException(
+                        "A prospect with email '" + request.getEmail() + "' already exists in the system"
+                    );
+                });
+
+        // Step 3 — Hard duplicate check (name + company)
         prospectRepository.findByContactFirstNameIgnoreCaseAndContactLastNameIgnoreCaseAndCompanyNameIgnoreCaseAndDeletionStatusFalse(
                 request.getContactFirstName(), request.getContactLastName(), request.getCompanyName())
                 .ifPresent(p -> {
-                    throw new RuntimeException("A prospect with this contact already exists at this company");
+                    String errorMessage = String.format(
+                        "Duplicate Prospect Detected: %s %s at %s already exists in the system",
+                        p.getContactFirstName(),
+                        p.getContactLastName(),
+                        p.getCompanyName()
+                    );
+                    throw new RuntimeException(errorMessage);
                 });
 
-        // Step 3 — Fuzzy match + city check
+        // Step 4 — Fuzzy match + city check
         boolean isProvisional = false;
         List<String> provisionalReasons = new ArrayList<>();
 
@@ -125,14 +140,14 @@ public class ProspectServiceImpl implements ProspectService {
             log.warn("Prospect flagged as provisional — company: {}, reasons: {}", request.getCompanyName(), combinedDescription);
         }
 
-        // Step 4 — Build and save Prospect entity
+        // Step 5 — Build and save Prospect entity
         Prospect prospect = prospectMapper.fromAddProspectRequest(request, associateId, requestingUserId, isProvisional);
         Prospect savedProspect = prospectRepository.save(prospect);
 
-        // Step 5 — Save ProspectLicensee
+        // Step 6 — Save ProspectLicensee
         prospectLicenseeRepository.save(prospectMapper.toProspectLicensee(savedProspect.getId(), effectiveLicenseeId));
 
-        // Step 6 — Create Alert if provisional
+        // Step 7 — Create Alert if provisional
         if (isProvisional) {
             alertService.createAlert(
                     AlertType.DUPLICATE_PROSPECT,
@@ -203,36 +218,48 @@ public class ProspectServiceImpl implements ProspectService {
     @Override
     @Transactional(readOnly = true)
     public List<ProspectResponse> getProspects(Integer requestingUserId, ProspectType typeFilter,
-                                               Integer licenseeIdFilter, Integer associateIdFilter) {
+                                               Integer licenseeIdFilter, Integer associateIdFilter, boolean getAll) {
 
         // Step 1 — Validate requesting user
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        log.info("GET /api/prospects — requestingUserId: {}, role: {}, typeFilter: {}, licenseeIdFilter: {}, associateIdFilter: {}",
-                requestingUserId, requestingUser.getRole(), typeFilter, licenseeIdFilter, associateIdFilter);
+        log.info("GET /api/prospects — requestingUserId: {}, role: {}, typeFilter: {}, licenseeIdFilter: {}, associateIdFilter: {}, getAll: {}",
+                requestingUserId, requestingUser.getRole(), typeFilter, licenseeIdFilter, associateIdFilter, getAll);
 
         List<Prospect> prospects;
 
         // Step 2 — Role-scoped visibility
         if (requestingUser.getRole() == UserRole.ASSOCIATE) {
-            prospects = prospectRepository.findByAssociateIdAndDeletionStatusFalse(requestingUserId);
-            if (typeFilter != null) {
-                prospects = prospects.stream()
-                        .filter(p -> p.getType() == typeFilter)
-                        .toList();
+            if (getAll) {
+                prospects = typeFilter != null
+                        ? prospectRepository.findByDeletionStatusFalseAndType(typeFilter)
+                        : prospectRepository.findByDeletionStatusFalse();
+            } else {
+                prospects = prospectRepository.findByAssociateIdAndDeletionStatusFalse(requestingUserId);
+                if (typeFilter != null) {
+                    prospects = prospects.stream()
+                            .filter(p -> p.getType() == typeFilter)
+                            .toList();
+                }
             }
 
         } else if (requestingUser.getRole() == UserRole.LICENSEE) {
-            List<Integer> prospectIds = prospectLicenseeRepository.findByLicenseeId(requestingUserId)
-                    .stream()
-                    .map(ProspectLicensee::getProspectId)
-                    .toList();
-            prospects = prospectRepository.findByIdInAndDeletionStatusFalse(prospectIds);
-            if (typeFilter != null) {
-                prospects = prospects.stream()
-                        .filter(p -> p.getType() == typeFilter)
+            if (getAll) {
+                prospects = typeFilter != null
+                        ? prospectRepository.findByDeletionStatusFalseAndType(typeFilter)
+                        : prospectRepository.findByDeletionStatusFalse();
+            } else {
+                List<Integer> prospectIds = prospectLicenseeRepository.findByLicenseeId(requestingUserId)
+                        .stream()
+                        .map(ProspectLicensee::getProspectId)
                         .toList();
+                prospects = prospectRepository.findByIdInAndDeletionStatusFalse(prospectIds);
+                if (typeFilter != null) {
+                    prospects = prospects.stream()
+                            .filter(p -> p.getType() == typeFilter)
+                            .toList();
+                }
             }
 
         } else if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
@@ -272,7 +299,11 @@ public class ProspectServiceImpl implements ProspectService {
         log.info("GET /api/prospects — returning {} prospects for userId: {}", prospects.size(), requestingUserId);
 
         // Step 4 — Field visibility by role
-        if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
+        boolean useFullResponse = requestingUser.getRole() == UserRole.ADMIN
+                || requestingUser.getRole() == UserRole.SUPER_ADMIN
+                || getAll;
+
+        if (useFullResponse) {
             List<Integer> prospectIds = prospects.stream().map(Prospect::getId).toList();
             Map<Integer, Integer> licenseeMap = prospectLicenseeRepository
                     .findByProspectIdInAndIsPrimaryTrue(prospectIds)
@@ -375,6 +406,16 @@ public class ProspectServiceImpl implements ProspectService {
         return "Prospect deleted successfully";
     }
 
+    /**
+     * Returns full prospect information for all authenticated users.
+     * No ownership restrictions apply to viewing prospects.
+     * Ownership validation is performed at action endpoints (update, delete, convert, extend protection).
+     *
+     * @param requestingUserId The ID of the user requesting prospect details
+     * @param prospectId The ID of the prospect to retrieve
+     * @return Full prospect details including all fields
+     * @throws RuntimeException if user or prospect not found
+     */
     @Override
     @Transactional(readOnly = true)
     public ProspectResponse getProspectDetail(Integer requestingUserId, Integer prospectId) {
@@ -389,31 +430,13 @@ public class ProspectServiceImpl implements ProspectService {
 
         log.info("GET /api/prospects/{} — requestingUserId: {}, role: {}", prospectId, requestingUserId, requestingUser.getRole());
 
-        // Step 2 — Ownership check for non-admin roles
-        if (requestingUser.getRole() == UserRole.ASSOCIATE) {
-            if (!requestingUserId.equals(prospect.getAssociateId())) {
-                throw new RuntimeException("Access denied");
-            }
-        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
-            if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, requestingUserId)) {
-                throw new RuntimeException("Access denied");
-            }
-        } else if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
-            throw new RuntimeException("Access denied");
-        }
+        // Step 2 — Return full prospect details for all authenticated users
+        Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospectId)
+                .map(ProspectLicensee::getLicenseeId)
+                .orElse(null);
+        ProspectResponse response = prospectMapper.toResponse(prospect, licenseeId, null);
 
-        // Step 3 — Return response based on role
-        ProspectResponse response;
-        if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
-            Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospectId)
-                    .map(ProspectLicensee::getLicenseeId)
-                    .orElse(null);
-            response = prospectMapper.toResponse(prospect, licenseeId, null);
-        } else {
-            response = prospectMapper.toLimitedResponse(prospect);
-        }
-
-        log.info("GET /api/prospects/{} — returned for userId: {}", prospectId, requestingUserId);
+        log.info("GET /api/prospects/{} — returned full details for userId: {}", prospectId, requestingUserId);
 
         return response;
     }
@@ -590,5 +613,32 @@ public class ProspectServiceImpl implements ProspectService {
                     .orElse(null);
             return ApiResponse.success("Provisional prospect left as-is", prospectMapper.toResponse(prospect, licenseeId, null));
         }
+    }
+
+    @Override
+    public List<DuplicateCheckResponse> checkDuplicateProspects(String companyName) {
+        if (companyName == null || companyName.trim().length() < 2) {
+            return List.of();
+        }
+
+        String prefix = companyName.trim().substring(0, Math.min(2, companyName.trim().length()));
+        List<Prospect> activeProspects = prospectRepository.findByCompanyNameStartingWithIgnoreCaseAndDeletionStatusFalse(prefix);
+
+        List<DuplicateCheckResponse> duplicates = new ArrayList<>();
+        for (Prospect existing : activeProspects) {
+            double similarity = FuzzyMatchUtil.similarity(existing.getCompanyName(), companyName.trim());
+            if (similarity >= 0.65) {
+                DuplicateCheckResponse response = new DuplicateCheckResponse();
+                response.setId(existing.getId().longValue());
+                response.setCompanyName(existing.getCompanyName());
+                response.setCity(existing.getCity());
+                response.setStatus(existing.getStatus());
+                response.setSimilarity(similarity);
+                duplicates.add(response);
+            }
+        }
+
+        log.debug("Duplicate check for '{}' found {} matches", companyName, duplicates.size());
+        return duplicates;
     }
 }

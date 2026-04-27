@@ -3,6 +3,7 @@ package com.lmi.crm.service;
 import com.lmi.crm.dto.request.AddProspectRequest;
 import com.lmi.crm.dto.request.UpdateProspectRequest;
 import com.lmi.crm.dto.response.ApiResponse;
+import com.lmi.crm.dto.response.DuplicateCheckResponse;
 import com.lmi.crm.dto.response.ProspectResponse;
 import com.lmi.crm.enums.ProspectType;
 import com.lmi.crm.enums.ProvisionalDecision;
@@ -16,7 +17,7 @@ public interface ProspectService {
     String requestProtectionExtension(Integer prospectId, Integer requestingUserId);
 
     List<ProspectResponse> getProspects(Integer requestingUserId, ProspectType typeFilter,
-                                        Integer licenseeIdFilter, Integer associateIdFilter);
+                                        Integer licenseeIdFilter, Integer associateIdFilter, boolean getAll);
 
     ProspectResponse getProspectDetail(Integer requestingUserId, Integer prospectId);
 
@@ -29,4 +30,6 @@ public interface ProspectService {
     ApiResponse<ProspectResponse> approveRejectConversion(Integer requestingUserId, Integer alertId, boolean approve);
 
     ApiResponse<ProspectResponse> approveRejectProvisional(Integer requestingUserId, Integer alertId, ProvisionalDecision decision);
+
+    List<DuplicateCheckResponse> checkDuplicateProspects(String companyName);
 }

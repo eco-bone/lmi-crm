@@ -3,6 +3,7 @@ package com.lmi.crm.auth;
 import com.lmi.crm.auth.dto.LoginRequest;
 import com.lmi.crm.auth.dto.LoginResponse;
 import com.lmi.crm.auth.dto.SetupPasswordRequest;
+import com.lmi.crm.auth.dto.TokenValidationResponse;
 import com.lmi.crm.auth.dto.VerifyOtpRequest;
 import com.lmi.crm.config.JwtUtil;
 import com.lmi.crm.dao.OtpStoreRepository;
@@ -244,9 +245,28 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Boolean validateInviteToken(String token) {
-        boolean exists = userRepository.findByInvitationToken(token).isPresent();
-        log.debug("validateInviteToken — valid: {}", exists);
-        return exists;
+    public TokenValidationResponse validateInviteToken(String token) {
+        log.debug("validateInviteToken — checking token");
+
+        return userRepository.findByInvitationToken(token)
+                .filter(user -> user.getStatus() == UserStatus.PENDING)
+                .map(user -> {
+                    log.info("validateInviteToken — valid token for userId: {}", user.getId());
+                    return TokenValidationResponse.builder()
+                            .valid(true)
+                            .userId(user.getId())
+                            .email(user.getEmail())
+                            .phone(user.getPhone())
+                            .firstName(user.getFirstName())
+                            .lastName(user.getLastName())
+                            .build();
+                })
+                .orElseGet(() -> {
+                    log.warn("validateInviteToken — invalid or expired token");
+                    return TokenValidationResponse.builder()
+                            .valid(false)
+                            .message("Invalid or expired invitation token")
+                            .build();
+                });
     }
 }

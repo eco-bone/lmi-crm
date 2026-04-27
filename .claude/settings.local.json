@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./mvnw compile:*)"
+      "Bash(./mvnw compile:*)",
+      "Read(//Users/shubhankarbhanot/lmi_crm/frontend/src/components/**)",
+      "Read(//Users/shubhankarbhanot/lmi_crm/frontend/src/services/**)",
+      "Read(//Users/shubhankarbhanot/lmi_crm/frontend/**)",
+      "Read(//Users/shubhankarbhanot/lmi_crm/**)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

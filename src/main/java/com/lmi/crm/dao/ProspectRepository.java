@@ -19,6 +19,8 @@ public interface ProspectRepository extends JpaRepository<Prospect, Integer> {
     Optional<Prospect> findByContactFirstNameIgnoreCaseAndContactLastNameIgnoreCaseAndCompanyNameIgnoreCaseAndDeletionStatusFalse(
             String contactFirstName, String contactLastName, String companyName);
 
+    Optional<Prospect> findByEmailIgnoreCaseAndDeletionStatusFalse(String email);
+
     List<Prospect> findByCompanyNameStartingWithIgnoreCaseAndDeletionStatusFalse(String prefix);
 
     List<Prospect> findByAssociateIdAndDeletionStatusFalse(Integer associateId);

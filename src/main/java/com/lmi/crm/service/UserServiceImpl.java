@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lmi.crm.dao.AlertRepository;
 import com.lmi.crm.dao.LicenseeCityRepository;
 import com.lmi.crm.dao.UserRepository;
+import com.lmi.crm.dto.request.AddAssociateRequest;
 import com.lmi.crm.dto.request.AddLicenseeRequest;
 import com.lmi.crm.dto.request.RequestAssociateCreationRequest;
 import com.lmi.crm.dto.request.ResetPasswordRequest;
@@ -114,6 +115,48 @@ public class UserServiceImpl implements UserService {
         log.info("Licensee created — id: {}, email: {}, createdBy: {}", userId, user.getEmail(), requestingUserId);
 
         return LicenseeMapper.toResponse(user, savedCities);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse addAssociate(AddAssociateRequest request, Integer requestingAdminId) {
+        log.debug("addAssociate — requestingAdminId: {}, email: {}, licenseeId: {}", requestingAdminId, request.getEmail(), request.getLicenseeId());
+
+        User admin = userRepository.findById(requestingAdminId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingAdminId));
+        if (admin.getRole() != UserRole.ADMIN && admin.getRole() != UserRole.SUPER_ADMIN) {
+            log.warn("addAssociate — access denied — userId: {} role: {}", requestingAdminId, admin.getRole());
+            throw new RuntimeException("Access denied");
+        }
+
+        userRepository.findById(request.getLicenseeId())
+                .filter(u -> u.getRole() == UserRole.LICENSEE)
+                .orElseThrow(() -> new RuntimeException("Licensee not found with id: " + request.getLicenseeId()));
+
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            log.warn("addAssociate — email already exists: {} — requestingAdminId: {}", request.getEmail(), requestingAdminId);
+            throw new RuntimeException("A user with this email already exists");
+        }
+
+        String tempPassword = "Temp-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+
+        User associate = userMapper.forAssociate(
+                request.getFirstName(), request.getLastName(),
+                request.getEmail(), request.getPhone(),
+                tempPassword, request.getLicenseeId()
+        );
+        String invitationToken = UUID.randomUUID().toString();
+        associate.setStatus(UserStatus.PENDING);
+        associate.setInvitationToken(invitationToken);
+        associate = userRepository.save(associate);
+
+        String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
+        notificationService.sendInviteEmail(associate.getEmail(), inviteLink, tempPassword);
+
+        log.info("Associate created directly by admin — id: {}, email: {}, licenseeId: {}, createdBy: {}",
+                associate.getId(), associate.getEmail(), associate.getLicenseeId(), requestingAdminId);
+
+        return userMapper.toResponse(associate);
     }
 
     @Override
@@ -286,7 +329,20 @@ public class UserServiceImpl implements UserService {
         }
 
         log.debug("getUsers — found {} users — requestingUserId: {}", users.size(), requestingUserId);
-        return users.stream().map(userMapper::toResponse).toList();
+        return users.stream().map(user -> {
+            UserResponse response = userMapper.toResponse(user);
+            if (user.getRole() == UserRole.LICENSEE) {
+                List<LicenseeCity> cities = licenseeCityRepository.findByLicenseeId(user.getId());
+                response.setCities(cities.stream().map(c -> {
+                    LicenseeResponse.CityInfo info = new LicenseeResponse.CityInfo();
+                    info.setId(c.getId());
+                    info.setCity(c.getCity());
+                    info.setIsPrimary(c.getIsPrimary());
+                    return info;
+                }).toList());
+            }
+            return response;
+        }).toList();
     }
 
     @Override

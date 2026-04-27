@@ -3,6 +3,7 @@ package com.lmi.crm.service;
 import com.lmi.crm.dao.AlertRepository;
 import com.lmi.crm.dao.UserRepository;
 import com.lmi.crm.dto.response.AlertResponse;
+import com.lmi.crm.dto.response.AlertSummaryResponse;
 import com.lmi.crm.entity.Alert;
 import com.lmi.crm.entity.User;
 import com.lmi.crm.enums.AlertStatus;
@@ -14,6 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -97,6 +103,26 @@ public class AlertServiceImpl implements AlertService {
             }
             return alertMapper.toResponse(alert, name);
         });
+    }
+
+    @Override
+    public AlertSummaryResponse getAlertSummary(Integer requestingUserId) {
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
+            throw new RuntimeException("Access denied");
+        }
+
+        List<Object[]> rows = alertRepository.countByAlertType();
+        Map<AlertType, Long> byType = Arrays.stream(AlertType.values())
+                .collect(Collectors.toMap(t -> t, t -> 0L));
+        rows.forEach(row -> byType.put((AlertType) row[0], (Long) row[1]));
+
+        long total = byType.values().stream().mapToLong(Long::longValue).sum();
+
+        log.info("getAlertSummary — requestingUserId: {}, total: {}", requestingUserId, total);
+
+        return new AlertSummaryResponse(total, byType);
     }
 
     @Override

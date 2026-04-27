@@ -1,6 +1,7 @@
 package com.lmi.crm.controller;
 
 import com.lmi.crm.dto.response.AlertResponse;
+import com.lmi.crm.dto.response.AlertSummaryResponse;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.enums.AlertStatus;
 import com.lmi.crm.enums.AlertType;
@@ -31,6 +32,15 @@ public class AlertController {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
         Page<AlertResponse> response = alertService.getAlerts(requestingUserId, type, status, page, size);
         return ResponseEntity.ok(ApiResponse.success("Alerts retrieved successfully", response));
+    }
+
+    @GetMapping("/summary")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<AlertSummaryResponse>> getAlertSummary() {
+        Integer requestingUserId = SecurityUtils.getCurrentUserId();
+        log.info("GET /api/admin/alerts/summary — requestingUserId: {}", requestingUserId);
+        AlertSummaryResponse response = alertService.getAlertSummary(requestingUserId);
+        return ResponseEntity.ok(ApiResponse.success("Alert summary retrieved successfully", response));
     }
 
     @GetMapping("/{id}")

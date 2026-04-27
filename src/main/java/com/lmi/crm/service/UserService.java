@@ -1,5 +1,6 @@
 package com.lmi.crm.service;
 
+import com.lmi.crm.dto.request.AddAssociateRequest;
 import com.lmi.crm.dto.request.AddLicenseeRequest;
 import com.lmi.crm.dto.request.RequestAssociateCreationRequest;
 import com.lmi.crm.dto.request.ResetPasswordRequest;
@@ -15,6 +16,8 @@ import java.util.List;
 public interface UserService {
 
     LicenseeResponse addLicensee(AddLicenseeRequest request, Integer requestingUserId);
+
+    UserResponse addAssociate(AddAssociateRequest request, Integer requestingAdminId);
 
     UserResponse createAdmin(RequestAssociateCreationRequest request, Integer requestingSuperAdminId);
 

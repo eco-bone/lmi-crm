@@ -420,3 +420,99 @@ Caused by: org.hibernate.HibernateException: Unable to determine Dialect without
 2026-04-26 00:38:31 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@160a09ec (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
 2026-04-26 00:38:31 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@182ebad6 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
 2026-04-26 00:38:31 [http-nio-8080-exec-2] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@5d75319f (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 00:42:31 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 18.0.2 with PID 24340 (C:\Users\nagpa\Desktop\crm\target\classes started by nagpa in C:\Users\nagpa\Desktop\crm)
+2026-04-26 00:42:31 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-04-26 00:42:31 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-04-26 00:42:36 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-26 00:42:36 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-26 00:42:36 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-26 00:42:50 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-04-26 00:42:55 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-26 00:42:55 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 25.618 seconds (process running for 27.11)
+2026-04-26 00:42:55 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-04-26 00:42:55 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-04-26 00:43:07 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-26 00:43:07 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/summary
+2026-04-26 00:43:07 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-26 00:43:07 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-26 00:43:08 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/summary
+2026-04-26 00:43:08 [http-nio-8080-exec-2] INFO  c.lmi.crm.controller.AlertController - GET /api/admin/alerts/summary — requestingUserId: 1
+2026-04-26 00:43:09 [http-nio-8080-exec-2] INFO  c.lmi.crm.service.AlertServiceImpl - getAlertSummary — requestingUserId: 1, total: 24
+2026-04-26 08:27:29 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=7h39m25s578ms708µs200ns).
+2026-04-26 08:27:30 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@5e4feeeb (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 08:27:30 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@1de55a22 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 08:27:30 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@3cfcd7c3 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 08:27:30 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@7a3f7ada (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 08:27:32 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2ae2ced9 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 08:27:32 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2b8a88f5 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 08:27:32 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2527ed0a (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 08:27:32 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@791e0f9 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 08:27:32 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@3b3962d4 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 08:27:32 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@440b9866 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-26 08:29:07 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m12s444ms744µs).
+2026-04-26 08:51:52 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 18.0.2 with PID 27736 (C:\Users\nagpa\Desktop\crm\target\classes started by nagpa in C:\Users\nagpa\Desktop\crm)
+2026-04-26 08:51:52 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-04-26 08:51:52 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-04-26 08:51:57 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-26 08:51:57 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-26 08:51:57 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-26 08:52:09 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-04-26 08:52:13 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-26 08:52:13 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 22.896 seconds (process running for 24.287)
+2026-04-26 08:52:13 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-04-26 08:52:13 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-04-26 08:55:51 [http-nio-8080-exec-3] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-26 08:55:51 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-04-26 08:55:51 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-04-26 08:55:51 [http-nio-8080-exec-3] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: nagpalajay@gmail.com
+2026-04-26 08:55:51 [http-nio-8080-exec-3] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: nagpalajay@gmail.com
+2026-04-26 08:55:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 1, role: SUPER_ADMIN, status: ACTIVE
+2026-04-26 08:55:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 1, role: SUPER_ADMIN, expiresAt: Mon Apr 27 08:55:52 IST 2026
+2026-04-26 08:55:52 [http-nio-8080-exec-3] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 1, role: SUPER_ADMIN
+2026-04-26 08:55:52 [http-nio-8080-exec-3] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 1, role: SUPER_ADMIN
+2026-04-26 08:56:10 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
+2026-04-26 08:56:10 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-26 08:56:10 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-26 08:56:11 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
+2026-04-26 08:56:11 [http-nio-8080-exec-2] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — requestingUserId: 1, getAll: true, typeFilter: null, statusFilter: null, page: 0, limit: 5
+2026-04-26 08:56:23 [http-nio-8080-exec-2] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — getAll mode — overallTotal: 24, overallPending: 5
+2026-04-26 08:56:23 [http-nio-8080-exec-2] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier - Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-04-26 08:56:43 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
+2026-04-26 08:56:43 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-26 08:56:43 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-26 08:56:43 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
+2026-04-26 08:56:43 [http-nio-8080-exec-4] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — requestingUserId: 1, getAll: false, typeFilter: null, statusFilter: null, page: 0, limit: 5
+2026-04-26 08:56:44 [http-nio-8080-exec-4] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — paginated mode — typeFilter: null, statusFilter: null, page: 0, limit: 5, total: 24
+2026-04-26 08:57:27 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/index.html
+2026-04-26 08:57:27 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/index.html
+2026-04-26 08:57:27 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/swagger-ui.css
+2026-04-26 08:57:27 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/swagger-ui.css
+2026-04-26 08:57:27 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/swagger-ui-bundle.js
+2026-04-26 08:57:27 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/swagger-ui-standalone-preset.js
+2026-04-26 08:57:27 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/index.css
+2026-04-26 08:57:27 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/swagger-ui-bundle.js
+2026-04-26 08:57:27 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/swagger-ui-standalone-preset.js
+2026-04-26 08:57:27 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/index.css
+2026-04-26 08:57:27 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/swagger-initializer.js
+2026-04-26 08:57:27 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/swagger-initializer.js
+2026-04-26 08:57:28 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /v3/api-docs/swagger-config
+2026-04-26 08:57:28 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /v3/api-docs/swagger-config
+2026-04-26 08:57:28 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/favicon-32x32.png
+2026-04-26 08:57:28 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/favicon-32x32.png
+2026-04-26 08:57:28 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /v3/api-docs
+2026-04-26 08:57:28 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /v3/api-docs
+2026-04-26 08:57:29 [http-nio-8080-exec-2] INFO  o.s.api.AbstractOpenApiResource - Init duration for springdoc-openapi is: 1698 ms
+2026-04-26 08:58:12 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
+2026-04-26 08:58:12 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /api/admin/alerts
+2026-04-26 09:01:10 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects
+2026-04-26 09:01:10 [http-nio-8080-exec-2] WARN  com.lmi.crm.config.JwtUtil - JWT validation failed — token expired: JWT expired 374377904 milliseconds ago at 2026-04-21T19:31:33.000Z. Current time: 2026-04-26T03:31:10.904Z. Allowed clock skew: 0 milliseconds.
+2026-04-26 09:01:10 [http-nio-8080-exec-2] WARN  com.lmi.crm.config.JwtAuthFilter - JWT filter — invalid token rejected — GET /api/prospects
+2026-04-26 09:03:10 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
+2026-04-26 09:03:10 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-04-26 09:03:10 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-04-26 09:03:10 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
+2026-04-26 09:03:11 [http-nio-8080-exec-9] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — requestingUserId: 1, getAll: false, typeFilter: DUPLICATE_PROSPECT, statusFilter: null, page: 0, limit: 5
+2026-04-26 09:03:11 [http-nio-8080-exec-9] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — paginated mode — typeFilter: DUPLICATE_PROSPECT, statusFilter: null, page: 0, limit: 5, total: 11

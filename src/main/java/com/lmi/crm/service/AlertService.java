@@ -5,7 +5,6 @@ import com.lmi.crm.dto.response.AlertSummaryResponse;
 import com.lmi.crm.enums.AlertStatus;
 import com.lmi.crm.enums.AlertType;
 import com.lmi.crm.enums.RelatedEntityType;
-import org.springframework.data.domain.Page;
 
 public interface AlertService {
 
@@ -13,7 +12,7 @@ public interface AlertService {
                      RelatedEntityType relatedEntityType, Integer relatedEntityId,
                      Integer triggeredBy, boolean actionRequired);
 
-    Page<AlertResponse> getAlerts(Integer requestingUserId, AlertType typeFilter, AlertStatus statusFilter, int page, int size);
+    Object getAlerts(Integer requestingUserId, boolean getAll, AlertType typeFilter, AlertStatus statusFilter, int page, int limit);
 
     AlertResponse getAlertDetail(Integer requestingUserId, Integer alertId);
 

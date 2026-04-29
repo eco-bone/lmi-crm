@@ -1,0 +1,48 @@
+name: Deploy to EC2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      - name: Build JAR
+        run: ./mvnw clean package -DskipTests
+
+      - name: Copy JAR to EC2
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          echo "$SSH_KEY" > /tmp/deploy_key.pem
+          chmod 400 /tmp/deploy_key.pem
+          scp -i /tmp/deploy_key.pem \
+            -o StrictHostKeyChecking=no \
+            target/crm-0.0.1-SNAPSHOT.jar \
+            ec2-user@$EC2_HOST:/home/ec2-user/app/
+          rm -f /tmp/deploy_key.pem
+
+      - name: Restart app on EC2
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          echo "$SSH_KEY" > /tmp/deploy_key.pem
+          chmod 400 /tmp/deploy_key.pem
+          ssh -i /tmp/deploy_key.pem \
+            -o StrictHostKeyChecking=no \
+            ec2-user@$EC2_HOST \
+            "sudo systemctl restart crm && sudo systemctl status crm --no-pager"
+          rm -f /tmp/deploy_key.pem

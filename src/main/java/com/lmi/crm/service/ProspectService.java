@@ -10,14 +10,15 @@ import com.lmi.crm.enums.ProvisionalDecision;
 
 import java.util.List;
 
+
 public interface ProspectService {
 
     ProspectResponse addProspect(AddProspectRequest request, Integer requestingUserId);
 
     String requestProtectionExtension(Integer prospectId, Integer requestingUserId);
 
-    List<ProspectResponse> getProspects(Integer requestingUserId, ProspectType typeFilter,
-                                        Integer licenseeIdFilter, Integer associateIdFilter, boolean getAll);
+    Object getProspects(Integer requestingUserId, boolean getAll, ProspectType typeFilter,
+                        Integer licenseeIdFilter, Integer associateIdFilter, int page, int limit);
 
     ProspectResponse getProspectDetail(Integer requestingUserId, Integer prospectId);
 

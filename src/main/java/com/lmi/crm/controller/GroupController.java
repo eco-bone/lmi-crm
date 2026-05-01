@@ -12,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequestMapping("/api/groups")
@@ -38,10 +36,13 @@ public class GroupController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<GroupResponse>>> getGroups(
-            @RequestParam(required = false) Integer licenseeId) {
+    public ResponseEntity<ApiResponse<?>> getGroups(
+            @RequestParam(defaultValue = "false") boolean getAll,
+            @RequestParam(required = false) Integer licenseeId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int limit) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        List<GroupResponse> response = groupService.getGroups(requestingUserId, licenseeId);
+        Object response = groupService.getGroups(requestingUserId, getAll, licenseeId, page, limit);
         return ResponseEntity.ok(ApiResponse.success("Groups retrieved successfully", response));
     }
 

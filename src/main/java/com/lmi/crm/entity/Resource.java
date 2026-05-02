@@ -39,6 +39,9 @@ public class Resource {
     @Column(name = "uploaded_by")
     private Integer uploadedBy;
 
+    @Column(name = "deletion_status")
+    private Boolean deletionStatus = false;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

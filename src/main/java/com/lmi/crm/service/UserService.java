@@ -8,6 +8,7 @@ import com.lmi.crm.dto.request.UpdateUserRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.LicenseeResponse;
 import com.lmi.crm.dto.response.UserResponse;
+import com.lmi.crm.dto.response.UsersPageResponse;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.enums.UserStatus;
 
@@ -36,4 +37,6 @@ public interface UserService {
     String requestAssociateDeactivation(Integer requestingLicenseeId, Integer targetAssociateId);
 
     ApiResponse<UserResponse> approveRejectAssociateDeactivation(Integer requestingUserId, Integer alertId, boolean approve);
+
+    UsersPageResponse searchUsers(Integer requestingUserId, String q, String scope, int page, int limit);
 }

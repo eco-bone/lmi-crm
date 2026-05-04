@@ -646,6 +646,65 @@ public class ProspectServiceImpl implements ProspectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public ProspectsPageResponse searchProspects(Integer requestingUserId, String q, String scope, int page, int limit) {
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
+        boolean scopeAll = "all".equalsIgnoreCase(scope) || isAdmin;
+        String keyword = "%" + q.trim() + "%";
+
+        List<Prospect> prospects;
+        if (scopeAll) {
+            prospects = prospectRepository.searchAll(keyword);
+        } else if (requestingUser.getRole() == UserRole.ASSOCIATE) {
+            prospects = prospectRepository.searchByAssociateId(keyword, requestingUserId);
+        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+            List<Integer> ids = prospectLicenseeRepository.findByLicenseeId(requestingUserId)
+                    .stream().map(ProspectLicensee::getProspectId).toList();
+            prospects = ids.isEmpty() ? List.of() : prospectRepository.searchByIds(keyword, ids);
+        } else {
+            throw new RuntimeException("Access denied");
+        }
+
+        long overallTotal = prospects.size();
+        long prospectCount = prospects.stream().filter(p -> p.getType() == ProspectType.PROSPECT).count();
+        long clientCount = prospects.stream().filter(p -> p.getType() == ProspectType.CLIENT).count();
+        long provisionalCount = prospects.stream().filter(p -> p.getStatus() == ProspectStatus.PROVISIONAL).count();
+        long unprotectedCount = prospects.stream().filter(p -> p.getStatus() == ProspectStatus.UNPROTECTED).count();
+
+        List<Integer> allIds = prospects.stream().map(Prospect::getId).toList();
+        Map<Integer, Integer> licenseeMap = (isAdmin && !allIds.isEmpty())
+                ? prospectLicenseeRepository.findByProspectIdInAndIsPrimaryTrue(allIds)
+                        .stream().collect(Collectors.toMap(ProspectLicensee::getProspectId, ProspectLicensee::getLicenseeId))
+                : Map.of();
+
+        List<ProspectResponse> allResponses = prospects.stream()
+                .map(p -> isAdmin
+                        ? prospectMapper.toResponse(p, licenseeMap.get(p.getId()), null)
+                        : prospectMapper.toLimitedResponse(p))
+                .toList();
+
+        int start = page * limit;
+        int end = Math.min(start + limit, allResponses.size());
+        List<ProspectResponse> pageContent = start < allResponses.size()
+                ? allResponses.subList(start, end) : List.of();
+        Page<ProspectResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
+
+        log.info("searchProspects — requestingUserId: {}, scope: {}, total: {}", requestingUserId, scope, overallTotal);
+
+        return ProspectsPageResponse.builder()
+                .overallTotal(overallTotal)
+                .prospectCount(prospectCount)
+                .clientCount(clientCount)
+                .provisionalCount(provisionalCount)
+                .unprotectedCount(unprotectedCount)
+                .prospects(pageResult)
+                .build();
+    }
+
+    @Override
     public List<DuplicateCheckResponse> checkDuplicateProspects(String companyName) {
         if (companyName == null || companyName.trim().length() < 2) {
             return List.of();

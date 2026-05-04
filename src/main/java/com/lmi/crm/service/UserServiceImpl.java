@@ -775,4 +775,54 @@ public class UserServiceImpl implements UserService {
 
         return ApiResponse.success("Associate deactivated successfully", response);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UsersPageResponse searchUsers(Integer requestingUserId, String q, String scope, int page, int limit) {
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingUserId));
+
+        boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
+        boolean scopeAll = "all".equalsIgnoreCase(scope) || isAdmin;
+        String keyword = "%" + q.trim() + "%";
+
+        List<User> users;
+        if (scopeAll) {
+            users = userRepository.searchAll(keyword);
+        } else {
+            Integer licenseeId;
+            if (requestingUser.getRole() == UserRole.ASSOCIATE) {
+                licenseeId = requestingUser.getLicenseeId();
+            } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+                licenseeId = requestingUserId;
+            } else {
+                throw new RuntimeException("Access denied");
+            }
+            users = userRepository.searchByLicenseeId(keyword, licenseeId);
+        }
+
+        long overallTotal = users.size();
+        long activeCount = users.stream().filter(u -> u.getStatus() == UserStatus.ACTIVE).count();
+        long inactiveCount = users.stream().filter(u -> u.getStatus() == UserStatus.INACTIVE).count();
+        Map<UserRole, Long> countByRole = users.stream()
+                .collect(Collectors.groupingBy(User::getRole, Collectors.counting()));
+
+        List<UserResponse> allResponses = users.stream().map(this::mapUserWithCities).toList();
+
+        int start = page * limit;
+        int end = Math.min(start + limit, allResponses.size());
+        List<UserResponse> pageContent = start < allResponses.size()
+                ? allResponses.subList(start, end) : List.of();
+        Page<UserResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
+
+        log.info("searchUsers — requestingUserId: {}, scope: {}, total: {}", requestingUserId, scope, overallTotal);
+
+        return UsersPageResponse.builder()
+                .overallTotal(overallTotal)
+                .activeCount(activeCount)
+                .inactiveCount(inactiveCount)
+                .countByRole(countByRole)
+                .users(pageResult)
+                .build();
+    }
 }

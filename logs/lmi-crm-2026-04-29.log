@@ -1,0 +1,32 @@
+2026-04-29 22:24:15 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 24186 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-04-29 22:24:15 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-04-29 22:24:15 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-04-29 22:24:16 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-29 22:24:16 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-29 22:24:16 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-29 22:24:22 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-04-29 22:24:22 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-29 22:24:22 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 7.365 seconds (process running for 7.659)
+2026-04-29 22:24:22 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-04-29 22:24:22 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-04-29 22:25:09 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=50s859ms).
+2026-04-29 22:25:21 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-29 22:25:21 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/index.html
+2026-04-29 22:25:21 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/index.html
+2026-04-29 22:25:21 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/swagger-ui-bundle.js
+2026-04-29 22:25:21 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/swagger-ui-bundle.js
+2026-04-29 22:25:21 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/index.css
+2026-04-29 22:25:21 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/swagger-ui.css
+2026-04-29 22:25:21 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/index.css
+2026-04-29 22:25:21 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/swagger-ui.css
+2026-04-29 22:25:21 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/swagger-ui-standalone-preset.js
+2026-04-29 22:25:21 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/swagger-ui-standalone-preset.js
+2026-04-29 22:25:21 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/swagger-initializer.js
+2026-04-29 22:25:21 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/swagger-initializer.js
+2026-04-29 22:25:21 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /v3/api-docs/swagger-config
+2026-04-29 22:25:21 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /v3/api-docs/swagger-config
+2026-04-29 22:25:21 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /swagger-ui/favicon-32x32.png
+2026-04-29 22:25:21 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /swagger-ui/favicon-32x32.png
+2026-04-29 22:25:21 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /v3/api-docs
+2026-04-29 22:25:21 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — GET /v3/api-docs
+2026-04-29 22:25:21 [http-nio-8080-exec-9] INFO  o.s.api.AbstractOpenApiResource - Init duration for springdoc-openapi is: 370 ms

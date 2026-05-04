@@ -18,8 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequestMapping("/api")
@@ -89,15 +87,16 @@ public class UserController {
 
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN') or hasRole('LICENSEE')")
-    public ResponseEntity<List<UserResponse>> getUsers(
+    public ResponseEntity<ApiResponse<?>> getUsers(
+            @RequestParam(defaultValue = "false") boolean getAll,
             @RequestParam(required = false) UserRole role,
             @RequestParam(required = false) UserStatus status,
-            @RequestParam(defaultValue = "false") boolean includeAllStatuses) {
+            @RequestParam(defaultValue = "false") boolean includeAllStatuses,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int limit) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        log.info("GET /api/users — requestingUserId: {}, roleFilter: {}, statusFilter: {}, includeAllStatuses: {}", requestingUserId, role, status, includeAllStatuses);
-        List<UserResponse> response = userService.getUsers(requestingUserId, role, status, includeAllStatuses);
-        log.info("GET /api/users — returned {} records — requestingUserId: {}", response.size(), requestingUserId);
-        return ResponseEntity.ok(response);
+        Object response = userService.getUsers(requestingUserId, getAll, role, status, includeAllStatuses, page, limit);
+        return ResponseEntity.ok(ApiResponse.success("Users retrieved successfully", response));
     }
 
     @GetMapping("/users/{id}")

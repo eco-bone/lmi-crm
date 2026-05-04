@@ -31,13 +31,15 @@ public class ProspectController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<ProspectResponse>>> getProspects(
+    public ResponseEntity<ApiResponse<?>> getProspects(
+            @RequestParam(defaultValue = "false") boolean getAll,
             @RequestParam(required = false) ProspectType type,
             @RequestParam(required = false) Integer licenseeId,
             @RequestParam(required = false) Integer associateId,
-            @RequestParam(required = false, defaultValue = "false") boolean getAll) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int limit) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        List<ProspectResponse> response = prospectService.getProspects(requestingUserId, type, licenseeId, associateId, getAll);
+        Object response = prospectService.getProspects(requestingUserId, getAll, type, licenseeId, associateId, page, limit);
         return ResponseEntity.ok(ApiResponse.success("Prospects retrieved successfully", response));
     }
 

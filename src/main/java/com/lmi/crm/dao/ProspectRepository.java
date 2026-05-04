@@ -1,6 +1,7 @@
 package com.lmi.crm.dao;
 
 import com.lmi.crm.entity.Prospect;
+import com.lmi.crm.enums.ProspectStatus;
 import com.lmi.crm.enums.ProspectType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,6 +31,12 @@ public interface ProspectRepository extends JpaRepository<Prospect, Integer> {
     List<Prospect> findByDeletionStatusFalseAndType(ProspectType type);
 
     List<Prospect> findByAssociateIdAndDeletionStatusFalseAndType(Integer associateId, ProspectType type);
+
+    long countByDeletionStatusFalse();
+
+    long countByStatusAndDeletionStatusFalse(ProspectStatus status);
+
+    long countByTypeAndDeletionStatusFalse(ProspectType type);
 
     @Query("SELECT p FROM Prospect p WHERE p.firstMeetingDate IS NULL AND p.entryDate <= :cutoff AND p.status = 'PROTECTED' AND p.deletionStatus = false AND p.programType NOT IN ('ONE_TO_ONE', 'SHC')")
     List<Prospect> findProtectedProspectsWithNoFirstMeeting(@Param("cutoff") LocalDate cutoff);

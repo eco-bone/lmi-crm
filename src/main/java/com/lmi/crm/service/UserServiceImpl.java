@@ -14,6 +14,8 @@ import com.lmi.crm.dto.request.UpdateUserRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.LicenseeResponse;
 import com.lmi.crm.dto.response.UserResponse;
+import com.lmi.crm.dto.response.UsersSummaryResponse;
+import com.lmi.crm.dto.response.UsersPageResponse;
 import com.lmi.crm.entity.Alert;
 import com.lmi.crm.entity.LicenseeCity;
 import com.lmi.crm.entity.User;
@@ -31,10 +33,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -299,50 +307,103 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponse> getUsers(Integer requestingUserId, UserRole roleFilter, UserStatus statusFilter, boolean includeAllStatuses) {
-        log.debug("getUsers — requestingUserId: {}, roleFilter: {}, statusFilter: {}, includeAllStatuses: {}", requestingUserId, roleFilter, statusFilter, includeAllStatuses);
+    public Object getUsers(Integer requestingUserId, boolean getAll, UserRole roleFilter, UserStatus statusFilter, boolean includeAllStatuses, int page, int limit) {
+        log.debug("getUsers — requestingUserId: {}, getAll: {}, roleFilter: {}, statusFilter: {}, includeAllStatuses: {}, page: {}, limit: {}",
+                requestingUserId, getAll, roleFilter, statusFilter, includeAllStatuses, page, limit);
 
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingUserId));
 
-        UserStatus effectiveStatus;
-        if (requestingUser.getRole() == UserRole.LICENSEE) {
-            effectiveStatus = statusFilter != null ? statusFilter : UserStatus.ACTIVE;
+        boolean isLicensee = requestingUser.getRole() == UserRole.LICENSEE;
+        boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
+
+        // Full scoped list (no role/status filters) — used for summary counts
+        List<User> scopedUsers;
+        if (isLicensee) {
+            scopedUsers = userRepository.findAssociatesByLicensee(requestingUserId, UserRole.ASSOCIATE, null);
+        } else if (isAdmin) {
+            scopedUsers = userRepository.findByOptionalFilters(null, null);
         } else {
-            effectiveStatus = includeAllStatuses ? null : (statusFilter != null ? statusFilter : UserStatus.ACTIVE);
+            log.warn("getUsers — access denied — userId: {}, role: {}", requestingUserId, requestingUser.getRole());
+            throw new RuntimeException("Access denied");
         }
 
-        log.debug("getUsers — role: {}, effectiveStatus: {}", requestingUser.getRole(), effectiveStatus);
+        // Summary counts from full scoped list
+        long overallTotal = scopedUsers.size();
+        long activeCount = scopedUsers.stream().filter(u -> u.getStatus() == UserStatus.ACTIVE).count();
+        long inactiveCount = scopedUsers.stream().filter(u -> u.getStatus() == UserStatus.INACTIVE).count();
+        Map<UserRole, Long> countByRole = Arrays.stream(UserRole.values())
+                .collect(Collectors.toMap(r -> r, r -> scopedUsers.stream().filter(u -> u.getRole() == r).count()));
 
-        List<User> users;
-        switch (requestingUser.getRole()) {
-            case LICENSEE:
-                users = userRepository.findAssociatesByLicensee(requestingUserId, UserRole.ASSOCIATE, effectiveStatus);
-                break;
-            case ADMIN:
-            case SUPER_ADMIN:
-                users = userRepository.findByOptionalFilters(roleFilter, effectiveStatus);
-                break;
-            default:
-                log.warn("getUsers — access denied — userId: {}, role: {}", requestingUserId, requestingUser.getRole());
-                throw new RuntimeException("Access denied");
-        }
+        if (getAll) {
+            List<UserResponse> allResponses = scopedUsers.stream().map(this::mapUserWithCities).toList();
+            int end = Math.min(limit, allResponses.size());
+            Page<UserResponse> firstPage = new PageImpl<>(
+                    end > 0 ? allResponses.subList(0, end) : List.of(),
+                    PageRequest.of(0, limit),
+                    allResponses.size());
 
-        log.debug("getUsers — found {} users — requestingUserId: {}", users.size(), requestingUserId);
-        return users.stream().map(user -> {
-            UserResponse response = userMapper.toResponse(user);
-            if (user.getRole() == UserRole.LICENSEE) {
-                List<LicenseeCity> cities = licenseeCityRepository.findByLicenseeId(user.getId());
-                response.setCities(cities.stream().map(c -> {
-                    LicenseeResponse.CityInfo info = new LicenseeResponse.CityInfo();
-                    info.setId(c.getId());
-                    info.setCity(c.getCity());
-                    info.setIsPrimary(c.getIsPrimary());
-                    return info;
-                }).toList());
+            log.info("getUsers — getAll mode — requestingUserId: {}, overallTotal: {}, activeCount: {}, inactiveCount: {}",
+                    requestingUserId, overallTotal, activeCount, inactiveCount);
+
+            return UsersSummaryResponse.builder()
+                    .overallTotal(overallTotal)
+                    .activeCount(activeCount)
+                    .inactiveCount(inactiveCount)
+                    .countByRole(countByRole)
+                    .firstPage(firstPage)
+                    .build();
+        } else {
+            // Apply filters in-memory from scoped list
+            UserStatus effectiveStatus;
+            if (isLicensee) {
+                effectiveStatus = statusFilter != null ? statusFilter : UserStatus.ACTIVE;
+            } else {
+                effectiveStatus = includeAllStatuses ? null : (statusFilter != null ? statusFilter : UserStatus.ACTIVE);
             }
-            return response;
-        }).toList();
+
+            final UserRole rf = roleFilter;
+            final UserStatus es = effectiveStatus;
+            List<User> filteredUsers = scopedUsers.stream()
+                    .filter(u -> rf == null || u.getRole() == rf)
+                    .filter(u -> es == null || u.getStatus() == es)
+                    .toList();
+
+            List<UserResponse> filteredResponses = filteredUsers.stream().map(this::mapUserWithCities).toList();
+
+            int start = page * limit;
+            int end = Math.min(start + limit, filteredResponses.size());
+            List<UserResponse> pageContent = start < filteredResponses.size()
+                    ? filteredResponses.subList(start, end)
+                    : List.of();
+            Page<UserResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), filteredResponses.size());
+
+            log.info("getUsers — paginated mode — requestingUserId: {}, overallTotal: {}, activeCount: {}, filteredTotal: {}",
+                    requestingUserId, overallTotal, activeCount, filteredResponses.size());
+
+            return UsersPageResponse.builder()
+                    .overallTotal(overallTotal)
+                    .activeCount(activeCount)
+                    .inactiveCount(inactiveCount)
+                    .countByRole(countByRole)
+                    .users(pageResult)
+                    .build();
+        }
+    }
+
+    private UserResponse mapUserWithCities(User user) {
+        UserResponse response = userMapper.toResponse(user);
+        if (user.getRole() == UserRole.LICENSEE) {
+            List<LicenseeCity> cities = licenseeCityRepository.findByLicenseeId(user.getId());
+            response.setCities(cities.stream().map(c -> {
+                LicenseeResponse.CityInfo info = new LicenseeResponse.CityInfo();
+                info.setId(c.getId());
+                info.setCity(c.getCity());
+                info.setIsPrimary(c.getIsPrimary());
+                return info;
+            }).toList());
+        }
+        return response;
     }
 
     @Override

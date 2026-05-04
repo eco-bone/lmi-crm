@@ -11,8 +11,6 @@ import com.lmi.crm.dto.response.UserResponse;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.enums.UserStatus;
 
-import java.util.List;
-
 public interface UserService {
 
     LicenseeResponse addLicensee(AddLicenseeRequest request, Integer requestingUserId);
@@ -25,7 +23,7 @@ public interface UserService {
 
     ApiResponse<UserResponse> approveRejectAssociateCreation(Integer alertId, boolean approve, Integer requestingAdminId);
 
-    List<UserResponse> getUsers(Integer requestingUserId, UserRole roleFilter, UserStatus statusFilter, boolean includeAllStatuses);
+    Object getUsers(Integer requestingUserId, boolean getAll, UserRole roleFilter, UserStatus statusFilter, boolean includeAllStatuses, int page, int limit);
 
     UserResponse getUserDetail(Integer requestingUserId, Integer targetUserId);
 

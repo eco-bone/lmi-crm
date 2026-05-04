@@ -379,8 +379,20 @@ public class ProspectServiceImpl implements ProspectService {
 
         // Step 4 — Apply admin-only fields
         if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
-            if (request.getStatus() != null) prospect.setStatus(request.getStatus());
-            if (request.getProtectionPeriodMonths() != null) prospect.setProtectionPeriodMonths(request.getProtectionPeriodMonths());
+            if (request.getStatus() != null) {
+                prospect.setStatus(request.getStatus());
+                // Resolve any pending provisional alert for this prospect
+                if (request.getStatus() != ProspectStatus.PROVISIONAL) {
+                    resolveAlertIfPresent(AlertType.DUPLICATE_PROSPECT, prospectId);
+                }
+            }
+            if (request.getProtectionPeriodMonths() != null) {
+                prospect.setProtectionPeriodMonths(request.getProtectionPeriodMonths());
+                // Resolve any pending protection-related alerts for this prospect
+                resolveAlertIfPresent(AlertType.PROTECTION_EXTENSION_REQUEST, prospectId);
+                resolveAlertIfPresent(AlertType.PROSPECT_PROTECTION_WARNING, prospectId);
+                resolveAlertIfPresent(AlertType.PROSPECT_UNPROTECTED, prospectId);
+            }
         }
 
         // Step 5 — Licensee reassignment (Admin/Super Admin only)
@@ -432,6 +444,14 @@ public class ProspectServiceImpl implements ProspectService {
         prospect.setDeletionStatus(true);
         prospect.setStatus(ProspectStatus.UNPROTECTED);
         prospectRepository.save(prospect);
+
+        // Resolve any pending alerts tied to this prospect
+        resolveAlertIfPresent(AlertType.PROSPECT_CONVERSION_REQUEST, prospectId);
+        resolveAlertIfPresent(AlertType.DUPLICATE_PROSPECT, prospectId);
+        resolveAlertIfPresent(AlertType.PROTECTION_EXTENSION_REQUEST, prospectId);
+        resolveAlertIfPresent(AlertType.PROSPECT_PROTECTION_WARNING, prospectId);
+        resolveAlertIfPresent(AlertType.PROSPECT_UNPROTECTED, prospectId);
+
         log.info("Prospect soft deleted — id: {}, deletedBy: {}", prospectId, requestingUserId);
         return "Prospect deleted successfully";
     }
@@ -729,5 +749,14 @@ public class ProspectServiceImpl implements ProspectService {
 
         log.debug("Duplicate check for '{}' found {} matches", companyName, duplicates.size());
         return duplicates;
+    }
+
+    private void resolveAlertIfPresent(AlertType alertType, Integer relatedEntityId) {
+        alertRepository.findByAlertTypeAndRelatedEntityIdAndStatus(alertType, relatedEntityId, AlertStatus.PENDING)
+                .ifPresent(a -> {
+                    a.setStatus(AlertStatus.RESOLVED);
+                    alertRepository.save(a);
+                    log.info("Alert auto-resolved — alertId: {}, type: {}, relatedEntityId: {}", a.getId(), alertType, relatedEntityId);
+                });
     }
 }

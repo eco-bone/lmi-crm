@@ -663,11 +663,13 @@ public class UserServiceImpl implements UserService {
             case ASSOCIATE -> {
                 // TODO: transfer all prospects where associateId = targetUserId to associate's parent licensee — implement after ProspectService is built
                 targetUser.setStatus(UserStatus.INACTIVE);
+                resolveAlertIfPresent(AlertType.ASSOCIATE_DEACTIVATION_REQUEST, targetUserId);
             }
             case LICENSEE -> {
                 // TODO: transfer all prospect_licensees where licenseeId = targetUserId to MLO — implement after ProspectService is built
                 // TODO: reassign all associates under this licensee to MLO — implement after ProspectService is built
                 targetUser.setStatus(UserStatus.INACTIVE);
+                resolveAlertIfPresent(AlertType.LICENSEE_DEACTIVATION_REQUEST, targetUserId);
             }
             default -> targetUser.setStatus(UserStatus.INACTIVE);
         }
@@ -824,5 +826,14 @@ public class UserServiceImpl implements UserService {
                 .countByRole(countByRole)
                 .users(pageResult)
                 .build();
+    }
+
+    private void resolveAlertIfPresent(AlertType alertType, Integer relatedEntityId) {
+        alertRepository.findByAlertTypeAndRelatedEntityIdAndStatus(alertType, relatedEntityId, AlertStatus.PENDING)
+                .ifPresent(a -> {
+                    a.setStatus(AlertStatus.RESOLVED);
+                    alertRepository.save(a);
+                    log.info("Alert auto-resolved — alertId: {}, type: {}, relatedEntityId: {}", a.getId(), alertType, relatedEntityId);
+                });
     }
 }

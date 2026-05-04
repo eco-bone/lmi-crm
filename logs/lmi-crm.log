@@ -4,3 +4,192 @@
 2026-05-05 00:00:30 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — GET /api/prospects/search
 2026-05-05 00:00:30 [http-nio-8080-exec-6] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 2, q: wip, scope: own
 2026-05-05 00:00:31 [http-nio-8080-exec-6] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 2, scope: own, total: 2
+2026-05-05 00:30:46 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 62621 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-05 00:30:46 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-05 00:30:46 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-05 00:30:47 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-05 00:30:47 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-05 00:30:47 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-05 00:30:54 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-05 00:30:54 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-05 00:30:54 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 8.355 seconds (process running for 8.601)
+2026-05-05 00:30:54 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-05-05 00:30:54 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-05-05 00:30:54 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-05 00:30:59 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-05 00:30:59 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-05-05 00:30:59 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-05-05 00:30:59 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: nagpalajay@gmail.com
+2026-05-05 00:30:59 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: nagpalajay@gmail.com
+2026-05-05 00:31:00 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 1, role: SUPER_ADMIN, status: ACTIVE
+2026-05-05 00:31:00 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 1, role: SUPER_ADMIN, expiresAt: Wed May 06 00:31:00 IST 2026
+2026-05-05 00:31:00 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 1, role: SUPER_ADMIN
+2026-05-05 00:31:00 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 1, role: SUPER_ADMIN
+2026-05-05 00:31:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
+2026-05-05 00:31:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:31:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:31:53 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
+2026-05-05 00:31:53 [http-nio-8080-exec-3] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: a, scope: own
+2026-05-05 00:31:54 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 22
+2026-05-05 00:32:00 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/users/search
+2026-05-05 00:32:00 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:32:00 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:32:01 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/users/search
+2026-05-05 00:32:01 [http-nio-8080-exec-5] INFO  c.lmi.crm.controller.UserController - GET /api/users/search — requestingUserId: 1, q: a, scope: own
+2026-05-05 00:32:04 [http-nio-8080-exec-5] INFO  com.lmi.crm.service.UserServiceImpl - searchUsers — requestingUserId: 1, scope: own, total: 25
+2026-05-05 00:32:10 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/groups/search
+2026-05-05 00:32:10 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:32:10 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:32:11 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/groups/search
+2026-05-05 00:32:11 [http-nio-8080-exec-8] INFO  c.lmi.crm.controller.GroupController - GET /api/groups/search — requestingUserId: 1, q: a, scope: own
+2026-05-05 00:32:13 [http-nio-8080-exec-8] INFO  c.lmi.crm.service.GroupServiceImpl - searchGroups — requestingUserId: 1, scope: own, total: 1
+2026-05-05 00:32:28 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
+2026-05-05 00:32:28 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:32:28 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:32:28 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
+2026-05-05 00:32:28 [http-nio-8080-exec-10] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: a, scope: own
+2026-05-05 00:32:29 [http-nio-8080-exec-10] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 22
+2026-05-05 00:32:29 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
+2026-05-05 00:32:29 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:32:29 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:32:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
+2026-05-05 00:32:30 [http-nio-8080-exec-2] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: a, scope: all
+2026-05-05 00:32:30 [http-nio-8080-exec-2] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: all, total: 22
+2026-05-05 00:32:42 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
+2026-05-05 00:32:42 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:32:42 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:32:42 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
+2026-05-05 00:32:42 [http-nio-8080-exec-4] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: Mumbai, scope: own
+2026-05-05 00:32:43 [http-nio-8080-exec-4] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 15
+2026-05-05 00:32:43 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
+2026-05-05 00:32:43 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:32:43 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:32:43 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
+2026-05-05 00:32:43 [http-nio-8080-exec-5] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: Rahul, scope: own
+2026-05-05 00:32:44 [http-nio-8080-exec-5] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 2
+2026-05-05 00:33:04 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
+2026-05-05 00:33:04 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:33:04 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:33:05 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
+2026-05-05 00:33:05 [http-nio-8080-exec-8] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: a, scope: own
+2026-05-05 00:33:05 [http-nio-8080-exec-8] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 22
+2026-05-05 00:33:06 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
+2026-05-05 00:33:06 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:33:06 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:33:06 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
+2026-05-05 00:33:06 [http-nio-8080-exec-10] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: a, scope: own
+2026-05-05 00:33:07 [http-nio-8080-exec-10] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 22
+2026-05-05 00:33:07 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
+2026-05-05 00:33:07 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:33:07 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:33:08 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
+2026-05-05 00:33:08 [http-nio-8080-exec-2] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: xyzxyzxyz123, scope: own
+2026-05-05 00:33:08 [http-nio-8080-exec-2] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 0
+2026-05-05 00:33:25 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/users/search
+2026-05-05 00:33:25 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:33:25 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:33:26 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/users/search
+2026-05-05 00:33:26 [http-nio-8080-exec-4] INFO  c.lmi.crm.controller.UserController - GET /api/users/search — requestingUserId: 1, q: Ajay, scope: own
+2026-05-05 00:33:26 [http-nio-8080-exec-4] INFO  com.lmi.crm.service.UserServiceImpl - searchUsers — requestingUserId: 1, scope: own, total: 3
+2026-05-05 00:33:27 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/groups/search
+2026-05-05 00:33:27 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:33:27 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:33:27 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/groups/search
+2026-05-05 00:33:27 [http-nio-8080-exec-5] INFO  c.lmi.crm.controller.GroupController - GET /api/groups/search — requestingUserId: 1, q: Ajay, scope: own
+2026-05-05 00:33:29 [http-nio-8080-exec-5] INFO  c.lmi.crm.service.GroupServiceImpl - searchGroups — requestingUserId: 1, scope: own, total: 1
+2026-05-05 00:33:29 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/groups/search
+2026-05-05 00:33:29 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:33:29 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:33:30 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/groups/search
+2026-05-05 00:33:30 [http-nio-8080-exec-8] INFO  c.lmi.crm.controller.GroupController - GET /api/groups/search — requestingUserId: 1, q: EPP, scope: own
+2026-05-05 00:33:32 [http-nio-8080-exec-8] INFO  c.lmi.crm.service.GroupServiceImpl - searchGroups — requestingUserId: 1, scope: own, total: 1
+2026-05-05 00:33:32 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/groups/search
+2026-05-05 00:33:32 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:33:32 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:33:33 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/groups/search
+2026-05-05 00:33:33 [http-nio-8080-exec-10] INFO  c.lmi.crm.controller.GroupController - GET /api/groups/search — requestingUserId: 1, q: Wipro, scope: own
+2026-05-05 00:33:34 [http-nio-8080-exec-10] INFO  c.lmi.crm.service.GroupServiceImpl - searchGroups — requestingUserId: 1, scope: own, total: 1
+2026-05-05 00:34:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
+2026-05-05 00:34:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:34:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:34:32 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
+2026-05-05 00:34:32 [http-nio-8080-exec-2] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — requestingUserId: 1, getAll: false, typeFilter: null, statusFilter: PENDING, page: 0, limit: 50
+2026-05-05 00:34:33 [http-nio-8080-exec-2] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — paginated mode — typeFilter: null, statusFilter: PENDING, page: 0, limit: 50, total: 4
+2026-05-05 00:34:57 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/8
+2026-05-05 00:34:57 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:34:57 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:34:57 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/8
+2026-05-05 00:34:58 [http-nio-8080-exec-4] INFO  c.l.crm.service.ProspectServiceImpl - PUT /api/prospects/8 — requestingUserId: 1, role: SUPER_ADMIN
+2026-05-05 00:34:58 [http-nio-8080-exec-4] INFO  c.l.crm.service.ProspectServiceImpl - Alert auto-resolved — alertId: 21, type: PROTECTION_EXTENSION_REQUEST, relatedEntityId: 8
+2026-05-05 00:34:59 [http-nio-8080-exec-4] INFO  c.l.crm.service.ProspectServiceImpl - Prospect updated — id: 8, requestedBy: 1
+2026-05-05 00:35:06 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/21
+2026-05-05 00:35:06 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:35:06 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:35:07 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/21
+2026-05-05 00:35:08 [http-nio-8080-exec-5] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts/21 — requestingUserId: 1
+2026-05-05 00:35:15 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/18
+2026-05-05 00:35:15 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:35:15 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:35:15 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/18
+2026-05-05 00:35:16 [http-nio-8080-exec-8] INFO  c.l.crm.service.ProspectServiceImpl - PUT /api/prospects/18 — requestingUserId: 1, role: SUPER_ADMIN
+2026-05-05 00:35:16 [http-nio-8080-exec-8] INFO  c.l.crm.service.ProspectServiceImpl - Alert auto-resolved — alertId: 15, type: DUPLICATE_PROSPECT, relatedEntityId: 18
+2026-05-05 00:35:16 [http-nio-8080-exec-8] INFO  c.l.crm.service.ProspectServiceImpl - Prospect updated — id: 18, requestedBy: 1
+2026-05-05 00:35:17 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/15
+2026-05-05 00:35:17 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:35:17 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:35:18 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/15
+2026-05-05 00:35:19 [http-nio-8080-exec-10] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts/15 — requestingUserId: 1
+2026-05-05 00:35:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/24
+2026-05-05 00:35:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:35:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:35:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/24
+2026-05-05 00:35:32 [http-nio-8080-exec-2] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: Prospect not found
+2026-05-05 00:35:32 [http-nio-8080-exec-2] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [java.lang.RuntimeException: Prospect not found]
+2026-05-05 00:35:41 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/24
+2026-05-05 00:35:41 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:35:41 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:35:41 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/24
+2026-05-05 00:35:42 [http-nio-8080-exec-3] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: Prospect not found
+2026-05-05 00:35:42 [http-nio-8080-exec-3] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [java.lang.RuntimeException: Prospect not found]
+2026-05-05 00:35:54 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-05 00:36:02 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/17
+2026-05-05 00:36:02 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:36:02 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:36:02 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/17
+2026-05-05 00:36:03 [http-nio-8080-exec-4] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts/17 — requestingUserId: 1
+2026-05-05 00:36:25 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/prospects
+2026-05-05 00:36:25 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:36:25 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:36:25 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — POST /api/prospects
+2026-05-05 00:36:25 [http-nio-8080-exec-5] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: Access Denied
+2026-05-05 00:36:25 [http-nio-8080-exec-5] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [org.springframework.security.authorization.AuthorizationDeniedException: Access Denied]
+2026-05-05 00:40:54 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-05 00:42:07 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/10
+2026-05-05 00:42:07 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:42:07 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:42:08 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/10
+2026-05-05 00:42:09 [http-nio-8080-exec-7] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts/10 — requestingUserId: 1
+2026-05-05 00:42:19 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — DELETE /api/prospects/4
+2026-05-05 00:42:19 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:42:19 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:42:19 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — DELETE /api/prospects/4
+2026-05-05 00:42:19 [http-nio-8080-exec-9] INFO  c.l.crm.service.ProspectServiceImpl - DELETE /api/prospects/4 — requestingUserId: 1
+2026-05-05 00:42:20 [http-nio-8080-exec-9] INFO  c.l.crm.service.ProspectServiceImpl - Alert auto-resolved — alertId: 10, type: PROTECTION_EXTENSION_REQUEST, relatedEntityId: 4
+2026-05-05 00:42:22 [http-nio-8080-exec-9] INFO  c.l.crm.service.ProspectServiceImpl - Prospect soft deleted — id: 4, deletedBy: 1
+2026-05-05 00:42:22 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/10
+2026-05-05 00:42:22 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:42:22 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:42:22 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/10
+2026-05-05 00:42:23 [http-nio-8080-exec-1] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts/10 — requestingUserId: 1
+2026-05-05 00:42:58 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
+2026-05-05 00:42:58 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:42:58 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:42:58 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
+2026-05-05 00:42:58 [http-nio-8080-exec-3] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — requestingUserId: 1, getAll: false, typeFilter: null, statusFilter: PENDING, page: 0, limit: 50
+2026-05-05 00:42:59 [http-nio-8080-exec-3] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — paginated mode — typeFilter: null, statusFilter: PENDING, page: 0, limit: 50, total: 1
+2026-05-05 00:43:00 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
+2026-05-05 00:43:00 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-05 00:43:00 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-05 00:43:00 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
+2026-05-05 00:43:01 [http-nio-8080-exec-6] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — requestingUserId: 1, getAll: false, typeFilter: ASSOCIATE_DEACTIVATION_REQUEST, statusFilter: null, page: 0, limit: 20
+2026-05-05 00:43:01 [http-nio-8080-exec-6] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — paginated mode — typeFilter: ASSOCIATE_DEACTIVATION_REQUEST, statusFilter: null, page: 0, limit: 20, total: 1

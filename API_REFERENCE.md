@@ -17,6 +17,7 @@ All endpoints are prefixed with `/api`. This document provides comprehensive API
 7. [Alerts](#alerts)
 8. [Tasks](#tasks)
 9. [Notes](#notes)
+10. [Search](#search)
 
 ---
 
@@ -1330,4 +1331,166 @@ All endpoints may return error responses with appropriate HTTP status codes:
    - Email fields must be valid email format
    - Phone fields are required but no specific format enforced (string)
    - Group size must be 1-100
+
+---
+
+## Search
+
+All three search endpoints share the same query parameters and follow the same scoping model. Search is distinct from the list endpoints — it performs keyword matching across multiple text fields simultaneously rather than filtering by known category values.
+
+### Common Query Parameters
+
+| Parameter | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `q` | string | yes | — | Keyword to search for (substring match, case-insensitive) |
+| `scope` | string | no | `own` | `own` to search within the user's own records; `all` to search across all records |
+| `page` | int | no | `0` | Zero-based page index |
+| `limit` | int | no | `10` | Page size |
+
+**Scope behaviour by role:**
+
+| Role | `scope=own` | `scope=all` |
+|---|---|---|
+| Associate | Their own records only | All records in the system |
+| Licensee | Records belonging to them | All records in the system |
+| Admin / Super Admin | Always all (scope ignored) | Always all |
+
+---
+
+### Search Prospects
+
+```
+GET /api/prospects/search
+```
+
+**Access:** All authenticated roles
+
+**Searched fields:** `companyName`, `contactFirstName`, `contactLastName`, `city`, `email`, `phone`
+
+**Scope=own detail:**
+- Associate → prospects where `associateId = self`
+- Licensee → prospects linked to them via `prospect_licensees`
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Search results retrieved successfully",
+  "data": {
+    "overallTotal": 12,
+    "prospectCount": 8,
+    "clientCount": 4,
+    "provisionalCount": 1,
+    "unprotectedCount": 2,
+    "prospects": {
+      "content": [ /* ProspectResponse objects */ ],
+      "totalElements": 12,
+      "totalPages": 2,
+      "number": 0,
+      "size": 10
+    }
+  }
+}
+```
+
+**Note:** Non-admin roles receive a limited `ProspectResponse` (no protection details) regardless of scope.
+
+---
+
+### Search Users
+
+```
+GET /api/users/search
+```
+
+**Access:** All authenticated roles
+
+**Searched fields:** `firstName`, `lastName`, `email`, `phone`
+
+**Scope=own detail:**
+- Associate → all users with the same `licenseeId` (their teammates and parent licensee)
+- Licensee → all users with `licenseeId = self` (their own associates + themselves)
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Search results retrieved successfully",
+  "data": {
+    "overallTotal": 5,
+    "activeCount": 4,
+    "inactiveCount": 1,
+    "countByRole": {
+      "LICENSEE": 1,
+      "ASSOCIATE": 4
+    },
+    "users": {
+      "content": [ /* UserResponse objects */ ],
+      "totalElements": 5,
+      "totalPages": 1,
+      "number": 0,
+      "size": 10
+    }
+  }
+}
+```
+
+---
+
+### Search Groups
+
+```
+GET /api/groups/search
+```
+
+**Access:** All authenticated roles
+
+**Searched fields:** `groupType` (e.g. `LI`, `SI`), `deliveryType` (e.g. `IN_PERSON`, `VIRTUAL`), licensee full name, facilitator full name, linked client `companyName`
+
+**Scope=own detail:**
+- Associate → groups belonging to their parent licensee
+- Licensee → groups they own
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Search results retrieved successfully",
+  "data": {
+    "overallTotal": 3,
+    "activeCount": 3,
+    "groups": {
+      "content": [ /* GroupResponse objects */ ],
+      "totalElements": 3,
+      "totalPages": 1,
+      "number": 0,
+      "size": 10
+    }
+  }
+}
+```
+
+---
+
+### Example Requests
+
+```
+# Find prospects matching "acme" within own scope
+GET /api/prospects/search?q=acme
+
+# Find prospects matching "mumbai" across all licensees
+GET /api/prospects/search?q=mumbai&scope=all
+
+# Find associates named "john" within same licensee org
+GET /api/users/search?q=john&scope=own
+
+# Find any user matching "sharma" across the whole system
+GET /api/users/search?q=sharma&scope=all
+
+# Find groups of type LI within own scope
+GET /api/groups/search?q=LI
+
+# Find groups linked to client "Tata" across all licensees
+GET /api/groups/search?q=tata&scope=all&page=0&limit=5
+```
    - Password minimum length is 8 characters

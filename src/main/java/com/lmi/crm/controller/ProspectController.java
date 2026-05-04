@@ -5,6 +5,7 @@ import com.lmi.crm.dto.request.UpdateProspectRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.DuplicateCheckResponse;
 import com.lmi.crm.dto.response.ProspectResponse;
+import com.lmi.crm.dto.response.ProspectsPageResponse;
 import com.lmi.crm.enums.ProspectStatus;
 import com.lmi.crm.enums.ProspectType;
 import com.lmi.crm.enums.ProvisionalDecision;
@@ -41,6 +42,19 @@ public class ProspectController {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
         Object response = prospectService.getProspects(requestingUserId, getAll, type, licenseeId, associateId, page, limit);
         return ResponseEntity.ok(ApiResponse.success("Prospects retrieved successfully", response));
+    }
+
+    @GetMapping("/search")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<ProspectsPageResponse>> searchProspects(
+            @RequestParam String q,
+            @RequestParam(defaultValue = "own") String scope,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit) {
+        Integer requestingUserId = SecurityUtils.getCurrentUserId();
+        log.info("GET /api/prospects/search — requestingUserId: {}, q: {}, scope: {}", requestingUserId, q, scope);
+        ProspectsPageResponse response = prospectService.searchProspects(requestingUserId, q, scope, page, limit);
+        return ResponseEntity.ok(ApiResponse.success("Search results retrieved successfully", response));
     }
 
     @GetMapping("/duplicate-check")

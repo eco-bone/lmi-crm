@@ -3,6 +3,7 @@ package com.lmi.crm.controller;
 // DEV ONLY — remove or disable before production deployment
 
 import com.lmi.crm.dto.response.ApiResponse;
+import com.lmi.crm.scheduler.AlertSyncScheduler;
 import com.lmi.crm.scheduler.ProtectionScheduler;
 import com.lmi.crm.util.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,9 @@ public class SchedulerController {
 
     @Autowired
     private ProtectionScheduler protectionScheduler;
+
+    @Autowired
+    private AlertSyncScheduler alertSyncScheduler;
 
     @PostMapping("/check-first-meeting")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
@@ -55,5 +59,14 @@ public class SchedulerController {
         log.info("Scheduler manually triggered — job: expireAfterGracePeriod, triggeredBy: {}", requestingUserId);
         protectionScheduler.expireAfterGracePeriod();
         return ResponseEntity.ok(ApiResponse.success("expireAfterGracePeriod triggered successfully", null));
+    }
+
+    @PostMapping("/sync-alerts")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<String>> syncAlerts() {
+        Integer requestingUserId = SecurityUtils.getCurrentUserId();
+        log.info("Scheduler manually triggered — job: syncPendingAlerts, triggeredBy: {}", requestingUserId);
+        alertSyncScheduler.syncPendingAlerts();
+        return ResponseEntity.ok(ApiResponse.success("syncPendingAlerts triggered successfully", null));
     }
 }

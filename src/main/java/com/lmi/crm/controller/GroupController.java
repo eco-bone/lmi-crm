@@ -4,6 +4,7 @@ import com.lmi.crm.dto.request.AddGroupRequest;
 import com.lmi.crm.dto.request.UpdateGroupRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.GroupResponse;
+import com.lmi.crm.dto.response.GroupsPageResponse;
 import com.lmi.crm.service.GroupService;
 import com.lmi.crm.util.SecurityUtils;
 import jakarta.validation.Valid;
@@ -44,6 +45,19 @@ public class GroupController {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
         Object response = groupService.getGroups(requestingUserId, getAll, licenseeId, page, limit);
         return ResponseEntity.ok(ApiResponse.success("Groups retrieved successfully", response));
+    }
+
+    @GetMapping("/search")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<GroupsPageResponse>> searchGroups(
+            @RequestParam String q,
+            @RequestParam(defaultValue = "own") String scope,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit) {
+        Integer requestingUserId = SecurityUtils.getCurrentUserId();
+        log.info("GET /api/groups/search — requestingUserId: {}, q: {}, scope: {}", requestingUserId, q, scope);
+        GroupsPageResponse response = groupService.searchGroups(requestingUserId, q, scope, page, limit);
+        return ResponseEntity.ok(ApiResponse.success("Search results retrieved successfully", response));
     }
 
     @GetMapping("/{id}")

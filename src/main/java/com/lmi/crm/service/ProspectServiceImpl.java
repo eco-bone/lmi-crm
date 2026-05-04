@@ -379,8 +379,20 @@ public class ProspectServiceImpl implements ProspectService {
 
         // Step 4 — Apply admin-only fields
         if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
-            if (request.getStatus() != null) prospect.setStatus(request.getStatus());
-            if (request.getProtectionPeriodMonths() != null) prospect.setProtectionPeriodMonths(request.getProtectionPeriodMonths());
+            if (request.getStatus() != null) {
+                prospect.setStatus(request.getStatus());
+                // Resolve any pending provisional alert for this prospect
+                if (request.getStatus() != ProspectStatus.PROVISIONAL) {
+                    resolveAlertIfPresent(AlertType.DUPLICATE_PROSPECT, prospectId);
+                }
+            }
+            if (request.getProtectionPeriodMonths() != null) {
+                prospect.setProtectionPeriodMonths(request.getProtectionPeriodMonths());
+                // Resolve any pending protection-related alerts for this prospect
+                resolveAlertIfPresent(AlertType.PROTECTION_EXTENSION_REQUEST, prospectId);
+                resolveAlertIfPresent(AlertType.PROSPECT_PROTECTION_WARNING, prospectId);
+                resolveAlertIfPresent(AlertType.PROSPECT_UNPROTECTED, prospectId);
+            }
         }
 
         // Step 5 — Licensee reassignment (Admin/Super Admin only)
@@ -432,6 +444,14 @@ public class ProspectServiceImpl implements ProspectService {
         prospect.setDeletionStatus(true);
         prospect.setStatus(ProspectStatus.UNPROTECTED);
         prospectRepository.save(prospect);
+
+        // Resolve any pending alerts tied to this prospect
+        resolveAlertIfPresent(AlertType.PROSPECT_CONVERSION_REQUEST, prospectId);
+        resolveAlertIfPresent(AlertType.DUPLICATE_PROSPECT, prospectId);
+        resolveAlertIfPresent(AlertType.PROTECTION_EXTENSION_REQUEST, prospectId);
+        resolveAlertIfPresent(AlertType.PROSPECT_PROTECTION_WARNING, prospectId);
+        resolveAlertIfPresent(AlertType.PROSPECT_UNPROTECTED, prospectId);
+
         log.info("Prospect soft deleted — id: {}, deletedBy: {}", prospectId, requestingUserId);
         return "Prospect deleted successfully";
     }
@@ -646,6 +666,65 @@ public class ProspectServiceImpl implements ProspectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public ProspectsPageResponse searchProspects(Integer requestingUserId, String q, String scope, int page, int limit) {
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
+        boolean scopeAll = "all".equalsIgnoreCase(scope) || isAdmin;
+        String keyword = "%" + q.trim() + "%";
+
+        List<Prospect> prospects;
+        if (scopeAll) {
+            prospects = prospectRepository.searchAll(keyword);
+        } else if (requestingUser.getRole() == UserRole.ASSOCIATE) {
+            prospects = prospectRepository.searchByAssociateId(keyword, requestingUserId);
+        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+            List<Integer> ids = prospectLicenseeRepository.findByLicenseeId(requestingUserId)
+                    .stream().map(ProspectLicensee::getProspectId).toList();
+            prospects = ids.isEmpty() ? List.of() : prospectRepository.searchByIds(keyword, ids);
+        } else {
+            throw new RuntimeException("Access denied");
+        }
+
+        long overallTotal = prospects.size();
+        long prospectCount = prospects.stream().filter(p -> p.getType() == ProspectType.PROSPECT).count();
+        long clientCount = prospects.stream().filter(p -> p.getType() == ProspectType.CLIENT).count();
+        long provisionalCount = prospects.stream().filter(p -> p.getStatus() == ProspectStatus.PROVISIONAL).count();
+        long unprotectedCount = prospects.stream().filter(p -> p.getStatus() == ProspectStatus.UNPROTECTED).count();
+
+        List<Integer> allIds = prospects.stream().map(Prospect::getId).toList();
+        Map<Integer, Integer> licenseeMap = (isAdmin && !allIds.isEmpty())
+                ? prospectLicenseeRepository.findByProspectIdInAndIsPrimaryTrue(allIds)
+                        .stream().collect(Collectors.toMap(ProspectLicensee::getProspectId, ProspectLicensee::getLicenseeId))
+                : Map.of();
+
+        List<ProspectResponse> allResponses = prospects.stream()
+                .map(p -> isAdmin
+                        ? prospectMapper.toResponse(p, licenseeMap.get(p.getId()), null)
+                        : prospectMapper.toLimitedResponse(p))
+                .toList();
+
+        int start = page * limit;
+        int end = Math.min(start + limit, allResponses.size());
+        List<ProspectResponse> pageContent = start < allResponses.size()
+                ? allResponses.subList(start, end) : List.of();
+        Page<ProspectResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
+
+        log.info("searchProspects — requestingUserId: {}, scope: {}, total: {}", requestingUserId, scope, overallTotal);
+
+        return ProspectsPageResponse.builder()
+                .overallTotal(overallTotal)
+                .prospectCount(prospectCount)
+                .clientCount(clientCount)
+                .provisionalCount(provisionalCount)
+                .unprotectedCount(unprotectedCount)
+                .prospects(pageResult)
+                .build();
+    }
+
+    @Override
     public List<DuplicateCheckResponse> checkDuplicateProspects(String companyName) {
         if (companyName == null || companyName.trim().length() < 2) {
             return List.of();
@@ -670,5 +749,14 @@ public class ProspectServiceImpl implements ProspectService {
 
         log.debug("Duplicate check for '{}' found {} matches", companyName, duplicates.size());
         return duplicates;
+    }
+
+    private void resolveAlertIfPresent(AlertType alertType, Integer relatedEntityId) {
+        alertRepository.findByAlertTypeAndRelatedEntityIdAndStatus(alertType, relatedEntityId, AlertStatus.PENDING)
+                .ifPresent(a -> {
+                    a.setStatus(AlertStatus.RESOLVED);
+                    alertRepository.save(a);
+                    log.info("Alert auto-resolved — alertId: {}, type: {}, relatedEntityId: {}", a.getId(), alertType, relatedEntityId);
+                });
     }
 }

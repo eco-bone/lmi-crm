@@ -454,4 +454,68 @@ public class GroupServiceImpl implements GroupService {
 
         return groupMapper.toResponse(group, licenseeName, facilitatorName, prospectResponses);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GroupsPageResponse searchGroups(Integer requestingUserId, String q, String scope, int page, int limit) {
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
+        boolean scopeAll = "all".equalsIgnoreCase(scope) || isAdmin;
+
+        List<Group> groups;
+        if (scopeAll) {
+            groups = groupRepository.findByDeletionStatusFalse();
+        } else if (requestingUser.getRole() == UserRole.ASSOCIATE) {
+            groups = groupRepository.findByLicenseeIdAndDeletionStatusFalse(requestingUser.getLicenseeId());
+        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+            groups = groupRepository.findByLicenseeIdAndDeletionStatusFalse(requestingUserId);
+        } else {
+            throw new RuntimeException("Access denied");
+        }
+
+        List<Integer> userIds = groups.stream()
+                .flatMap(g -> Stream.of(g.getLicenseeId(), g.getFacilitatorId()))
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        Map<Integer, User> userCache = new HashMap<>();
+        userRepository.findAllById(userIds).forEach(u -> userCache.put(u.getId(), u));
+
+        String keyword = q.trim().toLowerCase();
+        List<GroupResponse> filtered = groups.stream()
+                .map(g -> buildGroupResponse(g, userCache))
+                .filter(r -> matchesGroupKeyword(r, keyword))
+                .toList();
+
+        long overallTotal = filtered.size();
+
+        int start = page * limit;
+        int end = Math.min(start + limit, filtered.size());
+        List<GroupResponse> pageContent = start < filtered.size()
+                ? filtered.subList(start, end) : List.of();
+        Page<GroupResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), filtered.size());
+
+        log.info("searchGroups — requestingUserId: {}, scope: {}, total: {}", requestingUserId, scope, overallTotal);
+
+        return GroupsPageResponse.builder()
+                .overallTotal(overallTotal)
+                .activeCount(overallTotal)
+                .groups(pageResult)
+                .build();
+    }
+
+    private boolean matchesGroupKeyword(GroupResponse r, String keyword) {
+        if (r.getGroupType() != null && r.getGroupType().name().toLowerCase().contains(keyword)) return true;
+        if (r.getDeliveryType() != null && r.getDeliveryType().name().toLowerCase().contains(keyword)) return true;
+        if (r.getLicenseeName() != null && r.getLicenseeName().toLowerCase().contains(keyword)) return true;
+        if (r.getFacilitatorName() != null && r.getFacilitatorName().toLowerCase().contains(keyword)) return true;
+        if (r.getProspects() != null) {
+            for (ProspectResponse p : r.getProspects()) {
+                if (p.getCompanyName() != null && p.getCompanyName().toLowerCase().contains(keyword)) return true;
+            }
+        }
+        return false;
+    }
 }

@@ -38,6 +38,15 @@ public interface ProspectRepository extends JpaRepository<Prospect, Integer> {
 
     long countByTypeAndDeletionStatusFalse(ProspectType type);
 
+    @Query("SELECT p FROM Prospect p WHERE p.deletionStatus = false AND (LOWER(p.companyName) LIKE LOWER(:q) OR LOWER(p.contactFirstName) LIKE LOWER(:q) OR LOWER(p.contactLastName) LIKE LOWER(:q) OR LOWER(p.city) LIKE LOWER(:q) OR LOWER(p.email) LIKE LOWER(:q) OR LOWER(p.phone) LIKE LOWER(:q))")
+    List<Prospect> searchAll(@Param("q") String q);
+
+    @Query("SELECT p FROM Prospect p WHERE p.deletionStatus = false AND p.associateId = :associateId AND (LOWER(p.companyName) LIKE LOWER(:q) OR LOWER(p.contactFirstName) LIKE LOWER(:q) OR LOWER(p.contactLastName) LIKE LOWER(:q) OR LOWER(p.city) LIKE LOWER(:q) OR LOWER(p.email) LIKE LOWER(:q) OR LOWER(p.phone) LIKE LOWER(:q))")
+    List<Prospect> searchByAssociateId(@Param("q") String q, @Param("associateId") Integer associateId);
+
+    @Query("SELECT p FROM Prospect p WHERE p.deletionStatus = false AND p.id IN :ids AND (LOWER(p.companyName) LIKE LOWER(:q) OR LOWER(p.contactFirstName) LIKE LOWER(:q) OR LOWER(p.contactLastName) LIKE LOWER(:q) OR LOWER(p.city) LIKE LOWER(:q) OR LOWER(p.email) LIKE LOWER(:q) OR LOWER(p.phone) LIKE LOWER(:q))")
+    List<Prospect> searchByIds(@Param("q") String q, @Param("ids") List<Integer> ids);
+
     @Query("SELECT p FROM Prospect p WHERE p.firstMeetingDate IS NULL AND p.entryDate <= :cutoff AND p.status = 'PROTECTED' AND p.deletionStatus = false AND p.programType NOT IN ('ONE_TO_ONE', 'SHC')")
     List<Prospect> findProtectedProspectsWithNoFirstMeeting(@Param("cutoff") LocalDate cutoff);
 

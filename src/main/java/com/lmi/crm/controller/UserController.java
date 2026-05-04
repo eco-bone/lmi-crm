@@ -8,6 +8,7 @@ import com.lmi.crm.dto.request.UpdateUserRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.LicenseeResponse;
 import com.lmi.crm.dto.response.UserResponse;
+import com.lmi.crm.dto.response.UsersPageResponse;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.enums.UserStatus;
 import com.lmi.crm.service.UserService;
@@ -83,6 +84,19 @@ public class UserController {
         ApiResponse<UserResponse> response = userService.approveRejectAssociateCreation(alertId, approve, requestingUserId);
         log.info("PUT /api/admin/associates/{}/decision — outcome: {} — requestingUserId: {}", alertId, approve ? "approved" : "rejected", requestingUserId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/users/search")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<UsersPageResponse>> searchUsers(
+            @RequestParam String q,
+            @RequestParam(defaultValue = "own") String scope,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit) {
+        Integer requestingUserId = SecurityUtils.getCurrentUserId();
+        log.info("GET /api/users/search — requestingUserId: {}, q: {}, scope: {}", requestingUserId, q, scope);
+        UsersPageResponse response = userService.searchUsers(requestingUserId, q, scope, page, limit);
+        return ResponseEntity.ok(ApiResponse.success("Search results retrieved successfully", response));
     }
 
     @GetMapping("/users")

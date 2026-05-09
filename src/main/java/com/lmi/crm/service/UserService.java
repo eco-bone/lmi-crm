@@ -38,5 +38,5 @@ public interface UserService {
 
     ApiResponse<UserResponse> approveRejectAssociateDeactivation(Integer requestingUserId, Integer alertId, boolean approve);
 
-    UsersPageResponse searchUsers(Integer requestingUserId, String q, String scope, int page, int limit);
+    UsersPageResponse searchUsers(Integer requestingUserId, String q, String scope, UserRole role, int page, int limit);
 }

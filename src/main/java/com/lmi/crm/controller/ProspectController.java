@@ -49,11 +49,12 @@ public class ProspectController {
     public ResponseEntity<ApiResponse<ProspectsPageResponse>> searchProspects(
             @RequestParam String q,
             @RequestParam(defaultValue = "own") String scope,
+            @RequestParam(required = false) ProspectType type,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        log.info("GET /api/prospects/search — requestingUserId: {}, q: {}, scope: {}", requestingUserId, q, scope);
-        ProspectsPageResponse response = prospectService.searchProspects(requestingUserId, q, scope, page, limit);
+        log.info("GET /api/prospects/search — requestingUserId: {}, q: {}, scope: {}, type: {}", requestingUserId, q, scope, type);
+        ProspectsPageResponse response = prospectService.searchProspects(requestingUserId, q, scope, type, page, limit);
         return ResponseEntity.ok(ApiResponse.success("Search results retrieved successfully", response));
     }
 
@@ -136,6 +137,16 @@ public class ProspectController {
             @RequestParam boolean approve) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
         return ResponseEntity.ok(prospectService.approveRejectConversion(requestingUserId, alertId, approve));
+    }
+
+    @PutMapping("/extensions/{alertId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<ProspectResponse>> approveRejectExtension(
+            @PathVariable Integer alertId,
+            @RequestParam boolean approve,
+            @RequestParam(required = false) Integer extensionMonths) {
+        Integer requestingUserId = SecurityUtils.getCurrentUserId();
+        return ResponseEntity.ok(prospectService.approveRejectExtension(requestingUserId, alertId, approve, extensionMonths));
     }
 
     @PostMapping("/{id}/extension-request")

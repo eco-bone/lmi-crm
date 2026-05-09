@@ -32,6 +32,8 @@ public class AddGroupRequest {
 
     private Integer facilitatorId;
 
+    private Integer licenseeId;
+
     @NotNull
     @NotEmpty
     private List<Integer> prospectIds;

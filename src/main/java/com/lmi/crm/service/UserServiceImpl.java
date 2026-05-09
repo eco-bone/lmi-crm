@@ -97,6 +97,10 @@ public class UserServiceImpl implements UserService {
             log.warn("addLicensee — rejected — email already exists: {} — requestingUserId: {}", request.getEmail(), requestingUserId);
             throw new IllegalArgumentException("A user with this email already exists");
         }
+        if (userRepository.findByPhone(request.getPhone()).isPresent()) {
+            log.warn("addLicensee — rejected — phone already exists: {} — requestingUserId: {}", request.getPhone(), requestingUserId);
+            throw new IllegalArgumentException("A user with this phone number already exists");
+        }
 
         String tempPassword = "Temp-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
@@ -145,6 +149,10 @@ public class UserServiceImpl implements UserService {
             log.warn("addAssociate — email already exists: {} — requestingAdminId: {}", request.getEmail(), requestingAdminId);
             throw new RuntimeException("A user with this email already exists");
         }
+        if (userRepository.findByPhone(request.getPhone()).isPresent()) {
+            log.warn("addAssociate — phone already exists: {} — requestingAdminId: {}", request.getPhone(), requestingAdminId);
+            throw new RuntimeException("A user with this phone number already exists");
+        }
 
         String tempPassword = "Temp-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
@@ -183,6 +191,10 @@ public class UserServiceImpl implements UserService {
             log.warn("createAdmin — rejected — email already exists: {} — requestingUserId: {}", request.getEmail(), requestingSuperAdminId);
             throw new RuntimeException("A user with this email already exists");
         }
+        if (userRepository.findByPhone(request.getPhone()).isPresent()) {
+            log.warn("createAdmin — rejected — phone already exists: {} — requestingUserId: {}", request.getPhone(), requestingSuperAdminId);
+            throw new RuntimeException("A user with this phone number already exists");
+        }
 
         String tempPassword = "Temp-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
@@ -210,6 +222,15 @@ public class UserServiceImpl implements UserService {
         if (licensee.getRole() != UserRole.LICENSEE) {
             log.warn("requestAssociateCreation — rejected — userId: {} is not LICENSEE (role: {})", requestingLicenseeId, licensee.getRole());
             throw new RuntimeException("Only a Licensee can request associate creation");
+        }
+
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            log.warn("requestAssociateCreation — rejected — email already exists: {} — requestingLicenseeId: {}", request.getEmail(), requestingLicenseeId);
+            throw new RuntimeException("A user with this email already exists");
+        }
+        if (userRepository.findByPhone(request.getPhone()).isPresent()) {
+            log.warn("requestAssociateCreation — rejected — phone already exists: {} — requestingLicenseeId: {}", request.getPhone(), requestingLicenseeId);
+            throw new RuntimeException("A user with this phone number already exists");
         }
 
         String descriptionJson;
@@ -780,7 +801,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UsersPageResponse searchUsers(Integer requestingUserId, String q, String scope, int page, int limit) {
+    public UsersPageResponse searchUsers(Integer requestingUserId, String q, String scope, UserRole role, int page, int limit) {
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestingUserId));
 
@@ -803,6 +824,10 @@ public class UserServiceImpl implements UserService {
             users = userRepository.searchByLicenseeId(keyword, licenseeId);
         }
 
+        if (role != null) {
+            users = users.stream().filter(u -> u.getRole() == role).toList();
+        }
+
         long overallTotal = users.size();
         long activeCount = users.stream().filter(u -> u.getStatus() == UserStatus.ACTIVE).count();
         long inactiveCount = users.stream().filter(u -> u.getStatus() == UserStatus.INACTIVE).count();
@@ -817,7 +842,7 @@ public class UserServiceImpl implements UserService {
                 ? allResponses.subList(start, end) : List.of();
         Page<UserResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
 
-        log.info("searchUsers — requestingUserId: {}, scope: {}, total: {}", requestingUserId, scope, overallTotal);
+        log.info("searchUsers — requestingUserId: {}, scope: {}, role: {}, total: {}", requestingUserId, scope, role, overallTotal);
 
         return UsersPageResponse.builder()
                 .overallTotal(overallTotal)

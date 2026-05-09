@@ -1,232 +1,350 @@
-2026-05-05 00:00:29 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
-2026-05-05 00:00:29 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:00:29 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
-2026-05-05 00:00:30 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — GET /api/prospects/search
-2026-05-05 00:00:30 [http-nio-8080-exec-6] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 2, q: wip, scope: own
-2026-05-05 00:00:31 [http-nio-8080-exec-6] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 2, scope: own, total: 2
-2026-05-05 00:30:46 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 62621 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
-2026-05-05 00:30:46 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
-2026-05-05 00:30:46 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
-2026-05-05 00:30:47 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:30:47 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-05-05 00:30:47 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
-2026-05-05 00:30:54 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
-2026-05-05 00:30:54 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:30:54 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 8.355 seconds (process running for 8.601)
-2026-05-05 00:30:54 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
-2026-05-05 00:30:54 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
-2026-05-05 00:30:54 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
-2026-05-05 00:30:59 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-05-05 00:30:59 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
-2026-05-05 00:30:59 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
-2026-05-05 00:30:59 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: nagpalajay@gmail.com
-2026-05-05 00:30:59 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: nagpalajay@gmail.com
-2026-05-05 00:31:00 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 1, role: SUPER_ADMIN, status: ACTIVE
-2026-05-05 00:31:00 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 1, role: SUPER_ADMIN, expiresAt: Wed May 06 00:31:00 IST 2026
-2026-05-05 00:31:00 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 1, role: SUPER_ADMIN
-2026-05-05 00:31:00 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 1, role: SUPER_ADMIN
-2026-05-05 00:31:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
-2026-05-05 00:31:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:31:52 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:31:53 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
-2026-05-05 00:31:53 [http-nio-8080-exec-3] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: a, scope: own
-2026-05-05 00:31:54 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 22
-2026-05-05 00:32:00 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/users/search
-2026-05-05 00:32:00 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:32:00 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:32:01 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/users/search
-2026-05-05 00:32:01 [http-nio-8080-exec-5] INFO  c.lmi.crm.controller.UserController - GET /api/users/search — requestingUserId: 1, q: a, scope: own
-2026-05-05 00:32:04 [http-nio-8080-exec-5] INFO  com.lmi.crm.service.UserServiceImpl - searchUsers — requestingUserId: 1, scope: own, total: 25
-2026-05-05 00:32:10 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/groups/search
-2026-05-05 00:32:10 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:32:10 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:32:11 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/groups/search
-2026-05-05 00:32:11 [http-nio-8080-exec-8] INFO  c.lmi.crm.controller.GroupController - GET /api/groups/search — requestingUserId: 1, q: a, scope: own
-2026-05-05 00:32:13 [http-nio-8080-exec-8] INFO  c.lmi.crm.service.GroupServiceImpl - searchGroups — requestingUserId: 1, scope: own, total: 1
-2026-05-05 00:32:28 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
-2026-05-05 00:32:28 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:32:28 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:32:28 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
-2026-05-05 00:32:28 [http-nio-8080-exec-10] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: a, scope: own
-2026-05-05 00:32:29 [http-nio-8080-exec-10] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 22
-2026-05-05 00:32:29 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
-2026-05-05 00:32:29 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:32:29 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:32:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
-2026-05-05 00:32:30 [http-nio-8080-exec-2] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: a, scope: all
-2026-05-05 00:32:30 [http-nio-8080-exec-2] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: all, total: 22
-2026-05-05 00:32:42 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
-2026-05-05 00:32:42 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:32:42 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:32:42 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
-2026-05-05 00:32:42 [http-nio-8080-exec-4] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: Mumbai, scope: own
-2026-05-05 00:32:43 [http-nio-8080-exec-4] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 15
-2026-05-05 00:32:43 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
-2026-05-05 00:32:43 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:32:43 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:32:43 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
-2026-05-05 00:32:43 [http-nio-8080-exec-5] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: Rahul, scope: own
-2026-05-05 00:32:44 [http-nio-8080-exec-5] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 2
-2026-05-05 00:33:04 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
-2026-05-05 00:33:04 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:33:04 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:33:05 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
-2026-05-05 00:33:05 [http-nio-8080-exec-8] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: a, scope: own
-2026-05-05 00:33:05 [http-nio-8080-exec-8] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 22
-2026-05-05 00:33:06 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
-2026-05-05 00:33:06 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:33:06 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:33:06 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
-2026-05-05 00:33:06 [http-nio-8080-exec-10] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: a, scope: own
-2026-05-05 00:33:07 [http-nio-8080-exec-10] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 22
-2026-05-05 00:33:07 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/search
-2026-05-05 00:33:07 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:33:07 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:33:08 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/search
-2026-05-05 00:33:08 [http-nio-8080-exec-2] INFO  c.l.c.controller.ProspectController - GET /api/prospects/search — requestingUserId: 1, q: xyzxyzxyz123, scope: own
-2026-05-05 00:33:08 [http-nio-8080-exec-2] INFO  c.l.crm.service.ProspectServiceImpl - searchProspects — requestingUserId: 1, scope: own, total: 0
-2026-05-05 00:33:25 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/users/search
-2026-05-05 00:33:25 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:33:25 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:33:26 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/users/search
-2026-05-05 00:33:26 [http-nio-8080-exec-4] INFO  c.lmi.crm.controller.UserController - GET /api/users/search — requestingUserId: 1, q: Ajay, scope: own
-2026-05-05 00:33:26 [http-nio-8080-exec-4] INFO  com.lmi.crm.service.UserServiceImpl - searchUsers — requestingUserId: 1, scope: own, total: 3
-2026-05-05 00:33:27 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/groups/search
-2026-05-05 00:33:27 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:33:27 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:33:27 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/groups/search
-2026-05-05 00:33:27 [http-nio-8080-exec-5] INFO  c.lmi.crm.controller.GroupController - GET /api/groups/search — requestingUserId: 1, q: Ajay, scope: own
-2026-05-05 00:33:29 [http-nio-8080-exec-5] INFO  c.lmi.crm.service.GroupServiceImpl - searchGroups — requestingUserId: 1, scope: own, total: 1
-2026-05-05 00:33:29 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/groups/search
-2026-05-05 00:33:29 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:33:29 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:33:30 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/groups/search
-2026-05-05 00:33:30 [http-nio-8080-exec-8] INFO  c.lmi.crm.controller.GroupController - GET /api/groups/search — requestingUserId: 1, q: EPP, scope: own
-2026-05-05 00:33:32 [http-nio-8080-exec-8] INFO  c.lmi.crm.service.GroupServiceImpl - searchGroups — requestingUserId: 1, scope: own, total: 1
-2026-05-05 00:33:32 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/groups/search
-2026-05-05 00:33:32 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:33:32 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:33:33 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/groups/search
-2026-05-05 00:33:33 [http-nio-8080-exec-10] INFO  c.lmi.crm.controller.GroupController - GET /api/groups/search — requestingUserId: 1, q: Wipro, scope: own
-2026-05-05 00:33:34 [http-nio-8080-exec-10] INFO  c.lmi.crm.service.GroupServiceImpl - searchGroups — requestingUserId: 1, scope: own, total: 1
-2026-05-05 00:34:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
-2026-05-05 00:34:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:34:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:34:32 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
-2026-05-05 00:34:32 [http-nio-8080-exec-2] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — requestingUserId: 1, getAll: false, typeFilter: null, statusFilter: PENDING, page: 0, limit: 50
-2026-05-05 00:34:33 [http-nio-8080-exec-2] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — paginated mode — typeFilter: null, statusFilter: PENDING, page: 0, limit: 50, total: 4
-2026-05-05 00:34:57 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/8
-2026-05-05 00:34:57 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:34:57 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:34:57 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/8
-2026-05-05 00:34:58 [http-nio-8080-exec-4] INFO  c.l.crm.service.ProspectServiceImpl - PUT /api/prospects/8 — requestingUserId: 1, role: SUPER_ADMIN
-2026-05-05 00:34:58 [http-nio-8080-exec-4] INFO  c.l.crm.service.ProspectServiceImpl - Alert auto-resolved — alertId: 21, type: PROTECTION_EXTENSION_REQUEST, relatedEntityId: 8
-2026-05-05 00:34:59 [http-nio-8080-exec-4] INFO  c.l.crm.service.ProspectServiceImpl - Prospect updated — id: 8, requestedBy: 1
-2026-05-05 00:35:06 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/21
-2026-05-05 00:35:06 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:35:06 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:35:07 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/21
-2026-05-05 00:35:08 [http-nio-8080-exec-5] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts/21 — requestingUserId: 1
-2026-05-05 00:35:15 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/18
-2026-05-05 00:35:15 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:35:15 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:35:15 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/18
-2026-05-05 00:35:16 [http-nio-8080-exec-8] INFO  c.l.crm.service.ProspectServiceImpl - PUT /api/prospects/18 — requestingUserId: 1, role: SUPER_ADMIN
-2026-05-05 00:35:16 [http-nio-8080-exec-8] INFO  c.l.crm.service.ProspectServiceImpl - Alert auto-resolved — alertId: 15, type: DUPLICATE_PROSPECT, relatedEntityId: 18
-2026-05-05 00:35:16 [http-nio-8080-exec-8] INFO  c.l.crm.service.ProspectServiceImpl - Prospect updated — id: 18, requestedBy: 1
-2026-05-05 00:35:17 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/15
-2026-05-05 00:35:17 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:35:17 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:35:18 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/15
-2026-05-05 00:35:19 [http-nio-8080-exec-10] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts/15 — requestingUserId: 1
-2026-05-05 00:35:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/24
-2026-05-05 00:35:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:35:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:35:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/24
-2026-05-05 00:35:32 [http-nio-8080-exec-2] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: Prospect not found
-2026-05-05 00:35:32 [http-nio-8080-exec-2] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [java.lang.RuntimeException: Prospect not found]
-2026-05-05 00:35:41 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects/24
-2026-05-05 00:35:41 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:35:41 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:35:41 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects/24
-2026-05-05 00:35:42 [http-nio-8080-exec-3] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: Prospect not found
-2026-05-05 00:35:42 [http-nio-8080-exec-3] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [java.lang.RuntimeException: Prospect not found]
-2026-05-05 00:35:54 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
-2026-05-05 00:36:02 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/17
-2026-05-05 00:36:02 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:36:02 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:36:02 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/17
-2026-05-05 00:36:03 [http-nio-8080-exec-4] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts/17 — requestingUserId: 1
-2026-05-05 00:36:25 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/prospects
-2026-05-05 00:36:25 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:36:25 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:36:25 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — POST /api/prospects
-2026-05-05 00:36:25 [http-nio-8080-exec-5] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: Access Denied
-2026-05-05 00:36:25 [http-nio-8080-exec-5] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [org.springframework.security.authorization.AuthorizationDeniedException: Access Denied]
-2026-05-05 00:40:54 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
-2026-05-05 00:42:07 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/10
-2026-05-05 00:42:07 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:42:07 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:42:08 [http-nio-8080-exec-7] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/10
-2026-05-05 00:42:09 [http-nio-8080-exec-7] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts/10 — requestingUserId: 1
-2026-05-05 00:42:19 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — DELETE /api/prospects/4
-2026-05-05 00:42:19 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:42:19 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:42:19 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — DELETE /api/prospects/4
-2026-05-05 00:42:19 [http-nio-8080-exec-9] INFO  c.l.crm.service.ProspectServiceImpl - DELETE /api/prospects/4 — requestingUserId: 1
-2026-05-05 00:42:20 [http-nio-8080-exec-9] INFO  c.l.crm.service.ProspectServiceImpl - Alert auto-resolved — alertId: 10, type: PROTECTION_EXTENSION_REQUEST, relatedEntityId: 4
-2026-05-05 00:42:22 [http-nio-8080-exec-9] INFO  c.l.crm.service.ProspectServiceImpl - Prospect soft deleted — id: 4, deletedBy: 1
-2026-05-05 00:42:22 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/10
-2026-05-05 00:42:22 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:42:22 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:42:22 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/10
-2026-05-05 00:42:23 [http-nio-8080-exec-1] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts/10 — requestingUserId: 1
-2026-05-05 00:42:58 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
-2026-05-05 00:42:58 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:42:58 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:42:58 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
-2026-05-05 00:42:58 [http-nio-8080-exec-3] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — requestingUserId: 1, getAll: false, typeFilter: null, statusFilter: PENDING, page: 0, limit: 50
-2026-05-05 00:42:59 [http-nio-8080-exec-3] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — paginated mode — typeFilter: null, statusFilter: PENDING, page: 0, limit: 50, total: 1
-2026-05-05 00:43:00 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
-2026-05-05 00:43:00 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 00:43:00 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 00:43:00 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
-2026-05-05 00:43:01 [http-nio-8080-exec-6] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — requestingUserId: 1, getAll: false, typeFilter: ASSOCIATE_DEACTIVATION_REQUEST, statusFilter: null, page: 0, limit: 20
-2026-05-05 00:43:01 [http-nio-8080-exec-6] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — paginated mode — typeFilter: ASSOCIATE_DEACTIVATION_REQUEST, statusFilter: null, page: 0, limit: 20, total: 1
-2026-05-05 00:45:54 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
-2026-05-05 00:50:54 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
-2026-05-05 00:55:54 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
-2026-05-05 00:56:22 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:56:22 [Thread-1] INFO  o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:56:25 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 62621 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
-2026-05-05 00:56:25 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
-2026-05-05 00:56:25 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
-2026-05-05 00:56:26 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:56:26 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-05-05 00:56:26 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
-2026-05-05 00:56:32 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
-2026-05-05 00:56:32 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:56:32 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
-2026-05-05 00:56:32 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 6.721 seconds (process running for 1546.04)
-2026-05-05 00:56:32 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
-2026-05-05 00:56:32 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
-2026-05-05 00:56:33 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:56:35 [Thread-5] INFO  o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:57:00 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 62621 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
-2026-05-05 00:57:00 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
-2026-05-05 00:57:00 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
-2026-05-05 00:57:01 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:57:01 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-05-05 00:57:01 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
-2026-05-05 00:57:17 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
-2026-05-05 00:57:17 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:57:17 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
-2026-05-05 00:57:17 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 16.804 seconds (process running for 1591.314)
-2026-05-05 00:57:17 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
-2026-05-05 00:57:17 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
-2026-05-05 00:59:13 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:59:15 [Thread-9] INFO  o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:59:15 [http-nio-8080-Acceptor] ERROR org.apache.tomcat.util.net.Acceptor - Socket accept failed
+2026-05-09 00:41:04 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 00:41:05 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=49m115ms).
+2026-05-09 00:41:05 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@7bcf5be4 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 00:53:08 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@446c9738 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 00:53:10 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=12m4s824ms).
+2026-05-09 00:53:12 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6998ea7e (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 01:09:31 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@412b00ae (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 01:09:36 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@4594e423 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 01:09:38 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@72c66e45 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 01:09:41 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m31s321ms).
+2026-05-09 01:09:57 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@67da5343 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 01:09:59 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@67718db6 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 01:10:17 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2684635b (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 01:10:30 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@7e226ea4 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 02:05:01 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=52m50s478ms).
+2026-05-09 02:34:36 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=29m34s463ms).
+2026-05-09 02:35:05 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 02:35:31 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@104e67a1 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 02:35:35 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@65790cad (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 02:35:37 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@5a945af1 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 02:35:39 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@39044d6d (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 02:35:39 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@29f5477e (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 02:35:51 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@4c43a89 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 02:35:56 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@678bfef5 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 02:35:57 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@64c68bcd (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 02:55:04 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m57s945ms).
+2026-05-09 02:57:33 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 03:13:51 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m17s433ms).
+2026-05-09 03:18:04 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=4m12s859ms).
+2026-05-09 03:50:34 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=32m29s241ms).
+2026-05-09 03:50:45 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@41f3f5ae (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 03:51:45 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m11s435ms).
+2026-05-09 04:07:29 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m44s236ms).
+2026-05-09 04:07:40 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@7890c220 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 04:09:58 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 04:13:35 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m36s122ms).
+2026-05-09 04:21:37 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8m1s432ms).
+2026-05-09 04:28:57 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=7m20s22ms).
+2026-05-09 04:48:33 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=19m36s660ms).
+2026-05-09 04:54:24 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m50s654ms).
+2026-05-09 05:12:22 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m58s69ms).
+2026-05-09 05:12:39 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@76d8782c (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 05:12:41 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6f105f89 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 05:12:50 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@215fc31 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 05:14:21 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 05:53:40 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=38m47s835ms).
+2026-05-09 06:26:38 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=32m57s499ms).
+2026-05-09 06:26:59 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@5ecd5848 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 06:27:11 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@1e153e33 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 06:27:14 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@520530f4 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 06:27:15 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@45f666b (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 06:27:16 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@338c3475 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 06:27:23 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@247e7454 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 06:27:24 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@20943b1a (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 06:27:35 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@72698ce1 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 06:27:45 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@419496a5 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 06:27:53 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@7ee9ab08 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 06:30:06 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 06:35:06 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 06:40:06 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 06:45:10 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 06:49:45 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m2s994ms).
+2026-05-09 07:15:01 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=23m15s473ms).
+2026-05-09 07:48:57 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2334f5cf (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 08:09:13 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@a55faa (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 08:09:17 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 08:09:19 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=54m17s918ms).
+2026-05-09 08:09:32 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@559af1fa (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 08:09:41 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@5a212557 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 08:09:58 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2ea053fa (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 08:10:07 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@16a7d09f (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 08:10:19 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2d0186fd (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 08:10:23 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@3abd8cc8 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 08:10:29 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2aea4633 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 08:10:39 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2dc44866 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 08:44:14 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=32m25s525ms).
+2026-05-09 09:32:11 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@3ea404e (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 09:49:22 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h5m7s841ms).
+2026-05-09 09:49:30 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6fa3f236 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 09:49:31 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@fb4a92d (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 09:50:04 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@37aef39f (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 09:50:14 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@72002e8b (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 09:50:26 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@18252ea9 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 09:50:31 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@48c51953 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 09:50:41 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@19f22185 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 09:50:45 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@5292224c (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 09:50:46 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@62a36b14 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 09:50:50 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 10:01:20 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=9m27s841ms).
+2026-05-09 10:35:34 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6ad590cc (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 10:35:35 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@76e2404f (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 10:52:12 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@f606e4c (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 10:52:13 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@70ca6f6b (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 11:02:19 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h58s880ms).
+2026-05-09 11:02:31 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@14cea905 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 11:02:46 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@7fa60974 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 11:03:00 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@3d539cce (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 11:03:09 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6f827234 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 11:03:33 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@365c76a3 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 11:03:45 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6ba55e40 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 11:11:14 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 11:11:17 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m27s530ms).
+2026-05-09 11:29:43 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=18m26s201ms).
+2026-05-09 11:44:58 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@686c9d46 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 12:03:15 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6a99599e (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 12:37:09 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h7m26s682ms).
+2026-05-09 12:37:13 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@5b97c961 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 12:37:48 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@2a934244 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 12:37:51 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@774cb631 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 12:37:58 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@486ce020 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 12:38:01 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@47596f9e (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 12:38:10 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@5536b47a (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 12:38:17 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@6a69e30b (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 12:38:24 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@635a991 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 13:21:15 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@78d64788 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 14:04:22 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h24m12s136ms).
+2026-05-09 14:04:34 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@37821d93 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 14:04:49 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@34dd09fd (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 14:04:49 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 14:05:06 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@d6f1a83 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 14:05:07 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@4010d887 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 14:05:17 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@5d8d3c28 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 14:05:19 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@41b4bd28 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 14:05:27 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@7268179 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 14:05:34 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@7f96af0 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 14:05:46 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection org.postgresql.jdbc.PgConnection@505eb282 (This connection has been closed.). Possibly consider using a shorter maxLifetime value.
+2026-05-09 14:09:49 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 14:14:49 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 14:19:49 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 14:24:49 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 14:29:49 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 14:34:49 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 14:37:25 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m33s90ms).
+2026-05-09 14:45:55 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m29s517ms).
+2026-05-09 15:01:21 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m26s590ms).
+2026-05-09 15:02:48 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 15:09:21 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m29s516ms).
+2026-05-09 15:21:19 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=11m58s476ms).
+2026-05-09 15:39:54 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=18m34s428ms).
+2026-05-09 15:42:21 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 15:47:17 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=4m53s581ms).
+2026-05-09 16:17:53 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=30m36s11ms).
+2026-05-09 16:38:45 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=18m21s734ms).
+2026-05-09 16:43:39 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=4m53s671ms).
+2026-05-09 16:44:06 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 16:49:06 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 16:54:06 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 16:59:06 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 17:04:06 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 17:06:21 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 21634 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 17:06:21 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 17:06:21 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 17:06:22 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:06:22 [Thread-1] INFO  o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:06:23 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:06:23 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 17:06:23 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 17:06:24 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 63964 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 17:06:24 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 17:06:24 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 17:06:25 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:06:25 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 17:06:25 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 17:06:28 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 17:06:29 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 17:06:29 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:06:29 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 7.48 seconds (process running for 8.031)
+2026-05-09 17:06:29 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-05-09 17:06:29 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-05-09 17:06:29 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 17:06:29 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:06:29 [restartedMain] WARN  o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-05-09 17:06:30 [restartedMain] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+2026-05-09 17:10:56 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-09 17:10:56 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-05-09 17:10:56 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-05-09 17:10:56 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
+2026-05-09 17:10:56 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
+2026-05-09 17:10:57 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 2, role: LICENSEE, status: ACTIVE
+2026-05-09 17:10:57 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 2, role: LICENSEE, expiresAt: Sun May 10 17:10:57 IST 2026
+2026-05-09 17:10:57 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 2, role: LICENSEE
+2026-05-09 17:10:57 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 2, role: LICENSEE
+2026-05-09 17:11:17 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects
+2026-05-09 17:11:17 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-09 17:11:17 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-05-09 17:11:17 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — GET /api/prospects
+2026-05-09 17:11:17 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — requestingUserId: 2, role: LICENSEE, getAll: false, typeFilter: PROSPECT, licenseeIdFilter: null, associateIdFilter: null, page: 0, limit: 5
+2026-05-09 17:11:18 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — requestingUserId: 2, overallTotal: 12, prospectCount: 12, clientCount: 0
+2026-05-09 17:11:18 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — paginated mode — requestingUserId: 2, page: 0, limit: 5
+2026-05-09 17:11:29 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 17:15:27 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects
+2026-05-09 17:15:27 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-09 17:15:27 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-05-09 17:15:27 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — GET /api/prospects
+2026-05-09 17:15:27 [http-nio-8080-exec-6] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: Method parameter 'type': Failed to convert value of type 'java.lang.String' to required type 'com.lmi.crm.enums.ProspectType'; Failed to convert from type [java.lang.String] to type [@org.springframework.web.bind.annotation.RequestParam com.lmi.crm.enums.ProspectType] for value [PROSPECT?getAll=True]
+2026-05-09 17:15:27 [http-nio-8080-exec-6] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'type': Failed to convert value of type 'java.lang.String' to required type 'com.lmi.crm.enums.ProspectType'; Failed to convert from type [java.lang.String] to type [@org.springframework.web.bind.annotation.RequestParam com.lmi.crm.enums.ProspectType] for value [PROSPECT?getAll=True]]
+2026-05-09 17:16:29 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 17:16:33 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects
+2026-05-09 17:16:33 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-09 17:16:33 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-05-09 17:16:33 [http-nio-8080-exec-8] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — GET /api/prospects
+2026-05-09 17:16:33 [http-nio-8080-exec-8] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — requestingUserId: 2, role: LICENSEE, getAll: true, typeFilter: PROSPECT, licenseeIdFilter: null, associateIdFilter: null, page: 0, limit: 5
+2026-05-09 17:16:34 [http-nio-8080-exec-8] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — requestingUserId: 2, overallTotal: 12, prospectCount: 12, clientCount: 0
+2026-05-09 17:16:34 [http-nio-8080-exec-8] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — getAll mode — requestingUserId: 2
+2026-05-09 17:17:17 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-05-09 17:17:17 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-05-09 17:17:17 [http-nio-8080-exec-9] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: nagpalajay@gmail.com
+2026-05-09 17:17:17 [http-nio-8080-exec-9] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: nagpalajay@gmail.com
+2026-05-09 17:17:18 [http-nio-8080-exec-9] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 1, role: SUPER_ADMIN, status: ACTIVE
+2026-05-09 17:17:18 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 1, role: SUPER_ADMIN, expiresAt: Sun May 10 17:17:18 IST 2026
+2026-05-09 17:17:18 [http-nio-8080-exec-9] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 1, role: SUPER_ADMIN
+2026-05-09 17:17:18 [http-nio-8080-exec-9] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 1, role: SUPER_ADMIN
+2026-05-09 17:17:59 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects
+2026-05-09 17:17:59 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-09 17:17:59 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-09 17:18:00 [http-nio-8080-exec-10] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects
+2026-05-09 17:18:00 [http-nio-8080-exec-10] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — requestingUserId: 1, role: SUPER_ADMIN, getAll: true, typeFilter: PROSPECT, licenseeIdFilter: null, associateIdFilter: null, page: 0, limit: 5
+2026-05-09 17:18:01 [http-nio-8080-exec-10] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — requestingUserId: 1, overallTotal: 17, prospectCount: 17, clientCount: 0
+2026-05-09 17:18:01 [http-nio-8080-exec-10] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — getAll mode — requestingUserId: 1
+2026-05-09 17:21:29 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 17:23:17 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects
+2026-05-09 17:23:17 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-09 17:23:17 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-09 17:23:18 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/prospects
+2026-05-09 17:23:18 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — requestingUserId: 1, role: SUPER_ADMIN, getAll: true, typeFilter: PROSPECT, licenseeIdFilter: null, associateIdFilter: null, page: 0, limit: 5
+2026-05-09 17:23:19 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — requestingUserId: 1, overallTotal: 17, prospectCount: 17, clientCount: 0
+2026-05-09 17:23:19 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — getAll mode — requestingUserId: 1
+2026-05-09 17:26:21 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 22282 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 17:26:21 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 17:26:21 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 17:26:22 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 63964 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 17:26:22 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 17:26:22 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 17:26:22 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:26:22 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 17:26:22 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 17:26:22 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:26:22 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 17:26:22 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 17:26:26 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 17:26:26 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:26:26 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 17:26:26 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 4.442 seconds (process running for 148349.107)
+2026-05-09 17:26:26 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-05-09 17:26:26 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-05-09 17:26:28 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 17:26:28 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:26:28 [restartedMain] WARN  o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-05-09 17:26:29 [restartedMain] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+2026-05-09 17:28:11 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 22312 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 17:28:11 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 17:28:11 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 17:28:12 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:28:12 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 17:28:12 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 17:28:17 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 17:28:17 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:28:17 [restartedMain] WARN  o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-05-09 17:28:18 [restartedMain] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+2026-05-09 17:28:31 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat-1].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-09 17:28:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-05-09 17:28:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-05-09 17:28:31 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
+2026-05-09 17:28:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
+2026-05-09 17:28:32 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 2, role: LICENSEE, status: ACTIVE
+2026-05-09 17:28:32 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 2, role: LICENSEE, expiresAt: Sun May 10 17:28:32 IST 2026
+2026-05-09 17:28:32 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 2, role: LICENSEE
+2026-05-09 17:28:32 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 2, role: LICENSEE
+2026-05-09 17:28:53 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-05-09 17:28:53 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-05-09 17:28:53 [http-nio-8080-exec-3] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
+2026-05-09 17:28:53 [http-nio-8080-exec-3] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
+2026-05-09 17:28:53 [http-nio-8080-exec-3] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 2, role: LICENSEE, status: ACTIVE
+2026-05-09 17:28:53 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 2, role: LICENSEE, expiresAt: Sun May 10 17:28:53 IST 2026
+2026-05-09 17:28:53 [http-nio-8080-exec-3] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 2, role: LICENSEE
+2026-05-09 17:28:53 [http-nio-8080-exec-3] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 2, role: LICENSEE
+2026-05-09 17:30:54 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 22431 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 17:30:54 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 17:30:54 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 17:30:55 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:30:55 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 17:30:55 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 17:31:00 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 17:31:00 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:31:00 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 6.576 seconds (process running for 6.882)
+2026-05-09 17:31:00 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-05-09 17:31:00 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 17:31:00 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-05-09 17:31:48 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-09 17:31:48 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-05-09 17:31:48 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-05-09 17:31:48 [http-nio-8080-exec-1] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
+2026-05-09 17:31:48 [http-nio-8080-exec-1] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
+2026-05-09 17:31:49 [http-nio-8080-exec-1] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 2, role: LICENSEE, status: ACTIVE
+2026-05-09 17:31:49 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 2, role: LICENSEE, expiresAt: Sun May 10 17:31:49 IST 2026
+2026-05-09 17:31:49 [http-nio-8080-exec-1] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 2, role: LICENSEE
+2026-05-09 17:31:49 [http-nio-8080-exec-1] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 2, role: LICENSEE
+2026-05-09 17:32:01 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/prospects
+2026-05-09 17:32:01 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-09 17:32:01 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-05-09 17:32:01 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — GET /api/prospects
+2026-05-09 17:32:02 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — requestingUserId: 2, role: LICENSEE, getAll: true, typeFilter: PROSPECT, licenseeIdFilter: null, associateIdFilter: null, page: 0, limit: 5
+2026-05-09 17:32:02 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — requestingUserId: 2, overallTotal: 17, prospectCount: 17, clientCount: 0
+2026-05-09 17:32:02 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - getProspects — getAll mode — requestingUserId: 2
+2026-05-09 17:36:00 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 17:40:36 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:40:38 [Thread-1] INFO  o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:40:38 [http-nio-8080-Acceptor] ERROR org.apache.tomcat.util.net.Acceptor - Socket accept failed
 java.nio.channels.AsynchronousCloseException
 	at java.base/java.nio.channels.spi.AbstractInterruptibleChannel.end(AbstractInterruptibleChannel.java:218)
 	at java.base/sun.nio.ch.ServerSocketChannelImpl.end(ServerSocketChannelImpl.java:372)
@@ -235,353 +353,213 @@ java.nio.channels.AsynchronousCloseException
 	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:71)
 	at org.apache.tomcat.util.net.Acceptor.run(Acceptor.java:127)
 	at java.base/java.lang.Thread.run(Thread.java:1516)
-2026-05-05 00:59:25 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 62621 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
-2026-05-05 00:59:25 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
-2026-05-05 00:59:25 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
-2026-05-05 00:59:26 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:59:26 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-05-05 00:59:26 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
-2026-05-05 00:59:52 [restartedMain] WARN  org.hibernate.orm.jdbc.error - HHH000247: ErrorCode: 0, SQLState: 08001
-2026-05-05 00:59:52 [restartedMain] WARN  org.hibernate.orm.jdbc.error - The connection attempt failed.
-2026-05-05 00:59:52 [restartedMain] WARN  org.hibernate.orm.jdbc - HHH100046: Could not obtain connection to query JDBC database metadata
-org.hibernate.exception.JDBCConnectionException: Unable to obtain isolated JDBC connection [The connection attempt failed.] [n/a]
-	at org.hibernate.exception.internal.SQLStateConversionDelegate.convert(SQLStateConversionDelegate.java:80)
-	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
-	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
-	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:101)
-	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcIsolationDelegate.delegateWork(JdbcIsolationDelegate.java:51)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironmentUsingJdbcMetadata(JdbcEnvironmentInitiator.java:366)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironment(JdbcEnvironmentInitiator.java:143)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:120)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:80)
-	at org.hibernate.boot.registry.internal.StandardServiceRegistryImpl.initiateService(StandardServiceRegistryImpl.java:133)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:260)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:235)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:212)
-	at org.hibernate.boot.model.relational.Database.<init>(Database.java:44)
-	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.getDatabase(InFlightMetadataCollectorImpl.java:251)
-	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.<init>(InFlightMetadataCollectorImpl.java:203)
-	at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:172)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.metadata(EntityManagerFactoryBuilderImpl.java:1392)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.populateSessionFactoryBuilder(EntityManagerFactoryBuilderImpl.java:1472)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1454)
-	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:93)
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:443)
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:436)
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:411)
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:419)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1864)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1813)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:603)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:196)
-	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:365)
-	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135)
-	at org.springframework.beans.factory.support.ConstructorResolver.resolveConstructorArguments(ConstructorResolver.java:691)
-	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:513)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1362)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1194)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201)
-	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:356)
-	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyPropertyValues(AbstractAutowireCapableBeanFactory.java:1712)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1461)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:602)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201)
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveBean(DefaultListableBeanFactory.java:1225)
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1704)
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1651)
-	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:764)
-	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:748)
-	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146)
-	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:493)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1446)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:602)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201)
-	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.getOrderedBeansOfType(ServletContextInitializerBeans.java:231)
-	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:185)
-	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:180)
-	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAdaptableBeans(ServletContextInitializerBeans.java:165)
-	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.<init>(ServletContextInitializerBeans.java:97)
-	at org.springframework.boot.web.context.servlet.WebApplicationContextInitializer.initialize(WebApplicationContextInitializer.java:53)
-	at org.springframework.boot.tomcat.servlet.DeferredServletContainerInitializers.onStartup(DeferredServletContainerInitializers.java:55)
-	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:4416)
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
-	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1162)
-	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1158)
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:330)
-	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:81)
-	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:149)
-	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:714)
-	at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:780)
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
-	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1162)
-	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1158)
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:330)
-	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:81)
-	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:149)
-	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:714)
-	at org.apache.catalina.core.StandardEngine.startInternal(StandardEngine.java:201)
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
-	at org.apache.catalina.core.StandardService.startInternal(StandardService.java:410)
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
-	at org.apache.catalina.core.StandardServer.startInternal(StandardServer.java:864)
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
-	at org.apache.catalina.startup.Tomcat.start(Tomcat.java:435)
-	at org.springframework.boot.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:131)
-	at org.springframework.boot.tomcat.TomcatWebServer.<init>(TomcatWebServer.java:110)
-	at org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory.getTomcatWebServer(TomcatServletWebServerFactory.java:408)
-	at org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory.getWebServer(TomcatServletWebServerFactory.java:166)
-	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.createWebServer(ServletWebServerApplicationContext.java:190)
-	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:164)
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:615)
-	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143)
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756)
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)
-	at com.lmi.crm.CrmApplication.main(CrmApplication.java:14)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
-	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:52)
-Caused by: org.postgresql.util.PSQLException: The connection attempt failed.
-	at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:385)
-	at org.postgresql.core.ConnectionFactory.openConnection(ConnectionFactory.java:57)
-	at org.postgresql.jdbc.PgConnection.<init>(PgConnection.java:290)
-	at org.postgresql.Driver.makeConnection(Driver.java:448)
-	at org.postgresql.Driver.connect(Driver.java:298)
-	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:144)
-	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:373)
-	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:210)
-	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:488)
-	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:576)
-	at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:97)
-	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:111)
-	at org.hibernate.engine.jdbc.connections.internal.DataSourceConnectionProvider.getConnection(DataSourceConnectionProvider.java:137)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess.obtainConnection(JdbcEnvironmentInitiator.java:508)
-	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcIsolationDelegate.delegateWork(JdbcIsolationDelegate.java:48)
-	... 111 common frames omitted
-Caused by: java.net.SocketTimeoutException: Read timed out
-	at java.base/sun.nio.ch.NioSocketImpl.timedRead(NioSocketImpl.java:276)
-	at java.base/sun.nio.ch.NioSocketImpl.implRead(NioSocketImpl.java:302)
-	at java.base/sun.nio.ch.NioSocketImpl.read(NioSocketImpl.java:360)
-	at java.base/sun.nio.ch.NioSocketImpl$1.read(NioSocketImpl.java:802)
-	at java.base/java.net.Socket$SocketInputStream.implRead(Socket.java:984)
-	at java.base/java.net.Socket$SocketInputStream.read(Socket.java:974)
-	at org.postgresql.core.VisibleBufferedInputStream.readMore(VisibleBufferedInputStream.java:192)
-	at org.postgresql.core.VisibleBufferedInputStream.ensureBytes(VisibleBufferedInputStream.java:159)
-	at org.postgresql.core.VisibleBufferedInputStream.ensureBytes(VisibleBufferedInputStream.java:144)
-	at org.postgresql.core.VisibleBufferedInputStream.read(VisibleBufferedInputStream.java:76)
-	at org.postgresql.core.PGStream.receiveChar(PGStream.java:477)
-	at org.postgresql.core.v3.ConnectionFactoryImpl.enableSSL(ConnectionFactoryImpl.java:627)
-	at org.postgresql.core.v3.ConnectionFactoryImpl.tryConnect(ConnectionFactoryImpl.java:207)
-	at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:289)
-	... 125 common frames omitted
-2026-05-05 00:59:52 [restartedMain] ERROR o.s.o.j.LocalContainerEntityManagerFactoryBean - Failed to initialize JPA EntityManagerFactory: Unable to create requested service [org.hibernate.engine.jdbc.env.spi.JdbcEnvironment] due to: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-2026-05-05 00:59:52 [restartedMain] ERROR o.s.b.t.s.DeferredServletContainerInitializers - Error starting Tomcat context. Exception: org.springframework.beans.factory.UnsatisfiedDependencyException. Message: Error creating bean with name 'jwtAuthFilter': Unsatisfied dependency expressed through field 'userRepository': Error creating bean with name 'userRepository' defined in com.lmi.crm.dao.UserRepository defined in @EnableJpaRepositories declared on DataJpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Cannot resolve reference to bean 'jpaSharedEM_entityManagerFactory' while setting bean property 'entityManager'
-2026-05-05 00:59:52 [restartedMain] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
-2026-05-05 00:59:52 [restartedMain] WARN  o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Unable to start web server
-2026-05-05 00:59:52 [restartedMain] ERROR o.s.boot.SpringApplication - Application run failed
-org.springframework.context.ApplicationContextException: Unable to start web server
-	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:167)
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:615)
-	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143)
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756)
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)
-	at com.lmi.crm.CrmApplication.main(CrmApplication.java:14)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
-	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:52)
-Caused by: org.springframework.boot.web.server.WebServerException: Unable to start embedded Tomcat
-	at org.springframework.boot.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:150)
-	at org.springframework.boot.tomcat.TomcatWebServer.<init>(TomcatWebServer.java:110)
-	at org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory.getTomcatWebServer(TomcatServletWebServerFactory.java:408)
-	at org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory.getWebServer(TomcatServletWebServerFactory.java:166)
-	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.createWebServer(ServletWebServerApplicationContext.java:190)
-	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:164)
-	... 11 common frames omitted
-Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'jwtAuthFilter': Unsatisfied dependency expressed through field 'userRepository': Error creating bean with name 'userRepository' defined in com.lmi.crm.dao.UserRepository defined in @EnableJpaRepositories declared on DataJpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Cannot resolve reference to bean 'jpaSharedEM_entityManagerFactory' while setting bean property 'entityManager'
-	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:767)
-	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:748)
-	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146)
-	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:493)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1446)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:602)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201)
-	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.getOrderedBeansOfType(ServletContextInitializerBeans.java:231)
-	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:185)
-	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:180)
-	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAdaptableBeans(ServletContextInitializerBeans.java:165)
-	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.<init>(ServletContextInitializerBeans.java:97)
-	at org.springframework.boot.web.context.servlet.WebApplicationContextInitializer.initialize(WebApplicationContextInitializer.java:53)
-	at org.springframework.boot.tomcat.servlet.DeferredServletContainerInitializers.onStartup(DeferredServletContainerInitializers.java:55)
-	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:4416)
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
-	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1162)
-	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1158)
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:330)
-	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:81)
-	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:149)
-	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:714)
-	at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:780)
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
-	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1162)
-	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1158)
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:330)
-	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:81)
-	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:149)
-	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:714)
-	at org.apache.catalina.core.StandardEngine.startInternal(StandardEngine.java:201)
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
-	at org.apache.catalina.core.StandardService.startInternal(StandardService.java:410)
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
-	at org.apache.catalina.core.StandardServer.startInternal(StandardServer.java:864)
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
-	at org.apache.catalina.startup.Tomcat.start(Tomcat.java:435)
-	at org.springframework.boot.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:131)
-	... 16 common frames omitted
-Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'userRepository' defined in com.lmi.crm.dao.UserRepository defined in @EnableJpaRepositories declared on DataJpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Cannot resolve reference to bean 'jpaSharedEM_entityManagerFactory' while setting bean property 'entityManager'
-	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:377)
-	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyPropertyValues(AbstractAutowireCapableBeanFactory.java:1712)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1461)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:602)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201)
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveBean(DefaultListableBeanFactory.java:1225)
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1704)
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1651)
-	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:764)
-	... 57 common frames omitted
-Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'jpaSharedEM_entityManagerFactory': Cannot resolve reference to bean 'entityManagerFactory' while setting constructor argument
-	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:377)
-	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135)
-	at org.springframework.beans.factory.support.ConstructorResolver.resolveConstructorArguments(ConstructorResolver.java:691)
-	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:513)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1362)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1194)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201)
-	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:356)
-	... 70 common frames omitted
-Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/hibernate/autoconfigure/HibernateJpaConfiguration.class]: Unable to create requested service [org.hibernate.engine.jdbc.env.spi.JdbcEnvironment] due to: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1817)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:603)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:196)
-	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:365)
-	... 82 common frames omitted
-Caused by: org.hibernate.service.spi.ServiceException: Unable to create requested service [org.hibernate.engine.jdbc.env.spi.JdbcEnvironment] due to: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:273)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:235)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:212)
-	at org.hibernate.boot.model.relational.Database.<init>(Database.java:44)
-	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.getDatabase(InFlightMetadataCollectorImpl.java:251)
-	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.<init>(InFlightMetadataCollectorImpl.java:203)
-	at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:172)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.metadata(EntityManagerFactoryBuilderImpl.java:1392)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.populateSessionFactoryBuilder(EntityManagerFactoryBuilderImpl.java:1472)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1454)
-	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:93)
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:443)
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:436)
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:411)
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:419)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1864)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1813)
-	... 89 common frames omitted
-Caused by: org.hibernate.HibernateException: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-	at org.hibernate.engine.jdbc.dialect.internal.DialectFactoryImpl.determineDialect(DialectFactoryImpl.java:190)
-	at org.hibernate.engine.jdbc.dialect.internal.DialectFactoryImpl.buildDialect(DialectFactoryImpl.java:86)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironmentWithDefaults(JdbcEnvironmentInitiator.java:200)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironmentUsingJdbcMetadata(JdbcEnvironmentInitiator.java:452)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironment(JdbcEnvironmentInitiator.java:143)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:120)
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:80)
-	at org.hibernate.boot.registry.internal.StandardServiceRegistryImpl.initiateService(StandardServiceRegistryImpl.java:133)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:260)
-	... 105 common frames omitted
-2026-05-05 00:59:53 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 62621 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
-2026-05-05 00:59:53 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
-2026-05-05 00:59:53 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
-2026-05-05 00:59:54 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-05-05 00:59:54 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-05-05 00:59:54 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
-2026-05-05 01:00:01 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
-2026-05-05 01:00:02 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
-2026-05-05 01:00:02 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
-2026-05-05 01:00:02 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 8.205 seconds (process running for 1755.727)
-2026-05-05 01:00:02 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
-2026-05-05 01:00:02 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
-2026-05-05 01:00:25 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 63964 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
-2026-05-05 01:00:25 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
-2026-05-05 01:00:25 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
-2026-05-05 01:00:26 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-05-05 01:00:26 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-05-05 01:00:26 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
-2026-05-05 01:00:33 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
-2026-05-05 01:00:34 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
-2026-05-05 01:00:34 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 8.415 seconds (process running for 8.681)
-2026-05-05 01:00:34 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
-2026-05-05 01:00:34 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
-2026-05-05 01:00:34 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
-2026-05-05 01:01:43 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-05-05 01:01:43 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
-2026-05-05 01:01:43 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 01:01:43 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 01:01:44 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
-2026-05-05 01:01:45 [http-nio-8080-exec-1] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — requestingUserId: 1, getAll: false, typeFilter: null, statusFilter: PENDING, page: 0, limit: 50
-2026-05-05 01:01:46 [http-nio-8080-exec-1] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — paginated mode — typeFilter: null, statusFilter: PENDING, page: 0, limit: 50, total: 1
-2026-05-05 01:02:03 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/admin/scheduler/sync-alerts
-2026-05-05 01:02:03 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 01:02:03 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 01:02:04 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — POST /api/admin/scheduler/sync-alerts
-2026-05-05 01:02:04 [http-nio-8080-exec-2] INFO  c.l.c.controller.SchedulerController - Scheduler manually triggered — job: syncPendingAlerts, triggeredBy: 1
-2026-05-05 01:02:04 [http-nio-8080-exec-2] INFO  c.l.crm.scheduler.AlertSyncScheduler - syncPendingAlerts — started
-2026-05-05 01:02:05 [http-nio-8080-exec-2] INFO  c.l.crm.scheduler.AlertSyncScheduler - syncPendingAlerts — auto-resolved alertId: 17, type: DUPLICATE_PROSPECT, entityId: 24
-2026-05-05 01:02:05 [http-nio-8080-exec-2] INFO  c.l.crm.scheduler.AlertSyncScheduler - syncPendingAlerts — finished — resolved: 1, skipped: 0, total: 1
-2026-05-05 01:02:20 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
-2026-05-05 01:02:20 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 01:02:20 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 01:02:21 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
-2026-05-05 01:02:22 [http-nio-8080-exec-4] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — requestingUserId: 1, getAll: false, typeFilter: null, statusFilter: PENDING, page: 0, limit: 50
-2026-05-05 01:02:23 [http-nio-8080-exec-4] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — paginated mode — typeFilter: null, statusFilter: PENDING, page: 0, limit: 50, total: 0
-2026-05-05 01:02:23 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts/17
-2026-05-05 01:02:23 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
-2026-05-05 01:02:23 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
-2026-05-05 01:02:24 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts/17
-2026-05-05 01:02:25 [http-nio-8080-exec-6] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts/17 — requestingUserId: 1
+2026-05-09 17:40:39 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 22431 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 17:40:39 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 17:40:39 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 17:40:40 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:40:40 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 17:40:40 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 17:40:44 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 17:40:44 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:40:44 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 17:40:44 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 4.509 seconds (process running for 590.453)
+2026-05-09 17:40:44 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-05-09 17:40:44 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-05-09 17:40:45 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:40:47 [Thread-5] INFO  o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:40:47 [http-nio-8080-Acceptor] ERROR org.apache.tomcat.util.net.Acceptor - Socket accept failed
+java.nio.channels.AsynchronousCloseException
+	at java.base/java.nio.channels.spi.AbstractInterruptibleChannel.end(AbstractInterruptibleChannel.java:218)
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.end(ServerSocketChannelImpl.java:372)
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:397)
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:532)
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:71)
+	at org.apache.tomcat.util.net.Acceptor.run(Acceptor.java:127)
+	at java.base/java.lang.Thread.run(Thread.java:1516)
+2026-05-09 17:40:48 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 22431 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 17:40:48 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 17:40:48 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 17:40:49 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:40:49 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 17:40:49 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 17:40:52 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 17:40:53 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:40:53 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 17:40:53 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 4.21 seconds (process running for 599.214)
+2026-05-09 17:40:53 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-05-09 17:40:53 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-05-09 17:52:09 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 22900 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 17:52:09 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 17:52:09 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 17:52:09 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:52:09 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 17:52:09 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 17:52:16 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 17:52:16 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 17:52:16 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 7.966 seconds (process running for 8.224)
+2026-05-09 17:52:16 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-05-09 17:52:16 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-05-09 17:52:16 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 17:57:16 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 18:02:16 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 18:05:13 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 23176 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 18:05:13 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 18:05:13 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 18:05:14 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:05:14 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 18:05:14 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 18:05:19 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 18:05:20 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:05:20 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 6.783 seconds (process running for 7.035)
+2026-05-09 18:05:20 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-05-09 18:05:20 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-05-09 18:05:20 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 18:05:30 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-09 18:05:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-05-09 18:05:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-05-09 18:05:30 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
+2026-05-09 18:05:30 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: 3ad660f15e4e36@sandbox.smtp.mailtrap.io
+2026-05-09 18:05:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 2, role: LICENSEE, status: ACTIVE
+2026-05-09 18:05:31 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 2, role: LICENSEE, expiresAt: Sun May 10 18:05:31 IST 2026
+2026-05-09 18:05:31 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 2, role: LICENSEE
+2026-05-09 18:05:31 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 2, role: LICENSEE
+2026-05-09 18:06:03 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/licensees/associates/request
+2026-05-09 18:06:03 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-09 18:06:03 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 2
+2026-05-09 18:06:04 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 2, role: LICENSEE — POST /api/licensees/associates/request
+2026-05-09 18:06:04 [http-nio-8080-exec-3] INFO  c.lmi.crm.controller.UserController - POST /api/licensees/associates/request — requestingUserId: 2, associate: Shubhankar Bhanot
+2026-05-09 18:06:04 [http-nio-8080-exec-3] DEBUG com.lmi.crm.service.UserServiceImpl - requestAssociateCreation — requestingLicenseeId: 2, associate: Shubhankar Bhanot
+2026-05-09 18:06:05 [http-nio-8080-exec-3] WARN  com.lmi.crm.service.UserServiceImpl - requestAssociateCreation — rejected — phone already exists: 9560057313 — requestingLicenseeId: 2
+2026-05-09 18:06:05 [http-nio-8080-exec-3] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: A user with this phone number already exists
+2026-05-09 18:06:05 [http-nio-8080-exec-3] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [java.lang.RuntimeException: A user with this phone number already exists]
+2026-05-09 18:21:45 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 23775 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 18:21:45 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 18:21:45 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 18:21:46 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:21:46 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 18:21:46 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 18:21:52 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 18:21:53 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:21:53 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 7.92 seconds (process running for 8.164)
+2026-05-09 18:21:53 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 18:21:53 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-05-09 18:21:53 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-05-09 18:22:04 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-09 18:22:04 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-05-09 18:22:04 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-05-09 18:22:04 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: nagpalajay@gmail.com
+2026-05-09 18:22:04 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: nagpalajay@gmail.com
+2026-05-09 18:22:04 [http-nio-8080-exec-2] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 1, role: SUPER_ADMIN, status: ACTIVE
+2026-05-09 18:22:04 [http-nio-8080-exec-2] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 1, role: SUPER_ADMIN, expiresAt: Sun May 10 18:22:04 IST 2026
+2026-05-09 18:22:04 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 1, role: SUPER_ADMIN
+2026-05-09 18:22:04 [http-nio-8080-exec-2] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 1, role: SUPER_ADMIN
+2026-05-09 18:22:27 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
+2026-05-09 18:22:27 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-09 18:22:27 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-09 18:22:28 [http-nio-8080-exec-4] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
+2026-05-09 18:22:28 [http-nio-8080-exec-4] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — requestingUserId: 1, getAll: false, typeFilter: null, statusFilter: null, page: 0, limit: 5
+2026-05-09 18:22:30 [http-nio-8080-exec-4] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — paginated mode — typeFilter: null, statusFilter: null, page: 0, limit: 5, total: 34
+2026-05-09 18:22:59 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
+2026-05-09 18:22:59 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-09 18:22:59 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-09 18:22:59 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
+2026-05-09 18:22:59 [http-nio-8080-exec-1] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: Method parameter 'type': Failed to convert value of type 'java.lang.String' to required type 'com.lmi.crm.enums.AlertType'; Failed to convert from type [java.lang.String] to type [@org.springframework.web.bind.annotation.RequestParam com.lmi.crm.enums.AlertType] for value [PENDING]
+2026-05-09 18:22:59 [http-nio-8080-exec-1] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'type': Failed to convert value of type 'java.lang.String' to required type 'com.lmi.crm.enums.AlertType'; Failed to convert from type [java.lang.String] to type [@org.springframework.web.bind.annotation.RequestParam com.lmi.crm.enums.AlertType] for value [PENDING]]
+2026-05-09 18:23:09 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — GET /api/admin/alerts
+2026-05-09 18:23:09 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-09 18:23:09 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-09 18:23:09 [http-nio-8080-exec-6] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — GET /api/admin/alerts
+2026-05-09 18:23:10 [http-nio-8080-exec-6] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — requestingUserId: 1, getAll: false, typeFilter: null, statusFilter: PENDING, page: 0, limit: 5
+2026-05-09 18:23:11 [http-nio-8080-exec-6] INFO  c.lmi.crm.service.AlertServiceImpl - GET /api/admin/alerts — paginated mode — typeFilter: null, statusFilter: PENDING, page: 0, limit: 5, total: 1
+2026-05-09 18:25:36 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/extensions/%7BalertId%7D
+2026-05-09 18:25:36 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-09 18:25:36 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-09 18:25:37 [http-nio-8080-exec-9] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/extensions/%7BalertId%7D
+2026-05-09 18:25:37 [http-nio-8080-exec-9] WARN  c.l.c.e.GlobalExceptionHandler - RuntimeException: Method parameter 'alertId': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer'; For input string: "{alertId}"
+2026-05-09 18:25:37 [http-nio-8080-exec-9] WARN  o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'alertId': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer'; For input string: "{alertId}"]
+2026-05-09 18:25:45 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — PUT /api/prospects/extensions/32
+2026-05-09 18:25:45 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-09 18:25:45 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-09 18:25:46 [http-nio-8080-exec-3] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — PUT /api/prospects/extensions/32
+2026-05-09 18:25:46 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - PUT /api/prospects/extensions/32 — requestingUserId: 1, approve: true, extensionMonths: 3
+2026-05-09 18:25:47 [http-nio-8080-exec-3] INFO  c.l.crm.service.ProspectServiceImpl - Protection extension approved — prospectId: 25, extensionMonths: 3, newTotal: 103, approvedBy: 1
+2026-05-09 18:26:53 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 18:31:04 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:31:06 [Thread-1] INFO  o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:31:06 [http-nio-8080-Acceptor] ERROR org.apache.tomcat.util.net.Acceptor - Socket accept failed
+java.nio.channels.AsynchronousCloseException
+	at java.base/java.nio.channels.spi.AbstractInterruptibleChannel.end(AbstractInterruptibleChannel.java:218)
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.end(ServerSocketChannelImpl.java:372)
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:397)
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:532)
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:71)
+	at org.apache.tomcat.util.net.Acceptor.run(Acceptor.java:127)
+	at java.base/java.lang.Thread.run(Thread.java:1516)
+2026-05-09 18:31:07 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 23775 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 18:31:07 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 18:31:07 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 18:31:08 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:31:08 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 18:31:08 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 18:31:13 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 18:31:13 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:31:13 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 18:31:13 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 5.859 seconds (process running for 568.773)
+2026-05-09 18:31:13 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-05-09 18:31:13 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-05-09 18:31:15 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:31:17 [Thread-5] INFO  o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:31:17 [http-nio-8080-Acceptor] ERROR org.apache.tomcat.util.net.Acceptor - Socket accept failed
+java.nio.channels.AsynchronousCloseException
+	at java.base/java.nio.channels.spi.AbstractInterruptibleChannel.end(AbstractInterruptibleChannel.java:218)
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.end(ServerSocketChannelImpl.java:372)
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.accept(ServerSocketChannelImpl.java:397)
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:532)
+	at org.apache.tomcat.util.net.NioEndpoint.serverSocketAccept(NioEndpoint.java:71)
+	at org.apache.tomcat.util.net.Acceptor.run(Acceptor.java:127)
+	at java.base/java.lang.Thread.run(Thread.java:1516)
+2026-05-09 18:31:18 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 23775 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 18:31:18 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 18:31:18 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 18:31:18 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:31:18 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 18:31:18 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 18:31:23 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 18:31:23 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:31:23 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 18:31:23 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 5.802 seconds (process running for 579.096)
+2026-05-09 18:31:23 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-05-09 18:31:23 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-05-09 18:36:23 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 18:41:23 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 18:46:23 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 18:50:09 [HikariPool-3:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-3 - Thread starvation or clock leap detected (housekeeper delta=3m18s647ms).
+2026-05-09 18:50:55 [restartedMain] INFO  com.lmi.crm.CrmApplication - Starting CrmApplication using Java 26.0.1 with PID 24369 (/Users/ajay/personal/lmi-crm/target/classes started by ajay in /Users/ajay/personal/lmi-crm)
+2026-05-09 18:50:55 [restartedMain] DEBUG com.lmi.crm.CrmApplication - Running with Spring Boot v4.0.5, Spring v7.0.6
+2026-05-09 18:50:55 [restartedMain] INFO  com.lmi.crm.CrmApplication - The following 1 profile is active: "local"
+2026-05-09 18:50:55 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:50:55 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-09 18:50:55 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-05-09 18:51:01 [restartedMain] DEBUG com.lmi.crm.config.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-05-09 18:51:01 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-05-09 18:51:01 [restartedMain] INFO  com.lmi.crm.CrmApplication - Started CrmApplication in 6.869 seconds (process running for 7.096)
+2026-05-09 18:51:01 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-05-09 18:51:01 [restartedMain] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-05-09 18:51:01 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered
+2026-05-09 18:54:04 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-09 18:54:04 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/auth/login
+2026-05-09 18:54:04 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — no Bearer token, continuing as anonymous — POST /api/auth/login
+2026-05-09 18:54:04 [http-nio-8080-exec-1] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — identifier: nagpalajay@gmail.com
+2026-05-09 18:54:04 [http-nio-8080-exec-1] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — attempting — identifier: nagpalajay@gmail.com
+2026-05-09 18:54:04 [http-nio-8080-exec-1] DEBUG com.lmi.crm.auth.AuthServiceImpl - login — user found — userId: 1, role: SUPER_ADMIN, status: ACTIVE
+2026-05-09 18:54:04 [http-nio-8080-exec-1] DEBUG com.lmi.crm.config.JwtUtil - JWT generated — userId: 1, role: SUPER_ADMIN, expiresAt: Sun May 10 18:54:04 IST 2026
+2026-05-09 18:54:04 [http-nio-8080-exec-1] INFO  com.lmi.crm.auth.AuthServiceImpl - login — success — userId: 1, role: SUPER_ADMIN
+2026-05-09 18:54:04 [http-nio-8080-exec-1] INFO  com.lmi.crm.auth.AuthController - POST /api/auth/login — success — userId: 1, role: SUPER_ADMIN
+2026-05-09 18:55:46 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — POST /api/groups
+2026-05-09 18:55:46 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT validation passed
+2026-05-09 18:55:46 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtUtil - JWT extractUserId — userId: 1
+2026-05-09 18:55:47 [http-nio-8080-exec-5] DEBUG com.lmi.crm.config.JwtAuthFilter - JWT filter — authenticated userId: 1, role: SUPER_ADMIN — POST /api/groups
+2026-05-09 18:55:47 [http-nio-8080-exec-5] INFO  c.lmi.crm.controller.GroupController - POST /api/groups — requestingUserId: 1
+2026-05-09 18:55:50 [http-nio-8080-exec-5] INFO  c.lmi.crm.service.GroupServiceImpl - Group created — id: 3, licenseeId: 2, createdBy: 1
+2026-05-09 18:55:51 [http-nio-8080-exec-5] INFO  c.lmi.crm.controller.GroupController - POST /api/groups — created groupId: 3 — requestingUserId: 1
+2026-05-09 18:56:01 [scheduling-1] INFO  c.l.c.scheduler.ProtectionScheduler - Task reminder scheduler triggered

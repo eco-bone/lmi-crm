@@ -91,11 +91,12 @@ public class UserController {
     public ResponseEntity<ApiResponse<UsersPageResponse>> searchUsers(
             @RequestParam String q,
             @RequestParam(defaultValue = "own") String scope,
+            @RequestParam(required = false) UserRole role,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        log.info("GET /api/users/search — requestingUserId: {}, q: {}, scope: {}", requestingUserId, q, scope);
-        UsersPageResponse response = userService.searchUsers(requestingUserId, q, scope, page, limit);
+        log.info("GET /api/users/search — requestingUserId: {}, q: {}, scope: {}, role: {}", requestingUserId, q, scope, role);
+        UsersPageResponse response = userService.searchUsers(requestingUserId, q, scope, role, page, limit);
         return ResponseEntity.ok(ApiResponse.success("Search results retrieved successfully", response));
     }
 

@@ -36,8 +36,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -64,6 +66,9 @@ public class ProspectServiceImpl implements ProspectService {
 
     @Autowired
     private ProspectMapper prospectMapper;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     @Transactional
@@ -234,9 +239,16 @@ public class ProspectServiceImpl implements ProspectService {
 
         boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
 
-        // Fetch scoped list — always scoped to caller's visibility
         List<Prospect> prospects;
-        if (requestingUser.getRole() == UserRole.ASSOCIATE) {
+        if (getAll) {
+            // getAll=true: all authenticated roles see the full system list
+            if (typeFilter != null) {
+                prospects = prospectRepository.findByDeletionStatusFalseAndType(typeFilter);
+            } else {
+                prospects = prospectRepository.findByDeletionStatusFalse();
+            }
+
+        } else if (requestingUser.getRole() == UserRole.ASSOCIATE) {
             prospects = prospectRepository.findByAssociateIdAndDeletionStatusFalse(requestingUserId);
             if (typeFilter != null) {
                 prospects = prospects.stream().filter(p -> p.getType() == typeFilter).toList();
@@ -291,7 +303,7 @@ public class ProspectServiceImpl implements ProspectService {
         }
 
         // Build licensee map and map to responses
-        boolean useFullResponse = isAdmin;
+        boolean useFullResponse = true;
         List<Integer> allProspectIds = prospects.stream().map(Prospect::getId).toList();
         Map<Integer, Integer> licenseeMap = (useFullResponse && !allProspectIds.isEmpty())
                 ? prospectLicenseeRepository.findByProspectIdInAndIsPrimaryTrue(allProspectIds)
@@ -419,6 +431,20 @@ public class ProspectServiceImpl implements ProspectService {
                 .map(ProspectLicensee::getLicenseeId)
                 .orElse(null);
         log.info("Prospect updated — id: {}, requestedBy: {}", prospectId, requestingUserId);
+
+        // Step 7 — Notify all affiliated users
+        String recordType = savedProspect.getType() == ProspectType.CLIENT ? "Client" : "Prospect";
+        Set<String> emails = new HashSet<>();
+        userRepository.findByRole(UserRole.ADMIN).forEach(u -> emails.add(u.getEmail()));
+        userRepository.findByRole(UserRole.SUPER_ADMIN).forEach(u -> emails.add(u.getEmail()));
+        if (licenseeId != null) {
+            userRepository.findById(licenseeId).ifPresent(u -> emails.add(u.getEmail()));
+        }
+        if (savedProspect.getAssociateId() != null) {
+            userRepository.findById(savedProspect.getAssociateId()).ifPresent(u -> emails.add(u.getEmail()));
+        }
+        emails.forEach(email -> notificationService.sendRecordUpdatedEmail(email, recordType, savedProspect.getCompanyName()));
+
         return prospectMapper.toResponse(savedProspect, licenseeId, null);
     }
 
@@ -667,7 +693,7 @@ public class ProspectServiceImpl implements ProspectService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProspectsPageResponse searchProspects(Integer requestingUserId, String q, String scope, int page, int limit) {
+    public ProspectsPageResponse searchProspects(Integer requestingUserId, String q, String scope, ProspectType type, int page, int limit) {
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -688,6 +714,10 @@ public class ProspectServiceImpl implements ProspectService {
             throw new RuntimeException("Access denied");
         }
 
+        if (type != null) {
+            prospects = prospects.stream().filter(p -> p.getType() == type).toList();
+        }
+
         long overallTotal = prospects.size();
         long prospectCount = prospects.stream().filter(p -> p.getType() == ProspectType.PROSPECT).count();
         long clientCount = prospects.stream().filter(p -> p.getType() == ProspectType.CLIENT).count();
@@ -695,15 +725,13 @@ public class ProspectServiceImpl implements ProspectService {
         long unprotectedCount = prospects.stream().filter(p -> p.getStatus() == ProspectStatus.UNPROTECTED).count();
 
         List<Integer> allIds = prospects.stream().map(Prospect::getId).toList();
-        Map<Integer, Integer> licenseeMap = (isAdmin && !allIds.isEmpty())
+        Map<Integer, Integer> licenseeMap = (!allIds.isEmpty())
                 ? prospectLicenseeRepository.findByProspectIdInAndIsPrimaryTrue(allIds)
                         .stream().collect(Collectors.toMap(ProspectLicensee::getProspectId, ProspectLicensee::getLicenseeId))
                 : Map.of();
 
         List<ProspectResponse> allResponses = prospects.stream()
-                .map(p -> isAdmin
-                        ? prospectMapper.toResponse(p, licenseeMap.get(p.getId()), null)
-                        : prospectMapper.toLimitedResponse(p))
+                .map(p -> prospectMapper.toResponse(p, licenseeMap.get(p.getId()), null))
                 .toList();
 
         int start = page * limit;
@@ -712,7 +740,7 @@ public class ProspectServiceImpl implements ProspectService {
                 ? allResponses.subList(start, end) : List.of();
         Page<ProspectResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
 
-        log.info("searchProspects — requestingUserId: {}, scope: {}, total: {}", requestingUserId, scope, overallTotal);
+        log.info("searchProspects — requestingUserId: {}, scope: {}, type: {}, total: {}", requestingUserId, scope, type, overallTotal);
 
         return ProspectsPageResponse.builder()
                 .overallTotal(overallTotal)
@@ -722,6 +750,62 @@ public class ProspectServiceImpl implements ProspectService {
                 .unprotectedCount(unprotectedCount)
                 .prospects(pageResult)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<ProspectResponse> approveRejectExtension(Integer requestingUserId, Integer alertId, boolean approve, Integer extensionMonths) {
+
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
+            throw new RuntimeException("Access denied");
+        }
+
+        log.info("PUT /api/prospects/extensions/{} — requestingUserId: {}, approve: {}, extensionMonths: {}", alertId, requestingUserId, approve, extensionMonths);
+
+        Alert alert = alertRepository.findById(alertId)
+                .orElseThrow(() -> new RuntimeException("Alert not found"));
+
+        if (alert.getAlertType() != AlertType.PROTECTION_EXTENSION_REQUEST) {
+            throw new RuntimeException("Alert is not a protection extension request");
+        }
+        if (alert.getStatus() != AlertStatus.PENDING) {
+            throw new RuntimeException("Alert is no longer pending");
+        }
+
+        if (!approve) {
+            alert.setStatus(AlertStatus.REJECTED);
+            alertRepository.save(alert);
+            log.info("Protection extension rejected — alertId: {}, rejectedBy: {}", alertId, requestingUserId);
+            return ApiResponse.rejected("Protection extension request rejected");
+        }
+
+        if (extensionMonths == null || extensionMonths <= 0) {
+            throw new RuntimeException("extensionMonths must be a positive number when approving");
+        }
+
+        Prospect prospect = prospectRepository.findById(alert.getRelatedEntityId())
+                .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
+                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+
+        int current = prospect.getProtectionPeriodMonths() != null ? prospect.getProtectionPeriodMonths() : 0;
+        prospect.setProtectionPeriodMonths(current + extensionMonths);
+        prospectRepository.save(prospect);
+
+        alert.setStatus(AlertStatus.RESOLVED);
+        alertRepository.save(alert);
+
+        Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospect.getId())
+                .map(ProspectLicensee::getLicenseeId)
+                .orElse(null);
+
+        log.info("Protection extension approved — prospectId: {}, extensionMonths: {}, newTotal: {}, approvedBy: {}",
+                prospect.getId(), extensionMonths, prospect.getProtectionPeriodMonths(), requestingUserId);
+
+        return ApiResponse.success("Protection extended by " + extensionMonths + " month(s) successfully",
+                prospectMapper.toResponse(prospect, licenseeId, null));
     }
 
     @Override

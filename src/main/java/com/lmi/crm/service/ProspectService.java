@@ -31,9 +31,11 @@ public interface ProspectService {
 
     ApiResponse<ProspectResponse> approveRejectConversion(Integer requestingUserId, Integer alertId, boolean approve);
 
+    ApiResponse<ProspectResponse> approveRejectExtension(Integer requestingUserId, Integer alertId, boolean approve, Integer extensionMonths);
+
     ApiResponse<ProspectResponse> approveRejectProvisional(Integer requestingUserId, Integer alertId, ProvisionalDecision decision);
 
     List<DuplicateCheckResponse> checkDuplicateProspects(String companyName);
 
-    ProspectsPageResponse searchProspects(Integer requestingUserId, String q, String scope, int page, int limit);
+    ProspectsPageResponse searchProspects(Integer requestingUserId, String q, String scope, ProspectType type, int page, int limit);
 }

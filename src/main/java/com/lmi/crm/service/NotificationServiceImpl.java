@@ -94,6 +94,16 @@ public class NotificationServiceImpl implements NotificationService {
         send(toEmail, subject, body);
     }
 
+    @Override
+    public void sendRecordUpdatedEmail(String toEmail, String recordType, String recordName) {
+        log.info("Sending record updated email to: {} for {}: {}", toEmail, recordType, recordName);
+        String subject = recordType + " Updated: " + recordName;
+        String body = "A " + recordType.toLowerCase() + " record you are affiliated with has been updated in the LMI CRM portal.\n\n"
+                + "Record: " + recordName + "\n\n"
+                + "Log in to the LMI CRM portal to view the latest details.";
+        send(toEmail, subject, body);
+    }
+
     private void send(String toEmail, String subject, String body) {
         long start = System.currentTimeMillis();
 

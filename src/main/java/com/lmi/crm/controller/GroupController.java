@@ -25,7 +25,7 @@ public class GroupController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE')")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<GroupResponse>> addGroup(
             @Valid @RequestBody AddGroupRequest request) {
         Integer requestingUserId = SecurityUtils.getCurrentUserId();

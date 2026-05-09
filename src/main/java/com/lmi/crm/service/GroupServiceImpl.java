@@ -36,9 +36,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -68,6 +70,9 @@ public class GroupServiceImpl implements GroupService {
     private AlertService alertService;
 
     @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
     private GroupMapper groupMapper;
 
     @Autowired
@@ -79,12 +84,23 @@ public class GroupServiceImpl implements GroupService {
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (requestingUser.getRole() != UserRole.LICENSEE && requestingUser.getRole() != UserRole.ASSOCIATE) {
+        boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
+        if (!isAdmin && requestingUser.getRole() != UserRole.LICENSEE && requestingUser.getRole() != UserRole.ASSOCIATE) {
             throw new RuntimeException("Access denied");
         }
 
         Integer effectiveLicenseeId;
-        if (requestingUser.getRole() == UserRole.LICENSEE) {
+        if (isAdmin) {
+            if (request.getLicenseeId() == null) {
+                throw new RuntimeException("licenseeId is required when creating a group as admin");
+            }
+            User licensee = userRepository.findById(request.getLicenseeId())
+                    .orElseThrow(() -> new RuntimeException("Licensee not found"));
+            if (licensee.getRole() != UserRole.LICENSEE) {
+                throw new RuntimeException("Target user is not a licensee");
+            }
+            effectiveLicenseeId = request.getLicenseeId();
+        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
             effectiveLicenseeId = requestingUserId;
         } else {
             effectiveLicenseeId = requestingUser.getLicenseeId();
@@ -115,6 +131,11 @@ public class GroupServiceImpl implements GroupService {
             if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, effectiveLicenseeId)) {
                 throw new RuntimeException("Prospect " + prospectId + " does not belong to your licensee");
             }
+        }
+
+        int clientCount = request.getProspectIds().size();
+        if (request.getGroupSize() < clientCount) {
+            throw new RuntimeException("Group size (" + request.getGroupSize() + ") cannot be less than the number of clients in the group (" + clientCount + ")");
         }
 
         Group group = groupMapper.fromAddGroupRequest(request, effectiveLicenseeId, effectiveFacilitatorId, requestingUserId);
@@ -307,8 +328,33 @@ public class GroupServiceImpl implements GroupService {
             }
         }
 
+        List<GroupProspect> finalGroupProspects = groupProspectRepository.findByGroupId(groupId);
+        int finalClientCount = finalGroupProspects.size();
+        if (group.getGroupSize() < finalClientCount) {
+            throw new RuntimeException("Group size (" + group.getGroupSize() + ") cannot be less than the number of clients in the group (" + finalClientCount + ")");
+        }
+
         Group savedGroup = groupRepository.save(group);
         log.info("Group updated — id: {}, updatedBy: {}", groupId, requestingUserId);
+
+        // Notify all affiliated users
+        String groupLabel = (savedGroup.getGroupType() != null ? savedGroup.getGroupType().name() + " " : "") + "Group #" + savedGroup.getId();
+        Set<String> emails = new HashSet<>();
+        userRepository.findByRole(UserRole.ADMIN).forEach(u -> emails.add(u.getEmail()));
+        userRepository.findByRole(UserRole.SUPER_ADMIN).forEach(u -> emails.add(u.getEmail()));
+        userRepository.findById(savedGroup.getLicenseeId()).ifPresent(u -> emails.add(u.getEmail()));
+        if (savedGroup.getFacilitatorId() != null) {
+            userRepository.findById(savedGroup.getFacilitatorId()).ifPresent(u -> emails.add(u.getEmail()));
+        }
+        for (GroupProspect gp : finalGroupProspects) {
+            prospectRepository.findById(gp.getProspectId()).ifPresent(p -> {
+                if (p.getAssociateId() != null) {
+                    userRepository.findById(p.getAssociateId()).ifPresent(u -> emails.add(u.getEmail()));
+                }
+            });
+        }
+        emails.forEach(email -> notificationService.sendRecordUpdatedEmail(email, "Group", groupLabel));
+
         return buildGroupResponse(savedGroup);
     }
 

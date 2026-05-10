@@ -690,7 +690,6 @@ public class UserServiceImpl implements UserService {
                 // TODO: transfer all prospect_licensees where licenseeId = targetUserId to MLO — implement after ProspectService is built
                 // TODO: reassign all associates under this licensee to MLO — implement after ProspectService is built
                 targetUser.setStatus(UserStatus.INACTIVE);
-                resolveAlertIfPresent(AlertType.LICENSEE_DEACTIVATION_REQUEST, targetUserId);
             }
             default -> targetUser.setStatus(UserStatus.INACTIVE);
         }

@@ -86,7 +86,7 @@ public class AlertSyncScheduler {
             }
 
             // Deactivation requests — resolve if the user is already inactive or no longer exists
-            case ASSOCIATE_DEACTIVATION_REQUEST, LICENSEE_DEACTIVATION_REQUEST -> {
+            case ASSOCIATE_DEACTIVATION_REQUEST -> {
                 Optional<User> u = userRepository.findById(entityId);
                 yield u.isEmpty() || u.get().getStatus() == UserStatus.INACTIVE;
             }

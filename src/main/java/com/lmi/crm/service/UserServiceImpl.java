@@ -356,60 +356,42 @@ public class UserServiceImpl implements UserService {
         Map<UserRole, Long> countByRole = Arrays.stream(UserRole.values())
                 .collect(Collectors.toMap(r -> r, r -> scopedUsers.stream().filter(u -> u.getRole() == r).count()));
 
+        // Apply filters in-memory from scoped list
+        UserStatus effectiveStatus;
         if (getAll) {
-            List<UserResponse> allResponses = scopedUsers.stream().map(this::mapUserWithCities).toList();
-            int end = Math.min(limit, allResponses.size());
-            Page<UserResponse> firstPage = new PageImpl<>(
-                    end > 0 ? allResponses.subList(0, end) : List.of(),
-                    PageRequest.of(0, limit),
-                    allResponses.size());
-
-            log.info("getUsers — getAll mode — requestingUserId: {}, overallTotal: {}, activeCount: {}, inactiveCount: {}",
-                    requestingUserId, overallTotal, activeCount, inactiveCount);
-
-            return UsersSummaryResponse.builder()
-                    .overallTotal(overallTotal)
-                    .activeCount(activeCount)
-                    .inactiveCount(inactiveCount)
-                    .countByRole(countByRole)
-                    .firstPage(firstPage)
-                    .build();
+            effectiveStatus = null; // getAll bypasses status filter — return all statuses
+        } else if (isLicensee) {
+            effectiveStatus = statusFilter != null ? statusFilter : UserStatus.ACTIVE;
         } else {
-            // Apply filters in-memory from scoped list
-            UserStatus effectiveStatus;
-            if (isLicensee) {
-                effectiveStatus = statusFilter != null ? statusFilter : UserStatus.ACTIVE;
-            } else {
-                effectiveStatus = includeAllStatuses ? null : (statusFilter != null ? statusFilter : UserStatus.ACTIVE);
-            }
-
-            final UserRole rf = roleFilter;
-            final UserStatus es = effectiveStatus;
-            List<User> filteredUsers = scopedUsers.stream()
-                    .filter(u -> rf == null || u.getRole() == rf)
-                    .filter(u -> es == null || u.getStatus() == es)
-                    .toList();
-
-            List<UserResponse> filteredResponses = filteredUsers.stream().map(this::mapUserWithCities).toList();
-
-            int start = page * limit;
-            int end = Math.min(start + limit, filteredResponses.size());
-            List<UserResponse> pageContent = start < filteredResponses.size()
-                    ? filteredResponses.subList(start, end)
-                    : List.of();
-            Page<UserResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), filteredResponses.size());
-
-            log.info("getUsers — paginated mode — requestingUserId: {}, overallTotal: {}, activeCount: {}, filteredTotal: {}",
-                    requestingUserId, overallTotal, activeCount, filteredResponses.size());
-
-            return UsersPageResponse.builder()
-                    .overallTotal(overallTotal)
-                    .activeCount(activeCount)
-                    .inactiveCount(inactiveCount)
-                    .countByRole(countByRole)
-                    .users(pageResult)
-                    .build();
+            effectiveStatus = includeAllStatuses ? null : (statusFilter != null ? statusFilter : UserStatus.ACTIVE);
         }
+
+        final UserRole rf = roleFilter;
+        final UserStatus es = effectiveStatus;
+        List<User> filteredUsers = scopedUsers.stream()
+                .filter(u -> rf == null || u.getRole() == rf)
+                .filter(u -> es == null || u.getStatus() == es)
+                .toList();
+
+        List<UserResponse> filteredResponses = filteredUsers.stream().map(this::mapUserWithCities).toList();
+
+        int start = page * limit;
+        int end = Math.min(start + limit, filteredResponses.size());
+        List<UserResponse> pageContent = start < filteredResponses.size()
+                ? filteredResponses.subList(start, end)
+                : List.of();
+        Page<UserResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), filteredResponses.size());
+
+        log.info("getUsers — requestingUserId: {}, getAll: {}, page: {}, limit: {}, filteredTotal: {}",
+                requestingUserId, getAll, page, limit, filteredResponses.size());
+
+        return UsersPageResponse.builder()
+                .overallTotal(overallTotal)
+                .activeCount(activeCount)
+                .inactiveCount(inactiveCount)
+                .countByRole(countByRole)
+                .users(pageResult)
+                .build();
     }
 
     private UserResponse mapUserWithCities(User user) {

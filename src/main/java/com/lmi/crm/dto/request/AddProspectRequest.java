@@ -39,4 +39,6 @@ public class AddProspectRequest {
 
     @NotNull
     private ProspectProgramType programType;
+
+    private Integer associateId;
 }

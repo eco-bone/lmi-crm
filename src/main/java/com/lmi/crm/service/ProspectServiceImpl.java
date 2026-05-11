@@ -87,7 +87,7 @@ public class ProspectServiceImpl implements ProspectService {
 
         if (requestingUser.getRole() == UserRole.LICENSEE) {
             effectiveLicenseeId = requestingUserId;
-            associateId = null;
+            associateId = request.getAssociateId();
         } else {
             if (requestingUser.getLicenseeId() == null) {
                 throw new RuntimeException("Associate is not linked to a licensee");

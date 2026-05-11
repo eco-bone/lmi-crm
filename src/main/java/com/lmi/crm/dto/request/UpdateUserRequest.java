@@ -3,6 +3,7 @@ package com.lmi.crm.dto.request;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.enums.UserStatus;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -20,7 +21,7 @@ public class UpdateUserRequest {
     @Size(min = 1)
     private String email;
 
-    @Size(min = 1)
+    @Pattern(regexp = "\\d{10}", message = "Phone number must be exactly 10 digits")
     private String phone;
 
     private UserStatus status;

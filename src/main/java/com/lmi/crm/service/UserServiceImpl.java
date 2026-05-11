@@ -342,9 +342,7 @@ public class UserServiceImpl implements UserService {
 
         // Full scoped list (no role/status filters) — used for summary counts
         List<User> scopedUsers;
-        if (isLicensee) {
-            scopedUsers = userRepository.findAssociatesByLicensee(requestingUserId, UserRole.ASSOCIATE, null);
-        } else if (isAdmin) {
+        if (isLicensee || isAdmin) {
             scopedUsers = userRepository.findByOptionalFilters(null, null);
         } else {
             log.warn("getUsers — access denied — userId: {}, role: {}", requestingUserId, requestingUser.getRole());
@@ -362,8 +360,6 @@ public class UserServiceImpl implements UserService {
         UserStatus effectiveStatus;
         if (getAll) {
             effectiveStatus = null; // getAll bypasses status filter — return all statuses
-        } else if (isLicensee) {
-            effectiveStatus = statusFilter != null ? statusFilter : UserStatus.ACTIVE;
         } else {
             effectiveStatus = includeAllStatuses ? null : (statusFilter != null ? statusFilter : UserStatus.ACTIVE);
         }

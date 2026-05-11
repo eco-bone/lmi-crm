@@ -14,8 +14,10 @@ import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.mapper.MeetingMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -42,27 +44,27 @@ public class MeetingServiceImpl implements MeetingService {
     @Transactional
     public MeetingResponse addMeeting(AddMeetingRequest request, Integer requestingUserId) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (requestingUser.getRole() != UserRole.LICENSEE && requestingUser.getRole() != UserRole.ASSOCIATE) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         Prospect prospect = prospectRepository.findById(request.getProspectId())
-                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
         if (Boolean.TRUE.equals(prospect.getDeletionStatus())) {
-            throw new RuntimeException("Prospect not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found");
         }
 
         if (requestingUser.getRole() == UserRole.LICENSEE) {
             if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospect.getId(), requestingUserId)) {
                 log.warn("Access denied — licensee {} not linked to prospect {}", requestingUserId, prospect.getId());
-                throw new RuntimeException("Access denied");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
         } else {
             if (!requestingUserId.equals(prospect.getAssociateId())) {
                 log.warn("Access denied — associate {} does not own prospect {}", requestingUserId, prospect.getId());
-                throw new RuntimeException("Access denied");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
         }
 
@@ -89,12 +91,12 @@ public class MeetingServiceImpl implements MeetingService {
     @Transactional(readOnly = true)
     public List<MeetingResponse> getMeetings(Integer requestingUserId, Integer prospectId) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Prospect prospect = prospectRepository.findById(prospectId)
-                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
         if (Boolean.TRUE.equals(prospect.getDeletionStatus())) {
-            throw new RuntimeException("Prospect not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found");
         }
 
         checkOwnership(requestingUser, prospect, prospectId, requestingUserId);
@@ -110,15 +112,15 @@ public class MeetingServiceImpl implements MeetingService {
     @Transactional(readOnly = true)
     public MeetingResponse getMeetingDetail(Integer requestingUserId, Integer meetingId) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Meeting meeting = meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new RuntimeException("Meeting not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found"));
 
         Prospect prospect = prospectRepository.findById(meeting.getProspectId())
-                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
         if (Boolean.TRUE.equals(prospect.getDeletionStatus())) {
-            throw new RuntimeException("Prospect not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found");
         }
 
         checkOwnership(requestingUser, prospect, prospect.getId(), requestingUserId);
@@ -130,22 +132,22 @@ public class MeetingServiceImpl implements MeetingService {
     @Transactional
     public MeetingResponse updateMeeting(Integer requestingUserId, Integer meetingId, UpdateMeetingRequest request) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Meeting meeting = meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new RuntimeException("Meeting not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found"));
 
         Prospect prospect = prospectRepository.findById(meeting.getProspectId())
-                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
         if (Boolean.TRUE.equals(prospect.getDeletionStatus())) {
-            throw new RuntimeException("Prospect not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found");
         }
 
         checkOwnership(requestingUser, prospect, prospect.getId(), requestingUserId);
 
         boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
         if (!meeting.getCreatedBy().equals(requestingUserId) && !isAdmin) {
-            throw new RuntimeException("You can only update your own meetings");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only update your own meetings");
         }
 
         if (request.getPointOfContact() != null) meeting.setPointOfContact(request.getPointOfContact());
@@ -181,22 +183,22 @@ public class MeetingServiceImpl implements MeetingService {
     @Transactional
     public String deleteMeeting(Integer requestingUserId, Integer meetingId) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Meeting meeting = meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new RuntimeException("Meeting not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found"));
 
         Prospect prospect = prospectRepository.findById(meeting.getProspectId())
-                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
         if (Boolean.TRUE.equals(prospect.getDeletionStatus())) {
-            throw new RuntimeException("Prospect not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found");
         }
 
         checkOwnership(requestingUser, prospect, prospect.getId(), requestingUserId);
 
         boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
         if (!meeting.getCreatedBy().equals(requestingUserId) && !isAdmin) {
-            throw new RuntimeException("You can only delete your own meetings");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete your own meetings");
         }
 
         meetingRepository.delete(meeting);
@@ -225,15 +227,15 @@ public class MeetingServiceImpl implements MeetingService {
         if (role == UserRole.ASSOCIATE) {
             if (!userId.equals(prospect.getAssociateId())) {
                 log.warn("Access denied — associate {} does not own prospect {}", userId, prospectId);
-                throw new RuntimeException("Access denied");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
         } else if (role == UserRole.LICENSEE) {
             if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, userId)) {
                 log.warn("Access denied — licensee {} not linked to prospect {}", userId, prospectId);
-                throw new RuntimeException("Access denied");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
         } else {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
     }
 }

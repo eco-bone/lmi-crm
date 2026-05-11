@@ -29,25 +29,52 @@ public class AlertController {
             @RequestParam(required = false) AlertStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit) {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        Object response = alertService.getAlerts(requestingUserId, getAll, type, status, page, limit);
-        return ResponseEntity.ok(ApiResponse.success("Alerts retrieved successfully", response));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            Object response = alertService.getAlerts(requestingUserId, getAll, type, status, page, limit);
+            return ResponseEntity.ok(ApiResponse.success("Alerts retrieved successfully", response));
+        } catch (RuntimeException ex) {
+            log.error("GET /api/admin/alerts — failed — requestingUserId: {}, type: {}, status: {} — {}", requestingUserId, type, status, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("GET /api/admin/alerts — unexpected error — requestingUserId: {}, type: {}, status: {}", requestingUserId, type, status, ex);
+            throw ex;
+        }
     }
 
     @GetMapping("/summary")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<AlertSummaryResponse>> getAlertSummary() {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        log.info("GET /api/admin/alerts/summary — requestingUserId: {}", requestingUserId);
-        AlertSummaryResponse response = alertService.getAlertSummary(requestingUserId);
-        return ResponseEntity.ok(ApiResponse.success("Alert summary retrieved successfully", response));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("GET /api/admin/alerts/summary — requestingUserId: {}", requestingUserId);
+            AlertSummaryResponse response = alertService.getAlertSummary(requestingUserId);
+            return ResponseEntity.ok(ApiResponse.success("Alert summary retrieved successfully", response));
+        } catch (RuntimeException ex) {
+            log.error("GET /api/admin/alerts/summary — failed — requestingUserId: {} — {}", requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("GET /api/admin/alerts/summary — unexpected error — requestingUserId: {}", requestingUserId, ex);
+            throw ex;
+        }
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<AlertResponse>> getAlertDetail(@PathVariable Integer id) {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        AlertResponse response = alertService.getAlertDetail(requestingUserId, id);
-        return ResponseEntity.ok(ApiResponse.success("Alert retrieved successfully", response));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            AlertResponse response = alertService.getAlertDetail(requestingUserId, id);
+            return ResponseEntity.ok(ApiResponse.success("Alert retrieved successfully", response));
+        } catch (RuntimeException ex) {
+            log.error("GET /api/admin/alerts/{} — failed — requestingUserId: {} — {}", id, requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("GET /api/admin/alerts/{} — unexpected error — requestingUserId: {}", id, requestingUserId, ex);
+            throw ex;
+        }
     }
 }

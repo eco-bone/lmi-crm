@@ -28,45 +28,90 @@ public class SchedulerController {
     @PostMapping("/check-first-meeting")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<String>> checkFirstMeeting() {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        log.info("Scheduler manually triggered — job: checkFirstMeetingDeadlines, triggeredBy: {}", requestingUserId);
-        protectionScheduler.checkFirstMeetingDeadlines();
-        return ResponseEntity.ok(ApiResponse.success("checkFirstMeetingDeadlines triggered successfully", null));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("Scheduler manually triggered — job: checkFirstMeetingDeadlines, triggeredBy: {}", requestingUserId);
+            protectionScheduler.checkFirstMeetingDeadlines();
+            return ResponseEntity.ok(ApiResponse.success("checkFirstMeetingDeadlines triggered successfully", null));
+        } catch (RuntimeException ex) {
+            log.error("POST /api/admin/scheduler/check-first-meeting — failed — requestingUserId: {} — {}", requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("POST /api/admin/scheduler/check-first-meeting — unexpected error — requestingUserId: {}", requestingUserId, ex);
+            throw ex;
+        }
     }
 
     @PostMapping("/expire-first-meeting")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<String>> expireFirstMeeting() {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        log.info("Scheduler manually triggered — job: expireFirstMeetingProtection, triggeredBy: {}", requestingUserId);
-        protectionScheduler.expireFirstMeetingProtection();
-        return ResponseEntity.ok(ApiResponse.success("expireFirstMeetingProtection triggered successfully", null));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("Scheduler manually triggered — job: expireFirstMeetingProtection, triggeredBy: {}", requestingUserId);
+            protectionScheduler.expireFirstMeetingProtection();
+            return ResponseEntity.ok(ApiResponse.success("expireFirstMeetingProtection triggered successfully", null));
+        } catch (RuntimeException ex) {
+            log.error("POST /api/admin/scheduler/expire-first-meeting — failed — requestingUserId: {} — {}", requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("POST /api/admin/scheduler/expire-first-meeting — unexpected error — requestingUserId: {}", requestingUserId, ex);
+            throw ex;
+        }
     }
 
     @PostMapping("/check-activity")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<String>> checkActivity() {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        log.info("Scheduler manually triggered — job: checkActivityDeadlines, triggeredBy: {}", requestingUserId);
-        protectionScheduler.checkActivityDeadlines();
-        return ResponseEntity.ok(ApiResponse.success("checkActivityDeadlines triggered successfully", null));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("Scheduler manually triggered — job: checkActivityDeadlines, triggeredBy: {}", requestingUserId);
+            protectionScheduler.checkActivityDeadlines();
+            return ResponseEntity.ok(ApiResponse.success("checkActivityDeadlines triggered successfully", null));
+        } catch (RuntimeException ex) {
+            log.error("POST /api/admin/scheduler/check-activity — failed — requestingUserId: {} — {}", requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("POST /api/admin/scheduler/check-activity — unexpected error — requestingUserId: {}", requestingUserId, ex);
+            throw ex;
+        }
     }
 
     @PostMapping("/expire-grace-period")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<String>> expireGracePeriod() {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        log.info("Scheduler manually triggered — job: expireAfterGracePeriod, triggeredBy: {}", requestingUserId);
-        protectionScheduler.expireAfterGracePeriod();
-        return ResponseEntity.ok(ApiResponse.success("expireAfterGracePeriod triggered successfully", null));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("Scheduler manually triggered — job: expireAfterGracePeriod, triggeredBy: {}", requestingUserId);
+            protectionScheduler.expireAfterGracePeriod();
+            return ResponseEntity.ok(ApiResponse.success("expireAfterGracePeriod triggered successfully", null));
+        } catch (RuntimeException ex) {
+            log.error("POST /api/admin/scheduler/expire-grace-period — failed — requestingUserId: {} — {}", requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("POST /api/admin/scheduler/expire-grace-period — unexpected error — requestingUserId: {}", requestingUserId, ex);
+            throw ex;
+        }
     }
 
     @PostMapping("/sync-alerts")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<String>> syncAlerts() {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        log.info("Scheduler manually triggered — job: syncPendingAlerts, triggeredBy: {}", requestingUserId);
-        alertSyncScheduler.syncPendingAlerts();
-        return ResponseEntity.ok(ApiResponse.success("syncPendingAlerts triggered successfully", null));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("Scheduler manually triggered — job: syncPendingAlerts, triggeredBy: {}", requestingUserId);
+            alertSyncScheduler.syncPendingAlerts();
+            return ResponseEntity.ok(ApiResponse.success("syncPendingAlerts triggered successfully", null));
+        } catch (RuntimeException ex) {
+            log.error("POST /api/admin/scheduler/sync-alerts — failed — requestingUserId: {} — {}", requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("POST /api/admin/scheduler/sync-alerts — unexpected error — requestingUserId: {}", requestingUserId, ex);
+            throw ex;
+        }
     }
 }

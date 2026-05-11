@@ -39,9 +39,18 @@ public class ProspectController {
             @RequestParam(required = false) Integer associateId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit) {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        Object response = prospectService.getProspects(requestingUserId, getAll, type, licenseeId, associateId, page, limit);
-        return ResponseEntity.ok(ApiResponse.success("Prospects retrieved successfully", response));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            Object response = prospectService.getProspects(requestingUserId, getAll, type, licenseeId, associateId, page, limit);
+            return ResponseEntity.ok(ApiResponse.success("Prospects retrieved successfully", response));
+        } catch (RuntimeException ex) {
+            log.error("GET /api/prospects — failed — requestingUserId: {}, getAll: {}, type: {}, licenseeId: {}, associateId: {} — {}", requestingUserId, getAll, type, licenseeId, associateId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("GET /api/prospects — unexpected error — requestingUserId: {}, getAll: {}, type: {}, licenseeId: {}, associateId: {}", requestingUserId, getAll, type, licenseeId, associateId, ex);
+            throw ex;
+        }
     }
 
     @GetMapping("/search")
@@ -52,47 +61,82 @@ public class ProspectController {
             @RequestParam(required = false) ProspectType type,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit) {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        log.info("GET /api/prospects/search — requestingUserId: {}, q: {}, scope: {}, type: {}", requestingUserId, q, scope, type);
-        ProspectsPageResponse response = prospectService.searchProspects(requestingUserId, q, scope, type, page, limit);
-        return ResponseEntity.ok(ApiResponse.success("Search results retrieved successfully", response));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("GET /api/prospects/search — requestingUserId: {}, q: {}, scope: {}, type: {}", requestingUserId, q, scope, type);
+            ProspectsPageResponse response = prospectService.searchProspects(requestingUserId, q, scope, type, page, limit);
+            return ResponseEntity.ok(ApiResponse.success("Search results retrieved successfully", response));
+        } catch (RuntimeException ex) {
+            log.error("GET /api/prospects/search — failed — requestingUserId: {}, q: {}, scope: {}, type: {} — {}", requestingUserId, q, scope, type, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("GET /api/prospects/search — unexpected error — requestingUserId: {}, q: {}, scope: {}, type: {}", requestingUserId, q, scope, type, ex);
+            throw ex;
+        }
     }
 
     @GetMapping("/duplicate-check")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<List<DuplicateCheckResponse>>> checkDuplicate(
             @RequestParam String companyName) {
-        log.info("GET /api/prospects/duplicate-check — companyName: {}", companyName);
-        List<DuplicateCheckResponse> duplicates = prospectService.checkDuplicateProspects(companyName);
-        String message = duplicates.isEmpty()
-            ? "No similar prospects found"
-            : String.format("Found %d similar prospect(s)", duplicates.size());
-        return ResponseEntity.ok(ApiResponse.success(message, duplicates));
+        try {
+            log.info("GET /api/prospects/duplicate-check — companyName: {}", companyName);
+            List<DuplicateCheckResponse> duplicates = prospectService.checkDuplicateProspects(companyName);
+            String message = duplicates.isEmpty()
+                ? "No similar prospects found"
+                : String.format("Found %d similar prospect(s)", duplicates.size());
+            return ResponseEntity.ok(ApiResponse.success(message, duplicates));
+        } catch (RuntimeException ex) {
+            log.error("GET /api/prospects/duplicate-check — failed — companyName: {} — {}", companyName, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("GET /api/prospects/duplicate-check — unexpected error — companyName: {}", companyName, ex);
+            throw ex;
+        }
     }
 
     @PostMapping
     @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE')")
     public ResponseEntity<ApiResponse<ProspectResponse>> addProspect(
             @Valid @RequestBody AddProspectRequest request) {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        log.info("POST /api/prospects — requestingUserId: {}, company: {}", requestingUserId, request.getCompanyName());
-        ProspectResponse response = prospectService.addProspect(request, requestingUserId);
-        log.info("POST /api/prospects — created prospectId: {} — requestingUserId: {}", response.getId(), requestingUserId);
-        String message;
-        if (response.getStatus() == ProspectStatus.PROVISIONAL) {
-            message = "Prospect has been flagged as provisional and is awaiting admin approval before further actions can be taken. Reason: " + response.getProvisionReason();
-        } else {
-            message = "Prospect created successfully";
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("POST /api/prospects — requestingUserId: {}, company: {}", requestingUserId, request.getCompanyName());
+            ProspectResponse response = prospectService.addProspect(request, requestingUserId);
+            log.info("POST /api/prospects — created prospectId: {} — requestingUserId: {}", response.getId(), requestingUserId);
+            String message;
+            if (response.getStatus() == ProspectStatus.PROVISIONAL) {
+                message = "Prospect has been flagged as provisional and is awaiting admin approval before further actions can be taken. Reason: " + response.getProvisionReason();
+            } else {
+                message = "Prospect created successfully";
+            }
+            return ResponseEntity.ok(ApiResponse.success(message, response));
+        } catch (RuntimeException ex) {
+            log.error("POST /api/prospects — failed — requestingUserId: {}, company: {} — {}", requestingUserId, request.getCompanyName(), ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("POST /api/prospects — unexpected error — requestingUserId: {}, company: {}", requestingUserId, request.getCompanyName(), ex);
+            throw ex;
         }
-        return ResponseEntity.ok(ApiResponse.success(message, response));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<ProspectResponse>> getProspectDetail(@PathVariable Integer id) {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        ProspectResponse response = prospectService.getProspectDetail(requestingUserId, id);
-        return ResponseEntity.ok(ApiResponse.success("Prospect retrieved successfully", response));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            ProspectResponse response = prospectService.getProspectDetail(requestingUserId, id);
+            return ResponseEntity.ok(ApiResponse.success("Prospect retrieved successfully", response));
+        } catch (RuntimeException ex) {
+            log.error("GET /api/prospects/{} — failed — requestingUserId: {} — {}", id, requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("GET /api/prospects/{} — unexpected error — requestingUserId: {}", id, requestingUserId, ex);
+            throw ex;
+        }
     }
 
     @PutMapping("/{id}")
@@ -100,25 +144,52 @@ public class ProspectController {
     public ResponseEntity<ApiResponse<ProspectResponse>> updateProspect(
             @PathVariable Integer id,
             @Valid @RequestBody UpdateProspectRequest request) {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        ProspectResponse response = prospectService.updateProspect(requestingUserId, id, request);
-        return ResponseEntity.ok(ApiResponse.success("Prospect updated successfully", response));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            ProspectResponse response = prospectService.updateProspect(requestingUserId, id, request);
+            return ResponseEntity.ok(ApiResponse.success("Prospect updated successfully", response));
+        } catch (RuntimeException ex) {
+            log.error("PUT /api/prospects/{} — failed — requestingUserId: {} — {}", id, requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("PUT /api/prospects/{} — unexpected error — requestingUserId: {}", id, requestingUserId, ex);
+            throw ex;
+        }
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<String>> softDeleteProspect(@PathVariable Integer id) {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        String result = prospectService.softDeleteProspect(requestingUserId, id);
-        return ResponseEntity.ok(ApiResponse.success(result, null));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            String result = prospectService.softDeleteProspect(requestingUserId, id);
+            return ResponseEntity.ok(ApiResponse.success(result, null));
+        } catch (RuntimeException ex) {
+            log.error("DELETE /api/prospects/{} — failed — requestingUserId: {} — {}", id, requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("DELETE /api/prospects/{} — unexpected error — requestingUserId: {}", id, requestingUserId, ex);
+            throw ex;
+        }
     }
 
     @PostMapping("/{id}/convert")
     @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE')")
     public ResponseEntity<ApiResponse<String>> requestConversion(@PathVariable Integer id) {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        String result = prospectService.requestConversion(requestingUserId, id);
-        return ResponseEntity.ok(ApiResponse.success(result, null));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            String result = prospectService.requestConversion(requestingUserId, id);
+            return ResponseEntity.ok(ApiResponse.success(result, null));
+        } catch (RuntimeException ex) {
+            log.error("POST /api/prospects/{}/convert — failed — requestingUserId: {} — {}", id, requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("POST /api/prospects/{}/convert — unexpected error — requestingUserId: {}", id, requestingUserId, ex);
+            throw ex;
+        }
     }
 
     @PutMapping("/provisional/{alertId}")
@@ -126,8 +197,17 @@ public class ProspectController {
     public ResponseEntity<ApiResponse<ProspectResponse>> approveRejectProvisional(
             @PathVariable Integer alertId,
             @RequestParam ProvisionalDecision decision) {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(prospectService.approveRejectProvisional(requestingUserId, alertId, decision));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            return ResponseEntity.ok(prospectService.approveRejectProvisional(requestingUserId, alertId, decision));
+        } catch (RuntimeException ex) {
+            log.error("PUT /api/prospects/provisional/{} — failed — requestingUserId: {}, decision: {} — {}", alertId, requestingUserId, decision, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("PUT /api/prospects/provisional/{} — unexpected error — requestingUserId: {}, decision: {}", alertId, requestingUserId, decision, ex);
+            throw ex;
+        }
     }
 
     @PutMapping("/conversions/{alertId}")
@@ -135,8 +215,17 @@ public class ProspectController {
     public ResponseEntity<ApiResponse<ProspectResponse>> approveRejectConversion(
             @PathVariable Integer alertId,
             @RequestParam boolean approve) {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(prospectService.approveRejectConversion(requestingUserId, alertId, approve));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            return ResponseEntity.ok(prospectService.approveRejectConversion(requestingUserId, alertId, approve));
+        } catch (RuntimeException ex) {
+            log.error("PUT /api/prospects/conversions/{} — failed — requestingUserId: {}, approve: {} — {}", alertId, requestingUserId, approve, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("PUT /api/prospects/conversions/{} — unexpected error — requestingUserId: {}, approve: {}", alertId, requestingUserId, approve, ex);
+            throw ex;
+        }
     }
 
     @PutMapping("/extensions/{alertId}")
@@ -145,18 +234,36 @@ public class ProspectController {
             @PathVariable Integer alertId,
             @RequestParam boolean approve,
             @RequestParam(required = false) Integer extensionMonths) {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        return ResponseEntity.ok(prospectService.approveRejectExtension(requestingUserId, alertId, approve, extensionMonths));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            return ResponseEntity.ok(prospectService.approveRejectExtension(requestingUserId, alertId, approve, extensionMonths));
+        } catch (RuntimeException ex) {
+            log.error("PUT /api/prospects/extensions/{} — failed — requestingUserId: {}, approve: {}, extensionMonths: {} — {}", alertId, requestingUserId, approve, extensionMonths, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("PUT /api/prospects/extensions/{} — unexpected error — requestingUserId: {}, approve: {}, extensionMonths: {}", alertId, requestingUserId, approve, extensionMonths, ex);
+            throw ex;
+        }
     }
 
     @PostMapping("/{id}/extension-request")
     @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE')")
     public ResponseEntity<ApiResponse<String>> requestProtectionExtension(
             @PathVariable Integer id) {
-        Integer requestingUserId = SecurityUtils.getCurrentUserId();
-        log.info("POST /api/prospects/{}/extension-request — requestingUserId: {}", id, requestingUserId);
-        String response = prospectService.requestProtectionExtension(id, requestingUserId);
-        log.info("POST /api/prospects/{}/extension-request — submitted — requestingUserId: {}", id, requestingUserId);
-        return ResponseEntity.ok(ApiResponse.success(response, null));
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("POST /api/prospects/{}/extension-request — requestingUserId: {}", id, requestingUserId);
+            String response = prospectService.requestProtectionExtension(id, requestingUserId);
+            log.info("POST /api/prospects/{}/extension-request — submitted — requestingUserId: {}", id, requestingUserId);
+            return ResponseEntity.ok(ApiResponse.success(response, null));
+        } catch (RuntimeException ex) {
+            log.error("POST /api/prospects/{}/extension-request — failed — requestingUserId: {} — {}", id, requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("POST /api/prospects/{}/extension-request — unexpected error — requestingUserId: {}", id, requestingUserId, ex);
+            throw ex;
+        }
     }
 }

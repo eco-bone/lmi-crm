@@ -28,12 +28,13 @@ import com.lmi.crm.mapper.GroupMapper;
 import com.lmi.crm.mapper.ProspectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,22 +83,22 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public GroupResponse addGroup(AddGroupRequest request, Integer requestingUserId) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
         if (!isAdmin && requestingUser.getRole() != UserRole.LICENSEE && requestingUser.getRole() != UserRole.ASSOCIATE) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         Integer effectiveLicenseeId;
         if (isAdmin) {
             if (request.getLicenseeId() == null) {
-                throw new RuntimeException("licenseeId is required when creating a group as admin");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "licenseeId is required when creating a group as admin");
             }
             User licensee = userRepository.findById(request.getLicenseeId())
-                    .orElseThrow(() -> new RuntimeException("Licensee not found"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Licensee not found"));
             if (licensee.getRole() != UserRole.LICENSEE) {
-                throw new RuntimeException("Target user is not a licensee");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target user is not a licensee");
             }
             effectiveLicenseeId = request.getLicenseeId();
         } else if (requestingUser.getRole() == UserRole.LICENSEE) {
@@ -105,16 +106,16 @@ public class GroupServiceImpl implements GroupService {
         } else {
             effectiveLicenseeId = requestingUser.getLicenseeId();
             if (effectiveLicenseeId == null) {
-                throw new RuntimeException("Associate is not linked to a licensee");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Associate is not linked to a licensee");
             }
         }
 
         Integer effectiveFacilitatorId;
         if (request.getFacilitatorId() != null) {
             User facilitator = userRepository.findById(request.getFacilitatorId())
-                    .orElseThrow(() -> new RuntimeException("Facilitator not found"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facilitator not found"));
             if (facilitator.getRole() != UserRole.LICENSEE) {
-                throw new RuntimeException("Facilitator must be a Licensee");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Facilitator must be a Licensee");
             }
             effectiveFacilitatorId = request.getFacilitatorId();
         } else {
@@ -124,18 +125,18 @@ public class GroupServiceImpl implements GroupService {
         for (Integer prospectId : request.getProspectIds()) {
             Prospect prospect = prospectRepository.findById(prospectId)
                     .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
-                    .orElseThrow(() -> new RuntimeException("Prospect not found: " + prospectId));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found: " + prospectId));
             if (prospect.getType() != ProspectType.CLIENT) {
-                throw new RuntimeException("Prospect " + prospectId + " is not a client");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Prospect " + prospectId + " is not a client");
             }
             if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, effectiveLicenseeId)) {
-                throw new RuntimeException("Prospect " + prospectId + " does not belong to your licensee");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Prospect " + prospectId + " does not belong to your licensee");
             }
         }
 
         int clientCount = request.getProspectIds().size();
         if (request.getGroupSize() < clientCount) {
-            throw new RuntimeException("Group size (" + request.getGroupSize() + ") cannot be less than the number of clients in the group (" + clientCount + ")");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Group size (" + request.getGroupSize() + ") cannot be less than the number of clients in the group (" + clientCount + ")");
         }
 
         Group group = groupMapper.fromAddGroupRequest(request, effectiveLicenseeId, effectiveFacilitatorId, requestingUserId);
@@ -157,7 +158,7 @@ public class GroupServiceImpl implements GroupService {
     @Transactional(readOnly = true)
     public Object getGroups(Integer requestingUserId, boolean getAll, Integer licenseeIdFilter, int page, int limit) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         log.info("getGroups — requestingUserId: {}, getAll: {}, licenseeIdFilter: {}, page: {}, limit: {}",
                 requestingUserId, getAll, licenseeIdFilter, page, limit);
@@ -175,7 +176,7 @@ public class GroupServiceImpl implements GroupService {
                 groups = groupRepository.findByDeletionStatusFalse();
             }
         } else {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         List<Integer> userIds = groups.stream()
@@ -191,7 +192,7 @@ public class GroupServiceImpl implements GroupService {
                 .toList();
 
         long overallTotal = allResponses.size();
-        long activeCount = overallTotal; // all fetched groups have deletionStatus = false
+        long activeCount = overallTotal;
 
         if (getAll) {
             int end = Math.min(limit, allResponses.size());
@@ -230,22 +231,22 @@ public class GroupServiceImpl implements GroupService {
     @Transactional(readOnly = true)
     public GroupResponse getGroupDetail(Integer requestingUserId, Integer groupId) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Group group = groupRepository.findById(groupId)
                 .filter(g -> !Boolean.TRUE.equals(g.getDeletionStatus()))
-                .orElseThrow(() -> new RuntimeException("Group not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
 
         if (requestingUser.getRole() == UserRole.ASSOCIATE) {
             if (!group.getLicenseeId().equals(requestingUser.getLicenseeId())) {
-                throw new RuntimeException("Access denied");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
         } else if (requestingUser.getRole() == UserRole.LICENSEE) {
             if (!group.getLicenseeId().equals(requestingUserId)) {
-                throw new RuntimeException("Access denied");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
         } else if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         log.info("GET /api/groups/{} — requestingUserId: {}", groupId, requestingUserId);
@@ -256,22 +257,22 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public GroupResponse updateGroup(Integer requestingUserId, Integer groupId, UpdateGroupRequest request) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Group group = groupRepository.findById(groupId)
                 .filter(g -> !Boolean.TRUE.equals(g.getDeletionStatus()))
-                .orElseThrow(() -> new RuntimeException("Group not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
 
         if (requestingUser.getRole() == UserRole.ASSOCIATE) {
             if (!group.getLicenseeId().equals(requestingUser.getLicenseeId())) {
-                throw new RuntimeException("Access denied");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
         } else if (requestingUser.getRole() == UserRole.LICENSEE) {
             if (!group.getLicenseeId().equals(requestingUserId)) {
-                throw new RuntimeException("Access denied");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
         } else if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         if (request.getGroupSize() != null) group.setGroupSize(request.getGroupSize());
@@ -285,9 +286,9 @@ public class GroupServiceImpl implements GroupService {
                  requestingUser.getRole() == UserRole.ADMIN ||
                  requestingUser.getRole() == UserRole.SUPER_ADMIN)) {
             User facilitator = userRepository.findById(request.getFacilitatorId())
-                    .orElseThrow(() -> new RuntimeException("Facilitator not found"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facilitator not found"));
             if (facilitator.getRole() != UserRole.LICENSEE) {
-                throw new RuntimeException("Facilitator must be a Licensee");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Facilitator must be a Licensee");
             }
             group.setFacilitatorId(request.getFacilitatorId());
         }
@@ -295,9 +296,9 @@ public class GroupServiceImpl implements GroupService {
         if (request.getLicenseeId() != null &&
                 (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN)) {
             User newLicensee = userRepository.findById(request.getLicenseeId())
-                    .orElseThrow(() -> new RuntimeException("Licensee not found"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Licensee not found"));
             if (newLicensee.getRole() != UserRole.LICENSEE) {
-                throw new RuntimeException("Target user is not a licensee");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target user is not a licensee");
             }
             group.setLicenseeId(request.getLicenseeId());
         }
@@ -306,12 +307,12 @@ public class GroupServiceImpl implements GroupService {
             for (Integer prospectId : request.getAddProspectIds()) {
                 Prospect prospect = prospectRepository.findById(prospectId)
                         .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
-                        .orElseThrow(() -> new RuntimeException("Prospect not found: " + prospectId));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found: " + prospectId));
                 if (prospect.getType() != ProspectType.CLIENT) {
-                    throw new RuntimeException("Prospect " + prospectId + " is not a client");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Prospect " + prospectId + " is not a client");
                 }
                 if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, group.getLicenseeId())) {
-                    throw new RuntimeException("Prospect " + prospectId + " does not belong to this group's licensee");
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Prospect " + prospectId + " does not belong to this group's licensee");
                 }
                 if (!groupProspectRepository.existsByGroupIdAndProspectId(groupId, prospectId)) {
                     groupProspectRepository.save(GroupProspect.builder()
@@ -331,13 +332,12 @@ public class GroupServiceImpl implements GroupService {
         List<GroupProspect> finalGroupProspects = groupProspectRepository.findByGroupId(groupId);
         int finalClientCount = finalGroupProspects.size();
         if (group.getGroupSize() < finalClientCount) {
-            throw new RuntimeException("Group size (" + group.getGroupSize() + ") cannot be less than the number of clients in the group (" + finalClientCount + ")");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Group size (" + group.getGroupSize() + ") cannot be less than the number of clients in the group (" + finalClientCount + ")");
         }
 
         Group savedGroup = groupRepository.save(group);
         log.info("Group updated — id: {}, updatedBy: {}", groupId, requestingUserId);
 
-        // Notify all affiliated users
         String groupLabel = (savedGroup.getGroupType() != null ? savedGroup.getGroupType().name() + " " : "") + "Group #" + savedGroup.getId();
         Set<String> emails = new HashSet<>();
         userRepository.findByRole(UserRole.ADMIN).forEach(u -> emails.add(u.getEmail()));
@@ -362,24 +362,24 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public String requestGroupDeletion(Integer requestingUserId, Integer groupId) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (requestingUser.getRole() != UserRole.LICENSEE) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         Group group = groupRepository.findById(groupId)
                 .filter(g -> !Boolean.TRUE.equals(g.getDeletionStatus()))
-                .orElseThrow(() -> new RuntimeException("Group not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
 
         if (!group.getLicenseeId().equals(requestingUserId)) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         alertRepository.findByAlertTypeAndRelatedEntityIdAndStatus(
                 AlertType.GROUP_DELETION_REQUEST, groupId, AlertStatus.PENDING)
                 .ifPresent(a -> {
-                    throw new RuntimeException("A deletion request for this group is already pending");
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "A deletion request for this group is already pending");
                 });
 
         alertService.createAlert(
@@ -399,15 +399,15 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public String deleteGroup(Integer requestingUserId, Integer groupId) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         Group group = groupRepository.findById(groupId)
                 .filter(g -> !Boolean.TRUE.equals(g.getDeletionStatus()))
-                .orElseThrow(() -> new RuntimeException("Group not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
 
         group.setDeletionStatus(true);
         groupRepository.save(group);
@@ -427,21 +427,21 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public ApiResponse<String> approveRejectGroupDeletion(Integer requestingUserId, Integer alertId, boolean approve) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         Alert alert = alertRepository.findById(alertId)
-                .orElseThrow(() -> new RuntimeException("Alert not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Alert not found"));
 
         if (alert.getAlertType() != AlertType.GROUP_DELETION_REQUEST) {
-            throw new RuntimeException("Alert is not a group deletion request");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Alert is not a group deletion request");
         }
 
         if (alert.getStatus() != AlertStatus.PENDING) {
-            throw new RuntimeException("Alert is no longer pending");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Alert is no longer pending");
         }
 
         if (!approve) {
@@ -505,7 +505,7 @@ public class GroupServiceImpl implements GroupService {
     @Transactional(readOnly = true)
     public GroupsPageResponse searchGroups(Integer requestingUserId, String q, String scope, int page, int limit) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
         boolean scopeAll = "all".equalsIgnoreCase(scope) || isAdmin;
@@ -518,7 +518,7 @@ public class GroupServiceImpl implements GroupService {
         } else if (requestingUser.getRole() == UserRole.LICENSEE) {
             groups = groupRepository.findByLicenseeIdAndDeletionStatusFalse(requestingUserId);
         } else {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         List<Integer> userIds = groups.stream()

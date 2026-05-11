@@ -21,8 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,10 +50,10 @@ public class TaskNoteServiceImpl implements TaskNoteService {
     @Transactional
     public TaskResponse createTask(CreateTaskRequest request, Integer requestingUserId) {
         userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (!request.getDueDate().isAfter(LocalDateTime.now())) {
-            throw new RuntimeException("Due date must be in the future");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Due date must be in the future");
         }
 
         UserItem saved = userItemRepository.save(taskNoteMapper.toTaskEntity(request, requestingUserId));
@@ -63,24 +65,24 @@ public class TaskNoteServiceImpl implements TaskNoteService {
     @Transactional
     public TaskResponse updateTask(Integer requestingUserId, Integer taskId, UpdateTaskRequest request) {
         userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         UserItem item = userItemRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
 
         if (item.getType() != UserItemType.TASK) {
-            throw new RuntimeException("Item is not a task");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item is not a task");
         }
         if (!item.getUserId().equals(requestingUserId)) {
             log.warn("Task update denied — taskId: {}, requestingUserId: {}, ownerId: {}", taskId, requestingUserId, item.getUserId());
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         if (request.getTitle() != null) item.setTitle(request.getTitle());
         if (request.getDescription() != null) item.setDescription(request.getDescription());
         if (request.getDueDate() != null) {
             if (request.getDueDate().isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("Due date must be in the future");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Due date must be in the future");
             }
             item.setDueDate(request.getDueDate());
         }
@@ -95,11 +97,11 @@ public class TaskNoteServiceImpl implements TaskNoteService {
     @Transactional
     public String deleteTask(Integer requestingUserId, Integer taskId) {
         UserItem item = userItemRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
 
         if (item.getType() != UserItemType.TASK || !item.getUserId().equals(requestingUserId)) {
             log.warn("Task delete denied — taskId: {}, requestingUserId: {}", taskId, requestingUserId);
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         userItemRepository.delete(item);
@@ -110,7 +112,7 @@ public class TaskNoteServiceImpl implements TaskNoteService {
     @Override
     public Object getTasks(Integer requestingUserId, boolean getAll, TaskStatus statusFilter, int page, int limit) {
         userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         List<UserItem> allTasks = userItemRepository.findByUserIdAndTypeOrderByDueDateAsc(requestingUserId, UserItemType.TASK);
 
@@ -167,11 +169,11 @@ public class TaskNoteServiceImpl implements TaskNoteService {
     @Override
     public TaskResponse getTaskDetail(Integer requestingUserId, Integer taskId) {
         UserItem item = userItemRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
 
         if (item.getType() != UserItemType.TASK || !item.getUserId().equals(requestingUserId)) {
             log.warn("Task detail access denied — taskId: {}, requestingUserId: {}", taskId, requestingUserId);
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         return taskNoteMapper.toTaskResponse(item);
@@ -185,7 +187,7 @@ public class TaskNoteServiceImpl implements TaskNoteService {
     @Transactional
     public NoteResponse createNote(CreateNoteRequest request, Integer requestingUserId) {
         userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         UserItem saved = userItemRepository.save(taskNoteMapper.toNoteEntity(request, requestingUserId));
         log.info("Note created — id: {}, userId: {}", saved.getId(), requestingUserId);
@@ -196,11 +198,11 @@ public class TaskNoteServiceImpl implements TaskNoteService {
     @Transactional
     public NoteResponse updateNote(Integer requestingUserId, Integer noteId, UpdateNoteRequest request) {
         UserItem item = userItemRepository.findById(noteId)
-                .orElseThrow(() -> new RuntimeException("Note not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not found"));
 
         if (item.getType() != UserItemType.NOTE || !item.getUserId().equals(requestingUserId)) {
             log.warn("Note update denied — noteId: {}, requestingUserId: {}", noteId, requestingUserId);
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         if (request.getTitle() != null) item.setTitle(request.getTitle());
@@ -215,11 +217,11 @@ public class TaskNoteServiceImpl implements TaskNoteService {
     @Transactional
     public String deleteNote(Integer requestingUserId, Integer noteId) {
         UserItem item = userItemRepository.findById(noteId)
-                .orElseThrow(() -> new RuntimeException("Note not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not found"));
 
         if (item.getType() != UserItemType.NOTE || !item.getUserId().equals(requestingUserId)) {
             log.warn("Note delete denied — noteId: {}, requestingUserId: {}", noteId, requestingUserId);
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         userItemRepository.delete(item);
@@ -271,11 +273,11 @@ public class TaskNoteServiceImpl implements TaskNoteService {
     @Override
     public NoteResponse getNoteDetail(Integer requestingUserId, Integer noteId) {
         UserItem item = userItemRepository.findById(noteId)
-                .orElseThrow(() -> new RuntimeException("Note not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not found"));
 
         if (item.getType() != UserItemType.NOTE || !item.getUserId().equals(requestingUserId)) {
             log.warn("Note detail access denied — noteId: {}, requestingUserId: {}", noteId, requestingUserId);
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         return taskNoteMapper.toNoteResponse(item);

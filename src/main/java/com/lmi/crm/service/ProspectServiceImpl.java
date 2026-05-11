@@ -28,12 +28,13 @@ import com.lmi.crm.mapper.ProspectMapper;
 import com.lmi.crm.util.FuzzyMatchUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -74,12 +75,11 @@ public class ProspectServiceImpl implements ProspectService {
     @Transactional
     public ProspectResponse addProspect(AddProspectRequest request, Integer requestingUserId) {
 
-        // Step 1 — Validate requesting user
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (requestingUser.getRole() != UserRole.LICENSEE && requestingUser.getRole() != UserRole.ASSOCIATE) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         Integer effectiveLicenseeId;
@@ -90,34 +90,27 @@ public class ProspectServiceImpl implements ProspectService {
             associateId = null;
         } else {
             if (requestingUser.getLicenseeId() == null) {
-                throw new RuntimeException("Associate is not linked to a licensee");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Associate is not linked to a licensee");
             }
             effectiveLicenseeId = requestingUser.getLicenseeId();
             associateId = requestingUserId;
         }
 
-        // Step 2 — Email uniqueness check
         prospectRepository.findByEmailIgnoreCaseAndDeletionStatusFalse(request.getEmail())
                 .ifPresent(p -> {
-                    throw new RuntimeException(
-                        "A prospect with email '" + request.getEmail() + "' already exists in the system"
-                    );
+                    throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "A prospect with email '" + request.getEmail() + "' already exists in the system");
                 });
 
-        // Step 3 — Hard duplicate check (name + company)
         prospectRepository.findByContactFirstNameIgnoreCaseAndContactLastNameIgnoreCaseAndCompanyNameIgnoreCaseAndDeletionStatusFalse(
                 request.getContactFirstName(), request.getContactLastName(), request.getCompanyName())
                 .ifPresent(p -> {
-                    String errorMessage = String.format(
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(
                         "Duplicate Prospect Detected: %s %s at %s already exists in the system",
-                        p.getContactFirstName(),
-                        p.getContactLastName(),
-                        p.getCompanyName()
-                    );
-                    throw new RuntimeException(errorMessage);
+                        p.getContactFirstName(), p.getContactLastName(), p.getCompanyName()
+                    ));
                 });
 
-        // Step 4 — Fuzzy match + city check
         boolean isProvisional = false;
         List<String> provisionalReasons = new ArrayList<>();
 
@@ -151,14 +144,11 @@ public class ProspectServiceImpl implements ProspectService {
             log.warn("Prospect flagged as provisional — company: {}, reasons: {}", request.getCompanyName(), combinedDescription);
         }
 
-        // Step 5 — Build and save Prospect entity
         Prospect prospect = prospectMapper.fromAddProspectRequest(request, associateId, requestingUserId, isProvisional);
         Prospect savedProspect = prospectRepository.save(prospect);
 
-        // Step 6 — Save ProspectLicensee
         prospectLicenseeRepository.save(prospectMapper.toProspectLicensee(savedProspect.getId(), effectiveLicenseeId));
 
-        // Step 7 — Create Alert if provisional
         if (isProvisional) {
             alertService.createAlert(
                     AlertType.DUPLICATE_PROSPECT,
@@ -171,7 +161,6 @@ public class ProspectServiceImpl implements ProspectService {
             );
         }
 
-        // Step 7 — Log and return
         log.info("Prospect created — id: {}, company: {}, licenseeId: {}, associateId: {}, provisional: {}",
                 savedProspect.getId(), savedProspect.getCompanyName(),
                 effectiveLicenseeId, associateId, isProvisional);
@@ -184,13 +173,13 @@ public class ProspectServiceImpl implements ProspectService {
 
         Prospect prospect = prospectRepository.findById(prospectId)
                 .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
-                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
 
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (requestingUser.getRole() != UserRole.LICENSEE && requestingUser.getRole() != UserRole.ASSOCIATE) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         boolean isOwner;
@@ -201,13 +190,13 @@ public class ProspectServiceImpl implements ProspectService {
         }
 
         if (!isOwner) {
-            throw new RuntimeException("You do not have ownership of this prospect");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have ownership of this prospect");
         }
 
         alertRepository.findByAlertTypeAndRelatedEntityIdAndStatus(
                 AlertType.PROTECTION_EXTENSION_REQUEST, prospectId, AlertStatus.PENDING)
                 .ifPresent(a -> {
-                    throw new RuntimeException("A protection extension request is already pending for this prospect");
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "A protection extension request is already pending for this prospect");
                 });
 
         alertService.createAlert(
@@ -232,7 +221,7 @@ public class ProspectServiceImpl implements ProspectService {
                                Integer licenseeIdFilter, Integer associateIdFilter, int page, int limit) {
 
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         log.info("getProspects — requestingUserId: {}, role: {}, getAll: {}, typeFilter: {}, licenseeIdFilter: {}, associateIdFilter: {}, page: {}, limit: {}",
                 requestingUserId, requestingUser.getRole(), getAll, typeFilter, licenseeIdFilter, associateIdFilter, page, limit);
@@ -241,7 +230,6 @@ public class ProspectServiceImpl implements ProspectService {
 
         List<Prospect> prospects;
         if (getAll) {
-            // getAll=true: all authenticated roles see the full system list
             if (typeFilter != null) {
                 prospects = prospectRepository.findByDeletionStatusFalseAndType(typeFilter);
             } else {
@@ -285,10 +273,9 @@ public class ProspectServiceImpl implements ProspectService {
             }
 
         } else {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
-        // Summary counts from scoped list
         long overallTotal = prospects.size();
         long prospectCount = prospects.stream().filter(p -> p.getType() == ProspectType.PROSPECT).count();
         long clientCount = prospects.stream().filter(p -> p.getType() == ProspectType.CLIENT).count();
@@ -302,7 +289,6 @@ public class ProspectServiceImpl implements ProspectService {
             globalPending = prospectRepository.countByStatusAndDeletionStatusFalse(ProspectStatus.PROVISIONAL);
         }
 
-        // Build licensee map and map to responses
         boolean useFullResponse = true;
         List<Integer> allProspectIds = prospects.stream().map(Prospect::getId).toList();
         Map<Integer, Integer> licenseeMap = (useFullResponse && !allProspectIds.isEmpty())
@@ -365,55 +351,48 @@ public class ProspectServiceImpl implements ProspectService {
     @Transactional
     public ProspectResponse updateProspect(Integer requestingUserId, Integer prospectId, UpdateProspectRequest request) {
 
-        // Step 1 — Validate requesting user and prospect
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Prospect prospect = prospectRepository.findById(prospectId)
                 .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
-                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
 
         log.info("PUT /api/prospects/{} — requestingUserId: {}, role: {}", prospectId, requestingUserId, requestingUser.getRole());
 
-        // Step 2 — Role and ownership check
         if (requestingUser.getRole() == UserRole.ASSOCIATE) {
-            throw new RuntimeException("Access denied: Associates cannot update prospects");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied: Associates cannot update prospects");
         } else if (requestingUser.getRole() == UserRole.LICENSEE) {
             if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, requestingUserId)) {
-                throw new RuntimeException("Access denied");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
         } else if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
-        // Step 3 — Apply standard fields
         prospectMapper.updateFromRequest(request, prospect);
 
-        // Step 4 — Apply admin-only fields
         if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
             if (request.getStatus() != null) {
                 prospect.setStatus(request.getStatus());
-                // Resolve any pending provisional alert for this prospect
                 if (request.getStatus() != ProspectStatus.PROVISIONAL) {
                     resolveAlertIfPresent(AlertType.DUPLICATE_PROSPECT, prospectId);
                 }
             }
             if (request.getProtectionPeriodMonths() != null) {
                 prospect.setProtectionPeriodMonths(request.getProtectionPeriodMonths());
-                // Resolve any pending protection-related alerts for this prospect
                 resolveAlertIfPresent(AlertType.PROTECTION_EXTENSION_REQUEST, prospectId);
                 resolveAlertIfPresent(AlertType.PROSPECT_PROTECTION_WARNING, prospectId);
                 resolveAlertIfPresent(AlertType.PROSPECT_UNPROTECTED, prospectId);
             }
         }
 
-        // Step 5 — Licensee reassignment (Admin/Super Admin only)
         if (request.getNewLicenseeId() != null
                 && (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN)) {
             User newLicensee = userRepository.findById(request.getNewLicenseeId())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
             if (newLicensee.getRole() != UserRole.LICENSEE) {
-                throw new RuntimeException("Target user is not a licensee");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target user is not a licensee");
             }
             ProspectLicensee existing = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospectId)
                     .orElse(null);
@@ -425,14 +404,12 @@ public class ProspectServiceImpl implements ProspectService {
             }
         }
 
-        // Step 6 — Save and return
         Prospect savedProspect = prospectRepository.save(prospect);
         Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospectId)
                 .map(ProspectLicensee::getLicenseeId)
                 .orElse(null);
         log.info("Prospect updated — id: {}, requestedBy: {}", prospectId, requestingUserId);
 
-        // Step 7 — Notify all affiliated users
         String recordType = savedProspect.getType() == ProspectType.CLIENT ? "Client" : "Prospect";
         Set<String> emails = new HashSet<>();
         userRepository.findByRole(UserRole.ADMIN).forEach(u -> emails.add(u.getEmail()));
@@ -452,26 +429,23 @@ public class ProspectServiceImpl implements ProspectService {
     @Transactional
     public String softDeleteProspect(Integer requestingUserId, Integer prospectId) {
 
-        // Step 1 — Validate
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         log.info("DELETE /api/prospects/{} — requestingUserId: {}", prospectId, requestingUserId);
 
         Prospect prospect = prospectRepository.findById(prospectId)
                 .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
-                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
 
-        // Step 2 — Soft delete
         prospect.setDeletionStatus(true);
         prospect.setStatus(ProspectStatus.UNPROTECTED);
         prospectRepository.save(prospect);
 
-        // Resolve any pending alerts tied to this prospect
         resolveAlertIfPresent(AlertType.PROSPECT_CONVERSION_REQUEST, prospectId);
         resolveAlertIfPresent(AlertType.DUPLICATE_PROSPECT, prospectId);
         resolveAlertIfPresent(AlertType.PROTECTION_EXTENSION_REQUEST, prospectId);
@@ -482,31 +456,19 @@ public class ProspectServiceImpl implements ProspectService {
         return "Prospect deleted successfully";
     }
 
-    /**
-     * Returns full prospect information for all authenticated users.
-     * No ownership restrictions apply to viewing prospects.
-     * Ownership validation is performed at action endpoints (update, delete, convert, extend protection).
-     *
-     * @param requestingUserId The ID of the user requesting prospect details
-     * @param prospectId The ID of the prospect to retrieve
-     * @return Full prospect details including all fields
-     * @throws RuntimeException if user or prospect not found
-     */
     @Override
     @Transactional(readOnly = true)
     public ProspectResponse getProspectDetail(Integer requestingUserId, Integer prospectId) {
 
-        // Step 1 — Validate requesting user and prospect
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Prospect prospect = prospectRepository.findById(prospectId)
                 .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
-                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
 
         log.info("GET /api/prospects/{} — requestingUserId: {}, role: {}", prospectId, requestingUserId, requestingUser.getRole());
 
-        // Step 2 — Return full prospect details for all authenticated users
         Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospectId)
                 .map(ProspectLicensee::getLicenseeId)
                 .orElse(null);
@@ -520,44 +482,39 @@ public class ProspectServiceImpl implements ProspectService {
     @Override
     public String requestConversion(Integer requestingUserId, Integer prospectId) {
 
-        // Step 1 — Validate requesting user and prospect
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (requestingUser.getRole() != UserRole.ASSOCIATE && requestingUser.getRole() != UserRole.LICENSEE) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         log.info("POST /api/prospects/{}/convert — requestingUserId: {}", prospectId, requestingUserId);
 
         Prospect prospect = prospectRepository.findById(prospectId)
                 .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
-                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
 
-        // Step 2 — Validate prospect state
         if (prospect.getType() == ProspectType.CLIENT) {
-            throw new RuntimeException("Prospect is already a client");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Prospect is already a client");
         }
 
-        // Step 3 — Ownership check
         if (requestingUser.getRole() == UserRole.ASSOCIATE) {
             if (!requestingUserId.equals(prospect.getAssociateId())) {
-                throw new RuntimeException("Access denied");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
         } else {
             if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, requestingUserId)) {
-                throw new RuntimeException("Access denied");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
         }
 
-        // Step 4 — Check no existing pending conversion request
         alertRepository.findByAlertTypeAndRelatedEntityIdAndStatus(
                 AlertType.PROSPECT_CONVERSION_REQUEST, prospectId, AlertStatus.PENDING)
                 .ifPresent(a -> {
-                    throw new RuntimeException("A conversion request for this prospect is already pending");
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "A conversion request for this prospect is already pending");
                 });
 
-        // Step 5 — Create alert
         alertService.createAlert(
                 AlertType.PROSPECT_CONVERSION_REQUEST,
                 "Conversion Request — " + prospect.getCompanyName(),
@@ -569,7 +526,6 @@ public class ProspectServiceImpl implements ProspectService {
                 true
         );
 
-        // Step 6 — Log and return
         log.info("Conversion requested — prospectId: {}, requestedBy: {}", prospectId, requestingUserId);
         return "Conversion request submitted successfully. Awaiting admin approval.";
     }
@@ -578,28 +534,25 @@ public class ProspectServiceImpl implements ProspectService {
     @Transactional
     public ApiResponse<ProspectResponse> approveRejectConversion(Integer requestingUserId, Integer alertId, boolean approve) {
 
-        // Step 1 — Validate requesting user
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         log.info("PUT /api/prospects/conversions/{} — requestingUserId: {}, approve: {}", alertId, requestingUserId, approve);
 
-        // Step 2 — Validate alert
         Alert alert = alertRepository.findById(alertId)
-                .orElseThrow(() -> new RuntimeException("Alert not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Alert not found"));
 
         if (alert.getAlertType() != AlertType.PROSPECT_CONVERSION_REQUEST) {
-            throw new RuntimeException("Alert is not a conversion request");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Alert is not a conversion request");
         }
         if (alert.getStatus() != AlertStatus.PENDING) {
-            throw new RuntimeException("Alert is no longer pending");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Alert is no longer pending");
         }
 
-        // Step 3 — Reject path
         if (!approve) {
             alert.setStatus(AlertStatus.REJECTED);
             alertRepository.save(alert);
@@ -607,10 +560,9 @@ public class ProspectServiceImpl implements ProspectService {
             return ApiResponse.rejected("Conversion request rejected");
         }
 
-        // Step 4 — Approve path
         Prospect prospect = prospectRepository.findById(alert.getRelatedEntityId())
                 .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
-                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
 
         prospect.setType(ProspectType.CLIENT);
         prospectRepository.save(prospect);
@@ -630,36 +582,32 @@ public class ProspectServiceImpl implements ProspectService {
     @Transactional
     public ApiResponse<ProspectResponse> approveRejectProvisional(Integer requestingUserId, Integer alertId, ProvisionalDecision decision) {
 
-        // Step 1 — Validate requesting user
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         log.info("PUT /api/prospects/provisional/{} — requestingUserId: {}, decision: {}", alertId, requestingUserId, decision);
 
-        // Step 2 — Validate alert
         Alert alert = alertRepository.findById(alertId)
-                .orElseThrow(() -> new RuntimeException("Alert not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Alert not found"));
 
         if (alert.getAlertType() != AlertType.DUPLICATE_PROSPECT) {
-            throw new RuntimeException("Alert is not a provisional prospect alert");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Alert is not a provisional prospect alert");
         }
         if (alert.getStatus() != AlertStatus.PENDING) {
-            throw new RuntimeException("Alert is no longer pending");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Alert is no longer pending");
         }
 
-        // Step 3 — Fetch prospect
         Prospect prospect = prospectRepository.findById(alert.getRelatedEntityId())
-                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
 
         if (prospect.getStatus() != ProspectStatus.PROVISIONAL) {
-            throw new RuntimeException("Prospect is not provisional");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Prospect is not provisional");
         }
 
-        // Step 4 — Apply decision
         if (decision == ProvisionalDecision.APPROVE) {
             prospect.setStatus(ProspectStatus.PROTECTED);
             prospectRepository.save(prospect);
@@ -695,7 +643,7 @@ public class ProspectServiceImpl implements ProspectService {
     @Transactional(readOnly = true)
     public ProspectsPageResponse searchProspects(Integer requestingUserId, String q, String scope, ProspectType type, int page, int limit) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
         boolean scopeAll = "all".equalsIgnoreCase(scope) || isAdmin;
@@ -711,7 +659,7 @@ public class ProspectServiceImpl implements ProspectService {
                     .stream().map(ProspectLicensee::getProspectId).toList();
             prospects = ids.isEmpty() ? List.of() : prospectRepository.searchByIds(keyword, ids);
         } else {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         if (type != null) {
@@ -757,22 +705,22 @@ public class ProspectServiceImpl implements ProspectService {
     public ApiResponse<ProspectResponse> approveRejectExtension(Integer requestingUserId, Integer alertId, boolean approve, Integer extensionMonths) {
 
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         log.info("PUT /api/prospects/extensions/{} — requestingUserId: {}, approve: {}, extensionMonths: {}", alertId, requestingUserId, approve, extensionMonths);
 
         Alert alert = alertRepository.findById(alertId)
-                .orElseThrow(() -> new RuntimeException("Alert not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Alert not found"));
 
         if (alert.getAlertType() != AlertType.PROTECTION_EXTENSION_REQUEST) {
-            throw new RuntimeException("Alert is not a protection extension request");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Alert is not a protection extension request");
         }
         if (alert.getStatus() != AlertStatus.PENDING) {
-            throw new RuntimeException("Alert is no longer pending");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Alert is no longer pending");
         }
 
         if (!approve) {
@@ -783,12 +731,12 @@ public class ProspectServiceImpl implements ProspectService {
         }
 
         if (extensionMonths == null || extensionMonths <= 0) {
-            throw new RuntimeException("extensionMonths must be a positive number when approving");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "extensionMonths must be a positive number when approving");
         }
 
         Prospect prospect = prospectRepository.findById(alert.getRelatedEntityId())
                 .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
-                .orElseThrow(() -> new RuntimeException("Prospect not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
 
         int current = prospect.getProtectionPeriodMonths() != null ? prospect.getProtectionPeriodMonths() : 0;
         prospect.setProtectionPeriodMonths(current + extensionMonths);

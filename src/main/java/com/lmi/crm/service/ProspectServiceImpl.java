@@ -383,6 +383,23 @@ public class ProspectServiceImpl implements ProspectService {
             }
         }
 
+        if (request.getNewAssociateId() != null) {
+            boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
+            boolean isLicensee = requestingUser.getRole() == UserRole.LICENSEE;
+            if (!isAdmin && !isLicensee) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+            }
+            User newAssociate = userRepository.findById(request.getNewAssociateId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Associate not found with id: " + request.getNewAssociateId()));
+            if (newAssociate.getRole() != UserRole.ASSOCIATE) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target user is not an associate");
+            }
+            if (isLicensee && !requestingUserId.equals(newAssociate.getLicenseeId())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Associate does not belong to your licensee");
+            }
+            prospect.setAssociateId(request.getNewAssociateId());
+        }
+
         Prospect savedProspect = prospectRepository.save(prospect);
         Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospectId)
                 .map(ProspectLicensee::getLicenseeId)

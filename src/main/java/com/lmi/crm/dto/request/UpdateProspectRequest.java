@@ -37,4 +37,6 @@ public class UpdateProspectRequest {
     private Integer protectionPeriodMonths;
 
     private Integer newLicenseeId;
+
+    private Integer newAssociateId;
 }

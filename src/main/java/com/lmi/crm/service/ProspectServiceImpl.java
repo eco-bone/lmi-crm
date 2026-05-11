@@ -87,7 +87,7 @@ public class ProspectServiceImpl implements ProspectService {
 
         if (requestingUser.getRole() == UserRole.LICENSEE) {
             effectiveLicenseeId = requestingUserId;
-            associateId = null;
+            associateId = request.getAssociateId();
         } else {
             if (requestingUser.getLicenseeId() == null) {
                 throw new RuntimeException("Associate is not linked to a licensee");
@@ -319,46 +319,25 @@ public class ProspectServiceImpl implements ProspectService {
         log.info("getProspects — requestingUserId: {}, overallTotal: {}, prospectCount: {}, clientCount: {}",
                 requestingUserId, overallTotal, prospectCount, clientCount);
 
-        if (getAll) {
-            int end = Math.min(limit, allResponses.size());
-            Page<ProspectResponse> firstPage = new PageImpl<>(
-                    end > 0 ? allResponses.subList(0, end) : List.of(),
-                    PageRequest.of(0, limit),
-                    allResponses.size());
+        int start = page * limit;
+        int end = Math.min(start + limit, allResponses.size());
+        List<ProspectResponse> pageContent = start < allResponses.size()
+                ? allResponses.subList(start, end)
+                : List.of();
+        Page<ProspectResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
 
-            log.info("getProspects — getAll mode — requestingUserId: {}", requestingUserId);
+        log.info("getProspects — requestingUserId: {}, getAll: {}, page: {}, limit: {}", requestingUserId, getAll, page, limit);
 
-            return ProspectsSummaryResponse.builder()
-                    .overallTotal(overallTotal)
-                    .prospectCount(prospectCount)
-                    .clientCount(clientCount)
-                    .provisionalCount(provisionalCount)
-                    .unprotectedCount(unprotectedCount)
-                    .globalTotal(globalTotal)
-                    .globalPending(globalPending)
-                    .firstPage(firstPage)
-                    .build();
-        } else {
-            int start = page * limit;
-            int end = Math.min(start + limit, allResponses.size());
-            List<ProspectResponse> pageContent = start < allResponses.size()
-                    ? allResponses.subList(start, end)
-                    : List.of();
-            Page<ProspectResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
-
-            log.info("getProspects — paginated mode — requestingUserId: {}, page: {}, limit: {}", requestingUserId, page, limit);
-
-            return ProspectsPageResponse.builder()
-                    .overallTotal(overallTotal)
-                    .prospectCount(prospectCount)
-                    .clientCount(clientCount)
-                    .provisionalCount(provisionalCount)
-                    .unprotectedCount(unprotectedCount)
-                    .globalTotal(globalTotal)
-                    .globalPending(globalPending)
-                    .prospects(pageResult)
-                    .build();
-        }
+        return ProspectsPageResponse.builder()
+                .overallTotal(overallTotal)
+                .prospectCount(prospectCount)
+                .clientCount(clientCount)
+                .provisionalCount(provisionalCount)
+                .unprotectedCount(unprotectedCount)
+                .globalTotal(globalTotal)
+                .globalPending(globalPending)
+                .prospects(pageResult)
+                .build();
     }
 
     @Override

@@ -2,9 +2,11 @@ package com.lmi.crm.util;
 
 import com.lmi.crm.entity.User;
 import com.lmi.crm.enums.UserRole;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class SecurityUtils {
@@ -22,7 +24,7 @@ public class SecurityUtils {
     public static User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
-            throw new RuntimeException("No authenticated user found");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No authenticated user found");
         }
         return (User) authentication.getPrincipal();
     }

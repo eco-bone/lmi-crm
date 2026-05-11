@@ -13,6 +13,9 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.UUID;
@@ -45,7 +48,7 @@ public class S3Util {
             );
         } catch (IOException e) {
             log.error("S3 upload failed — key: {}, error: {}", key, e.getMessage());
-            throw new RuntimeException("Failed to upload file to S3");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file to S3");
         }
 
         log.info("S3 upload — key: {}, size: {} bytes", key, file.getSize());

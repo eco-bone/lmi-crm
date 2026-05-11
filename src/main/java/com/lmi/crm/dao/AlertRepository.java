@@ -17,6 +17,8 @@ public interface AlertRepository extends JpaRepository<Alert, Integer> {
 
     Optional<Alert> findByAlertTypeAndRelatedEntityIdAndStatus(AlertType alertType, Integer relatedEntityId, AlertStatus status);
 
+    List<Alert> findByStatus(AlertStatus status);
+
     Page<Alert> findByAlertTypeAndStatus(AlertType alertType, AlertStatus status, Pageable pageable);
 
     Page<Alert> findByAlertType(AlertType alertType, Pageable pageable);

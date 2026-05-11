@@ -5,6 +5,7 @@ import com.lmi.crm.dto.request.UpdateProspectRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.DuplicateCheckResponse;
 import com.lmi.crm.dto.response.ProspectResponse;
+import com.lmi.crm.dto.response.ProspectsPageResponse;
 import com.lmi.crm.enums.ProspectType;
 import com.lmi.crm.enums.ProvisionalDecision;
 
@@ -30,7 +31,11 @@ public interface ProspectService {
 
     ApiResponse<ProspectResponse> approveRejectConversion(Integer requestingUserId, Integer alertId, boolean approve);
 
+    ApiResponse<ProspectResponse> approveRejectExtension(Integer requestingUserId, Integer alertId, boolean approve, Integer extensionMonths);
+
     ApiResponse<ProspectResponse> approveRejectProvisional(Integer requestingUserId, Integer alertId, ProvisionalDecision decision);
 
     List<DuplicateCheckResponse> checkDuplicateProspects(String companyName);
+
+    ProspectsPageResponse searchProspects(Integer requestingUserId, String q, String scope, ProspectType type, int page, int limit);
 }

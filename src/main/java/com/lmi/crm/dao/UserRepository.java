@@ -31,6 +31,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<User> findByOptionalFilters(@Param("role") UserRole role,
                                      @Param("status") UserStatus status);
 
+    @Query("SELECT u FROM User u WHERE (LOWER(u.firstName) LIKE LOWER(:q) OR LOWER(u.lastName) LIKE LOWER(:q) OR LOWER(u.email) LIKE LOWER(:q) OR LOWER(u.phone) LIKE LOWER(:q))")
+    List<User> searchAll(@Param("q") String q);
+
+    @Query("SELECT u FROM User u WHERE u.licenseeId = :licenseeId AND (LOWER(u.firstName) LIKE LOWER(:q) OR LOWER(u.lastName) LIKE LOWER(:q) OR LOWER(u.email) LIKE LOWER(:q) OR LOWER(u.phone) LIKE LOWER(:q))")
+    List<User> searchByLicenseeId(@Param("q") String q, @Param("licenseeId") Integer licenseeId);
+
     long countByRole(UserRole role);
 
     long countByRoleAndStatus(UserRole role, UserStatus status);

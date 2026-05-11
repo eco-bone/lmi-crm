@@ -15,9 +15,11 @@ import com.lmi.crm.enums.UserStatus;
 import com.lmi.crm.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Random;
@@ -52,24 +54,24 @@ public class AuthServiceImpl implements AuthService {
                 })
                 .orElseThrow(() -> {
                     log.warn("login — no user found for identifier: {}", request.getIdentifier());
-                    return new RuntimeException("Invalid credentials");
+                    return new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
                 });
 
         log.debug("login — user found — userId: {}, role: {}, status: {}", user.getId(), user.getRole(), user.getStatus());
 
         if (user.getStatus() == UserStatus.PENDING) {
             log.warn("login — blocked — account setup incomplete — userId: {}", user.getId());
-            throw new RuntimeException("Account setup not complete. Please check your invitation email.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Account setup not complete. Please check your invitation email.");
         }
 
         if (user.getStatus() == UserStatus.INACTIVE) {
             log.warn("login — blocked — account inactive — userId: {}", user.getId());
-            throw new RuntimeException("Account has been deactivated. Contact your administrator.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Account has been deactivated. Contact your administrator.");
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             log.warn("login — failed — wrong password — userId: {}", user.getId());
-            throw new RuntimeException("Invalid credentials");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
         String token = jwtUtil.generateToken(user);
@@ -92,24 +94,24 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByInvitationToken(token)
                 .orElseThrow(() -> {
                     log.warn("setupPassword — invalid or expired token");
-                    return new RuntimeException("Invalid or expired invitation token");
+                    return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired invitation token");
                 });
 
         log.debug("setupPassword — token matched — userId: {}, status: {}", user.getId(), user.getStatus());
 
         if (user.getStatus() != UserStatus.PENDING) {
             log.warn("setupPassword — invitation already used — userId: {}, status: {}", user.getId(), user.getStatus());
-            throw new RuntimeException("This invitation has already been used");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This invitation has already been used");
         }
 
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
             log.warn("setupPassword — passwords do not match — userId: {}", user.getId());
-            throw new RuntimeException("Passwords do not match");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match");
         }
 
         if (request.getNewPassword().length() < 8) {
             log.warn("setupPassword — password too short — userId: {}", user.getId());
-            throw new RuntimeException("Password must be at least 8 characters");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 8 characters");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
@@ -127,13 +129,13 @@ public class AuthServiceImpl implements AuthService {
         log.debug("sendEmailOtp — userId: {}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
 
         log.debug("sendEmailOtp — user found — email: {}, status: {}", user.getEmail(), user.getStatus());
 
         if (user.getStatus() != UserStatus.PENDING) {
             log.warn("sendEmailOtp — rejected — status is not PENDING — userId: {}, status: {}", userId, user.getStatus());
-            throw new RuntimeException("Account is already active or deactivated");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Account is already active or deactivated");
         }
 
         log.debug("sendEmailOtp — deleting any existing unverified EMAIL OTP — userId: {}", userId);
@@ -163,13 +165,13 @@ public class AuthServiceImpl implements AuthService {
         log.debug("sendPhoneOtp — userId: {}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
 
         log.debug("sendPhoneOtp — user found — phone: {}, status: {}", user.getPhone(), user.getStatus());
 
         if (user.getStatus() != UserStatus.PENDING) {
             log.warn("sendPhoneOtp — rejected — status is not PENDING — userId: {}, status: {}", userId, user.getStatus());
-            throw new RuntimeException("Account is already active or deactivated");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Account is already active or deactivated");
         }
 
         log.debug("sendPhoneOtp — deleting any existing unverified PHONE OTP — userId: {}", userId);
@@ -200,26 +202,26 @@ public class AuthServiceImpl implements AuthService {
         log.debug("verifyOtp — userId: {}, type: {}", userId, request.getType());
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
 
         log.debug("verifyOtp — user found — userId: {}, status: {}", userId, user.getStatus());
 
         OtpStore otpRecord = otpStoreRepository.findByUserIdAndTypeAndVerifiedFalse(userId, request.getType())
                 .orElseThrow(() -> {
                     log.warn("verifyOtp — no pending OTP found — userId: {}, type: {}", userId, request.getType());
-                    return new RuntimeException("No pending OTP found");
+                    return new ResponseStatusException(HttpStatus.BAD_REQUEST, "No pending OTP found");
                 });
 
         log.debug("verifyOtp — OTP record found — expiresAt: {}", otpRecord.getExpiresAt());
 
         if (otpRecord.getExpiresAt().isBefore(LocalDateTime.now())) {
             log.warn("verifyOtp — OTP expired — userId: {}, type: {}, expiredAt: {}", userId, request.getType(), otpRecord.getExpiresAt());
-            throw new RuntimeException("OTP has expired");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP has expired");
         }
 
         if (!otpRecord.getOtp().equals(request.getOtp())) {
             log.warn("verifyOtp — wrong OTP submitted — userId: {}, type: {}", userId, request.getType());
-            throw new RuntimeException("Invalid OTP");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid OTP");
         }
 
         otpRecord.setVerified(true);

@@ -21,7 +21,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -76,9 +78,9 @@ public class AlertServiceImpl implements AlertService {
     @Override
     public Object getAlerts(Integer requestingUserId, boolean getAll, AlertType typeFilter, AlertStatus statusFilter, int page, int limit) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN)
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
 
         log.info("GET /api/admin/alerts — requestingUserId: {}, getAll: {}, typeFilter: {}, statusFilter: {}, page: {}, limit: {}",
                 requestingUserId, getAll, typeFilter, statusFilter, page, limit);
@@ -153,9 +155,9 @@ public class AlertServiceImpl implements AlertService {
     @Override
     public AlertSummaryResponse getAlertSummary(Integer requestingUserId) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         List<Object[]> rows = alertRepository.countByAlertType();
@@ -173,13 +175,13 @@ public class AlertServiceImpl implements AlertService {
     @Override
     public AlertResponse getAlertDetail(Integer requestingUserId, Integer alertId) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         Alert alert = alertRepository.findById(alertId)
-                .orElseThrow(() -> new RuntimeException("Alert not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Alert not found"));
 
         log.info("GET /api/admin/alerts/{} — requestingUserId: {}", alertId, requestingUserId);
 

@@ -4,6 +4,7 @@ import com.lmi.crm.dto.request.AddGroupRequest;
 import com.lmi.crm.dto.request.UpdateGroupRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.GroupResponse;
+import com.lmi.crm.dto.response.GroupsPageResponse;
 
 public interface GroupService {
 
@@ -20,4 +21,6 @@ public interface GroupService {
     String deleteGroup(Integer requestingUserId, Integer groupId);
 
     ApiResponse<String> approveRejectGroupDeletion(Integer requestingUserId, Integer alertId, boolean approve);
+
+    GroupsPageResponse searchGroups(Integer requestingUserId, String q, String scope, int page, int limit);
 }

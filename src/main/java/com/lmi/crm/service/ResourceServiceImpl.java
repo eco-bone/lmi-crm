@@ -20,9 +20,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -48,10 +50,10 @@ public class ResourceServiceImpl implements ResourceService {
     @Transactional
     public ResourceResponse uploadResource(UploadResourceRequest request, Integer requestingUserId) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
             log.warn("uploadResource — access denied — requestingUserId: {}, role: {}", requestingUserId, requestingUser.getRole());
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         FileType fileType;
@@ -64,7 +66,7 @@ public class ResourceServiceImpl implements ResourceService {
         } else {
             MultipartFile file = request.getFile();
             if (file == null || file.isEmpty()) {
-                throw new RuntimeException("File is required for DOCUMENT and PPT resources");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is required for DOCUMENT and PPT resources");
             }
             fileType = detectFileType(file);
             validateFileTypeForResourceType(request.getResourceType(), fileType);
@@ -75,7 +77,7 @@ public class ResourceServiceImpl implements ResourceService {
 
         resourceRepository.findByFileUrlAndDeletionStatusFalse(fileUrl)
                 .ifPresent(existing -> {
-                    throw new RuntimeException("A resource with this " +
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "A resource with this " +
                             (request.getResourceType() == ResourceType.ZCDC ? "YouTube URL" : "file") +
                             " already exists: " + existing.getTitle());
                 });
@@ -100,7 +102,7 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public Object getResources(Integer requestingUserId, boolean getAll, ResourceType typeFilter, int page, int limit) {
         userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         log.info("getResources — requestingUserId: {}, getAll: {}, typeFilter: {}, page: {}, limit: {}",
                 requestingUserId, getAll, typeFilter, page, limit);
@@ -140,12 +142,12 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public ResourceResponse getResourceDetail(Integer requestingUserId, Integer resourceId) {
         userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Resource resource = resourceRepository.findById(resourceId)
-                .orElseThrow(() -> new RuntimeException("Resource not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
         if (Boolean.TRUE.equals(resource.getDeletionStatus())) {
-            throw new RuntimeException("Resource not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
         }
 
         return resourceMapper.toResponse(resource);
@@ -154,12 +156,12 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public String downloadResource(Integer requestingUserId, Integer resourceId) {
         userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Resource resource = resourceRepository.findById(resourceId)
-                .orElseThrow(() -> new RuntimeException("Resource not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
         if (Boolean.TRUE.equals(resource.getDeletionStatus())) {
-            throw new RuntimeException("Resource not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
         }
 
         log.info("Resource download — id: {}, fileType: {}, requestedBy: {}",
@@ -175,16 +177,16 @@ public class ResourceServiceImpl implements ResourceService {
     @Transactional
     public ResourceResponse updateResource(Integer requestingUserId, Integer resourceId, UpdateResourceRequest request) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
             log.warn("updateResource — access denied — requestingUserId: {}, role: {}", requestingUserId, requestingUser.getRole());
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         Resource resource = resourceRepository.findById(resourceId)
-                .orElseThrow(() -> new RuntimeException("Resource not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
         if (Boolean.TRUE.equals(resource.getDeletionStatus())) {
-            throw new RuntimeException("Resource not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
         }
 
         if (request.getTitle() != null) resource.setTitle(request.getTitle());
@@ -214,16 +216,16 @@ public class ResourceServiceImpl implements ResourceService {
     @Transactional
     public String deleteResource(Integer requestingUserId, Integer resourceId) {
         User requestingUser = userRepository.findById(requestingUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (requestingUser.getRole() != UserRole.ADMIN && requestingUser.getRole() != UserRole.SUPER_ADMIN) {
             log.warn("deleteResource — access denied — requestingUserId: {}, role: {}", requestingUserId, requestingUser.getRole());
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         Resource resource = resourceRepository.findById(resourceId)
-                .orElseThrow(() -> new RuntimeException("Resource not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
         if (Boolean.TRUE.equals(resource.getDeletionStatus())) {
-            throw new RuntimeException("Resource not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
         }
 
         resource.setDeletionStatus(true);
@@ -234,21 +236,21 @@ public class ResourceServiceImpl implements ResourceService {
 
     private void validateYouTubeUrl(String url) {
         if (url == null || url.isBlank())
-            throw new RuntimeException("Video URL is required for ZCDC resources");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Video URL is required for ZCDC resources");
 
         if (!url.startsWith("https://www.youtube.com/watch?v=") &&
                 !url.startsWith("https://youtu.be/") &&
                 !url.startsWith("https://www.youtube.com/embed/")) {
-            throw new RuntimeException("Invalid YouTube URL format. Must be a valid YouTube watch, share, or embed link");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid YouTube URL format. Must be a valid YouTube watch, share, or embed link");
         }
 
         String videoId = extractYouTubeVideoId(url);
         if (videoId == null || videoId.isBlank()) {
-            throw new RuntimeException("Could not extract video ID from YouTube URL");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not extract video ID from YouTube URL");
         }
 
         if (videoId.length() != 11) {
-            throw new RuntimeException("Invalid YouTube video ID");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid YouTube video ID");
         }
     }
 
@@ -271,11 +273,11 @@ public class ResourceServiceImpl implements ResourceService {
     private void validateFileTypeForResourceType(ResourceType resourceType, FileType fileType) {
         if (resourceType == ResourceType.DOCUMENT) {
             if (fileType != FileType.PDF && fileType != FileType.DOC && fileType != FileType.XLS) {
-                throw new RuntimeException("DOCUMENT resources only allow PDF, DOC, DOCX, XLS, XLSX files");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "DOCUMENT resources only allow PDF, DOC, DOCX, XLS, XLSX files");
             }
         } else if (resourceType == ResourceType.PPT) {
             if (fileType != FileType.PPT) {
-                throw new RuntimeException("PPT resources only allow PPT, PPTX files");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PPT resources only allow PPT, PPTX files");
             }
         }
     }
@@ -285,7 +287,7 @@ public class ResourceServiceImpl implements ResourceService {
         String originalName = file.getOriginalFilename() != null
                 ? file.getOriginalFilename().toLowerCase() : "";
 
-        if (contentType == null) throw new RuntimeException("Cannot determine file type");
+        if (contentType == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot determine file type");
 
         if (contentType.equals("application/pdf") || originalName.endsWith(".pdf"))
             return FileType.PDF;
@@ -305,6 +307,6 @@ public class ResourceServiceImpl implements ResourceService {
                 || originalName.endsWith(".pptx"))
             return FileType.PPT;
 
-        throw new RuntimeException("Unsupported file type. Allowed: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported file type. Allowed: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX");
     }
 }

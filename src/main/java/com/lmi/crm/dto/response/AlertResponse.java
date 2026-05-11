@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -26,5 +26,5 @@ public class AlertResponse {
     private String triggeredByName;
     private AlertStatus status;
     private boolean actionRequired;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 }

@@ -10,6 +10,8 @@ import com.lmi.crm.dto.response.MeetingResponse;
 import com.lmi.crm.entity.Meeting;
 import com.lmi.crm.entity.Prospect;
 import com.lmi.crm.entity.User;
+import com.lmi.crm.enums.AuditActionType;
+import com.lmi.crm.enums.RelatedEntityType;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.mapper.MeetingMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -39,6 +42,9 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Autowired
     private MeetingMapper meetingMapper;
+
+    @Autowired
+    private AuditService auditService;
 
     @Override
     @Transactional
@@ -84,6 +90,10 @@ public class MeetingServiceImpl implements MeetingService {
 
         log.info("Meeting added — id: {}, prospectId: {}, createdBy: {}, meetingAt: {}",
                 saved.getId(), prospect.getId(), requestingUserId, saved.getMeetingAt());
+
+        auditService.log(AuditActionType.MEETING_CREATED, RelatedEntityType.MEETING, saved.getId(),
+                requestingUserId, null, auditService.snapshot(saved), Map.of("prospectId", prospect.getId()));
+
         return meetingMapper.toResponse(saved);
     }
 

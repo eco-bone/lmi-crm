@@ -4,5 +4,7 @@ public enum RelatedEntityType {
     PROSPECT,
     USER,
     GROUP,
+    MEETING,
+    RESOURCE,
     SYSTEM
 }

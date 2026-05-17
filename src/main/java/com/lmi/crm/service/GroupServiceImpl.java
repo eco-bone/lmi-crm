@@ -21,6 +21,7 @@ import com.lmi.crm.entity.ProspectLicensee;
 import com.lmi.crm.entity.User;
 import com.lmi.crm.enums.AlertStatus;
 import com.lmi.crm.enums.AlertType;
+import com.lmi.crm.enums.AuditActionType;
 import com.lmi.crm.enums.ProspectType;
 import com.lmi.crm.enums.RelatedEntityType;
 import com.lmi.crm.enums.UserRole;
@@ -78,6 +79,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Autowired
     private ProspectMapper prospectMapper;
+
+    @Autowired
+    private AuditService auditService;
 
     @Override
     @Transactional
@@ -151,6 +155,10 @@ public class GroupServiceImpl implements GroupService {
         }
 
         log.info("Group created — id: {}, licenseeId: {}, createdBy: {}", savedGroup.getId(), effectiveLicenseeId, requestingUserId);
+
+        auditService.log(AuditActionType.GROUP_CREATED, RelatedEntityType.GROUP, savedGroup.getId(),
+                requestingUserId, null, auditService.snapshot(savedGroup), null);
+
         return buildGroupResponse(savedGroup);
     }
 
@@ -275,6 +283,8 @@ public class GroupServiceImpl implements GroupService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
+        Map<String, Object> previousState = auditService.snapshot(group);
+
         if (request.getGroupSize() != null) group.setGroupSize(request.getGroupSize());
         if (request.getGroupType() != null) group.setGroupType(request.getGroupType());
         if (request.getDeliveryType() != null) group.setDeliveryType(request.getDeliveryType());
@@ -337,6 +347,9 @@ public class GroupServiceImpl implements GroupService {
 
         Group savedGroup = groupRepository.save(group);
         log.info("Group updated — id: {}, updatedBy: {}", groupId, requestingUserId);
+
+        auditService.log(AuditActionType.GROUP_UPDATED, RelatedEntityType.GROUP, groupId,
+                requestingUserId, previousState, auditService.snapshot(savedGroup), null);
 
         String groupLabel = (savedGroup.getGroupType() != null ? savedGroup.getGroupType().name() + " " : "") + "Group #" + savedGroup.getId();
         Set<String> emails = new HashSet<>();
@@ -420,6 +433,10 @@ public class GroupServiceImpl implements GroupService {
                 });
 
         log.info("Group soft deleted — id: {}, deletedBy: {}", groupId, requestingUserId);
+
+        auditService.log(AuditActionType.GROUP_DELETED, RelatedEntityType.GROUP, groupId,
+                requestingUserId, auditService.snapshot(group), null, null);
+
         return "Group deleted successfully";
     }
 

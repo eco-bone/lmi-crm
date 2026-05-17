@@ -18,6 +18,7 @@ import com.lmi.crm.entity.ProspectLicensee;
 import com.lmi.crm.entity.User;
 import com.lmi.crm.enums.AlertStatus;
 import com.lmi.crm.enums.AlertType;
+import com.lmi.crm.enums.AuditActionType;
 import com.lmi.crm.enums.ProspectProgramType;
 import com.lmi.crm.enums.ProspectStatus;
 import com.lmi.crm.enums.ProspectType;
@@ -37,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +72,9 @@ public class ProspectServiceImpl implements ProspectService {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private AuditService auditService;
 
     @Override
     @Transactional
@@ -164,6 +169,12 @@ public class ProspectServiceImpl implements ProspectService {
         log.info("Prospect created — id: {}, company: {}, licenseeId: {}, associateId: {}, provisional: {}",
                 savedProspect.getId(), savedProspect.getCompanyName(),
                 effectiveLicenseeId, associateId, isProvisional);
+
+        Map<String, Object> auditMeta = isProvisional
+                ? Map.of("provisional", true, "reasons", combinedDescription, "licenseeId", effectiveLicenseeId)
+                : Map.of("licenseeId", effectiveLicenseeId);
+        auditService.log(AuditActionType.PROSPECT_CREATED, RelatedEntityType.PROSPECT, savedProspect.getId(),
+                requestingUserId, null, auditService.snapshot(savedProspect), auditMeta);
 
         return prospectMapper.toResponse(savedProspect, effectiveLicenseeId, isProvisional ? combinedDescription : null);
     }
@@ -339,6 +350,8 @@ public class ProspectServiceImpl implements ProspectService {
 
         log.info("PUT /api/prospects/{} — requestingUserId: {}, role: {}", prospectId, requestingUserId, requestingUser.getRole());
 
+        Map<String, Object> previousState = auditService.snapshot(prospect);
+
         if (requestingUser.getRole() == UserRole.ASSOCIATE) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied: Associates cannot update prospects");
         } else if (requestingUser.getRole() == UserRole.LICENSEE) {
@@ -406,6 +419,9 @@ public class ProspectServiceImpl implements ProspectService {
                 .orElse(null);
         log.info("Prospect updated — id: {}, requestedBy: {}", prospectId, requestingUserId);
 
+        auditService.log(AuditActionType.PROSPECT_UPDATED, RelatedEntityType.PROSPECT, prospectId,
+                requestingUserId, previousState, auditService.snapshot(savedProspect), null);
+
         String recordType = savedProspect.getType() == ProspectType.CLIENT ? "Client" : "Prospect";
         Set<String> emails = new HashSet<>();
         userRepository.findByRole(UserRole.ADMIN).forEach(u -> emails.add(u.getEmail()));
@@ -438,9 +454,13 @@ public class ProspectServiceImpl implements ProspectService {
                 .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found"));
 
+        Map<String, Object> deletedState = auditService.snapshot(prospect);
         prospect.setDeletionStatus(true);
         prospect.setStatus(ProspectStatus.UNPROTECTED);
         prospectRepository.save(prospect);
+
+        auditService.log(AuditActionType.PROSPECT_DELETED, RelatedEntityType.PROSPECT, prospectId,
+                requestingUserId, deletedState, null, null);
 
         resolveAlertIfPresent(AlertType.PROSPECT_CONVERSION_REQUEST, prospectId);
         resolveAlertIfPresent(AlertType.DUPLICATE_PROSPECT, prospectId);
@@ -523,6 +543,10 @@ public class ProspectServiceImpl implements ProspectService {
         );
 
         log.info("Conversion requested — prospectId: {}, requestedBy: {}", prospectId, requestingUserId);
+
+        auditService.log(AuditActionType.PROSPECT_CONVERSION_REQUESTED, RelatedEntityType.PROSPECT, prospectId,
+                requestingUserId, null, null, Map.of("company", prospect.getCompanyName()));
+
         return "Conversion request submitted successfully. Awaiting admin approval.";
     }
 
@@ -553,6 +577,8 @@ public class ProspectServiceImpl implements ProspectService {
             alert.setStatus(AlertStatus.REJECTED);
             alertRepository.save(alert);
             log.info("Conversion rejected — alertId: {}, rejectedBy: {}", alertId, requestingUserId);
+            auditService.log(AuditActionType.PROSPECT_CONVERSION_REJECTED, RelatedEntityType.PROSPECT,
+                    alert.getRelatedEntityId(), requestingUserId, null, null, Map.of("alertId", alertId));
             return ApiResponse.rejected("Conversion request rejected");
         }
 
@@ -571,6 +597,10 @@ public class ProspectServiceImpl implements ProspectService {
                 .orElse(null);
 
         log.info("Conversion approved — prospectId: {}, approvedBy: {}", prospect.getId(), requestingUserId);
+
+        auditService.log(AuditActionType.PROSPECT_CONVERSION_APPROVED, RelatedEntityType.PROSPECT,
+                prospect.getId(), requestingUserId, null, auditService.snapshot(prospect), Map.of("alertId", alertId));
+
         return ApiResponse.success("Prospect converted to client successfully", prospectMapper.toResponse(prospect, licenseeId, null));
     }
 
@@ -610,6 +640,8 @@ public class ProspectServiceImpl implements ProspectService {
             alert.setStatus(AlertStatus.RESOLVED);
             alertRepository.save(alert);
             log.info("Provisional prospect approved — prospectId: {}, approvedBy: {}", prospect.getId(), requestingUserId);
+            auditService.log(AuditActionType.PROVISIONAL_APPROVED, RelatedEntityType.PROSPECT,
+                    prospect.getId(), requestingUserId, null, auditService.snapshot(prospect), Map.of("alertId", alertId));
             Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospect.getId())
                     .map(ProspectLicensee::getLicenseeId)
                     .orElse(null);
@@ -622,6 +654,8 @@ public class ProspectServiceImpl implements ProspectService {
             alert.setStatus(AlertStatus.REJECTED);
             alertRepository.save(alert);
             log.info("Provisional prospect rejected — prospectId: {}, rejectedBy: {}", prospect.getId(), requestingUserId);
+            auditService.log(AuditActionType.PROVISIONAL_REJECTED, RelatedEntityType.PROSPECT,
+                    prospect.getId(), requestingUserId, null, null, Map.of("alertId", alertId));
             return ApiResponse.rejected("Provisional prospect rejected and removed");
 
         } else {
@@ -723,6 +757,9 @@ public class ProspectServiceImpl implements ProspectService {
             alert.setStatus(AlertStatus.REJECTED);
             alertRepository.save(alert);
             log.info("Protection extension rejected — alertId: {}, rejectedBy: {}", alertId, requestingUserId);
+            auditService.log(AuditActionType.PROSPECT_UPDATED, RelatedEntityType.PROSPECT,
+                    alert.getRelatedEntityId(), requestingUserId, null, null,
+                    Map.of("alertId", alertId, "extensionDecision", "REJECTED"));
             return ApiResponse.rejected("Protection extension request rejected");
         }
 
@@ -747,6 +784,10 @@ public class ProspectServiceImpl implements ProspectService {
 
         log.info("Protection extension approved — prospectId: {}, extensionMonths: {}, newTotal: {}, approvedBy: {}",
                 prospect.getId(), extensionMonths, prospect.getProtectionPeriodMonths(), requestingUserId);
+
+        auditService.log(AuditActionType.PROSPECT_UPDATED, RelatedEntityType.PROSPECT,
+                prospect.getId(), requestingUserId, null, auditService.snapshot(prospect),
+                Map.of("alertId", alertId, "extensionDecision", "APPROVED", "extensionMonths", extensionMonths));
 
         return ApiResponse.success("Protection extended by " + extensionMonths + " month(s) successfully",
                 prospectMapper.toResponse(prospect, licenseeId, null));

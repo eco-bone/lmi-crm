@@ -9,7 +9,9 @@ import com.lmi.crm.dto.response.ResourcesPageResponse;
 import com.lmi.crm.dto.response.ResourcesSummaryResponse;
 import com.lmi.crm.entity.Resource;
 import com.lmi.crm.entity.User;
+import com.lmi.crm.enums.AuditActionType;
 import com.lmi.crm.enums.FileType;
+import com.lmi.crm.enums.RelatedEntityType;
 import com.lmi.crm.enums.ResourceType;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.mapper.ResourceMapper;
@@ -45,6 +47,9 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Autowired
     private ResourceMapper resourceMapper;
+
+    @Autowired
+    private AuditService auditService;
 
     @Override
     @Transactional
@@ -95,6 +100,9 @@ public class ResourceServiceImpl implements ResourceService {
         Resource saved = resourceRepository.save(resource);
         log.info("Resource uploaded — id: {}, type: {}, fileType: {}, uploadedBy: {}",
                 saved.getId(), saved.getResourceType(), saved.getFileType(), requestingUserId);
+
+        auditService.log(AuditActionType.RESOURCE_CREATED, RelatedEntityType.RESOURCE, saved.getId(),
+                requestingUserId, null, auditService.snapshot(saved), null);
 
         return resourceMapper.toResponse(saved);
     }
@@ -189,6 +197,8 @@ public class ResourceServiceImpl implements ResourceService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
         }
 
+        Map<String, Object> previousState = auditService.snapshot(resource);
+
         if (request.getTitle() != null) resource.setTitle(request.getTitle());
         if (request.getDescription() != null) resource.setDescription(request.getDescription());
 
@@ -209,6 +219,10 @@ public class ResourceServiceImpl implements ResourceService {
 
         Resource saved = resourceRepository.save(resource);
         log.info("Resource updated — id: {}, updatedBy: {}", resourceId, requestingUserId);
+
+        auditService.log(AuditActionType.RESOURCE_UPDATED, RelatedEntityType.RESOURCE, resourceId,
+                requestingUserId, previousState, auditService.snapshot(saved), null);
+
         return resourceMapper.toResponse(saved);
     }
 
@@ -228,9 +242,14 @@ public class ResourceServiceImpl implements ResourceService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
         }
 
+        Map<String, Object> deletedState = auditService.snapshot(resource);
         resource.setDeletionStatus(true);
         resourceRepository.save(resource);
         log.info("Resource soft deleted — id: {}, deletedBy: {}", resourceId, requestingUserId);
+
+        auditService.log(AuditActionType.RESOURCE_DELETED, RelatedEntityType.RESOURCE, resourceId,
+                requestingUserId, deletedState, null, null);
+
         return "Resource deleted successfully";
     }
 

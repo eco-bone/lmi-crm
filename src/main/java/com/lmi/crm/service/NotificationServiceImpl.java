@@ -104,6 +104,16 @@ public class NotificationServiceImpl implements NotificationService {
         send(toEmail, subject, body);
     }
 
+    @Override
+    public void sendAssociateApprovedEmail(String toLicenseeEmail, String associateFirstName, String associateLastName) {
+        log.info("Sending associate approved notification to licensee: {}", toLicenseeEmail);
+        String subject = "Associate Approved: " + associateFirstName + " " + associateLastName;
+        String body = "This is a notification that your associate creation request has been approved.\n\n"
+                + "Associate: " + associateFirstName + " " + associateLastName + "\n\n"
+                + "They have been sent an invitation to set up their account and will be active once they complete registration.";
+        send(toLicenseeEmail, subject, body);
+    }
+
     private void send(String toEmail, String subject, String body) {
         long start = System.currentTimeMillis();
 

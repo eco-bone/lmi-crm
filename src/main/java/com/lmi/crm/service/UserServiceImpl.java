@@ -338,6 +338,11 @@ public class UserServiceImpl implements UserService {
         String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
         notificationService.sendInviteEmail(associate.getEmail(), inviteLink, tempPassword);
 
+        final User savedAssociate = associate;
+        userRepository.findById(savedAssociate.getLicenseeId()).ifPresent(licensee ->
+                notificationService.sendAssociateApprovedEmail(
+                        licensee.getEmail(), savedAssociate.getFirstName(), savedAssociate.getLastName()));
+
         log.info("Associate created — id: {}, email: {}, licenseeId: {}, approvedBy: {}",
                 associate.getId(), associate.getEmail(), associate.getLicenseeId(), requestingAdminId);
 
@@ -348,9 +353,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Object getUsers(Integer requestingUserId, boolean getAll, UserRole roleFilter, UserStatus statusFilter, boolean includeAllStatuses, int page, int limit) {
-        log.debug("getUsers — requestingUserId: {}, getAll: {}, roleFilter: {}, statusFilter: {}, includeAllStatuses: {}, page: {}, limit: {}",
-                requestingUserId, getAll, roleFilter, statusFilter, includeAllStatuses, page, limit);
+    public Object getUsers(Integer requestingUserId, boolean getAll, UserRole roleFilter, UserStatus statusFilter, boolean includeAllStatuses, Integer licenseeIdFilter, int page, int limit) {
+        log.debug("getUsers — requestingUserId: {}, getAll: {}, roleFilter: {}, statusFilter: {}, includeAllStatuses: {}, licenseeIdFilter: {}, page: {}, limit: {}",
+                requestingUserId, getAll, roleFilter, statusFilter, includeAllStatuses, licenseeIdFilter, page, limit);
 
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + requestingUserId));
@@ -382,11 +387,16 @@ public class UserServiceImpl implements UserService {
             effectiveStatus = includeAllStatuses ? null : (statusFilter != null ? statusFilter : UserStatus.ACTIVE);
         }
 
+        if (licenseeIdFilter != null && !isAdmin) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can filter by licensee");
+        }
+
         final UserRole rf = roleFilter;
         final UserStatus es = effectiveStatus;
         List<User> filteredUsers = scopedUsers.stream()
                 .filter(u -> rf == null || u.getRole() == rf)
                 .filter(u -> es == null || u.getStatus() == es)
+                .filter(u -> licenseeIdFilter == null || licenseeIdFilter.equals(u.getLicenseeId()))
                 .toList();
 
         List<UserResponse> filteredResponses = filteredUsers.stream().map(this::mapUserWithCities).toList();
@@ -856,6 +866,38 @@ public class UserServiceImpl implements UserService {
         Page<UserResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
 
         log.info("searchUsers — requestingUserId: {}, scope: {}, role: {}, total: {}", requestingUserId, scope, role, overallTotal);
+
+        return UsersPageResponse.builder()
+                .overallTotal(overallTotal)
+                .activeCount(activeCount)
+                .inactiveCount(inactiveCount)
+                .countByRole(countByRole)
+                .users(pageResult)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UsersPageResponse getLicenseesAndAssociates(Integer requestingUserId, int page, int limit) {
+        List<UserRole> roles = List.of(UserRole.LICENSEE, UserRole.ASSOCIATE);
+        List<User> users = userRepository.findActiveByRoles(roles, UserStatus.ACTIVE);
+
+        long overallTotal = users.size();
+        long activeCount = users.stream().filter(u -> u.getStatus() == UserStatus.ACTIVE).count();
+        long inactiveCount = users.stream().filter(u -> u.getStatus() == UserStatus.INACTIVE).count();
+        Map<UserRole, Long> countByRole = Arrays.stream(UserRole.values())
+                .collect(Collectors.toMap(r -> r, r -> users.stream().filter(u -> u.getRole() == r).count()));
+
+        List<UserResponse> allResponses = users.stream().map(this::mapUserWithCities).toList();
+
+        int start = page * limit;
+        int end = Math.min(start + limit, allResponses.size());
+        List<UserResponse> pageContent = start < allResponses.size()
+                ? allResponses.subList(start, end) : List.of();
+        Page<UserResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
+
+        log.info("getLicenseesAndAssociates — requestingUserId: {}, page: {}, limit: {}, total: {}",
+                requestingUserId, page, limit, overallTotal);
 
         return UsersPageResponse.builder()
                 .overallTotal(overallTotal)

@@ -19,4 +19,6 @@ public interface NotificationService {
     void sendUserDeactivatedEmail(String toEmail, String deactivatedUserName, String deactivatedUserRole);
 
     void sendRecordUpdatedEmail(String toEmail, String recordType, String recordName);
+
+    void sendAssociateApprovedEmail(String toLicenseeEmail, String associateFirstName, String associateLastName);
 }

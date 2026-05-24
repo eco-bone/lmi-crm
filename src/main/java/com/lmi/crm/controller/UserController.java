@@ -161,18 +161,39 @@ public class UserController {
             @RequestParam(required = false) UserRole role,
             @RequestParam(required = false) UserStatus status,
             @RequestParam(defaultValue = "false") boolean includeAllStatuses,
+            @RequestParam(required = false) Integer licenseeId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit) {
         Integer requestingUserId = null;
         try {
             requestingUserId = SecurityUtils.getCurrentUserId();
-            Object response = userService.getUsers(requestingUserId, getAll, role, status, includeAllStatuses, page, limit);
+            Object response = userService.getUsers(requestingUserId, getAll, role, status, includeAllStatuses, licenseeId, page, limit);
             return ResponseEntity.ok(ApiResponse.success("Users retrieved successfully", response));
         } catch (RuntimeException ex) {
             log.error("GET /api/users — failed — requestingUserId: {}, getAll: {}, role: {}, status: {} — {}", requestingUserId, getAll, role, status, ex.getMessage(), ex);
             throw ex;
         } catch (Exception ex) {
             log.error("GET /api/users — unexpected error — requestingUserId: {}, getAll: {}, role: {}, status: {}", requestingUserId, getAll, role, status, ex);
+            throw ex;
+        }
+    }
+
+    @GetMapping("/users/directory")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<UsersPageResponse>> getLicenseesAndAssociates(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit) {
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("GET /api/users/directory — requestingUserId: {}, page: {}, limit: {}", requestingUserId, page, limit);
+            UsersPageResponse response = userService.getLicenseesAndAssociates(requestingUserId, page, limit);
+            return ResponseEntity.ok(ApiResponse.success("Directory retrieved successfully", response));
+        } catch (RuntimeException ex) {
+            log.error("GET /api/users/directory — failed — requestingUserId: {} — {}", requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("GET /api/users/directory — unexpected error — requestingUserId: {}", requestingUserId, ex);
             throw ex;
         }
     }

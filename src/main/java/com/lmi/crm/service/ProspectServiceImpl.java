@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -101,11 +102,19 @@ public class ProspectServiceImpl implements ProspectService {
             associateId = requestingUserId;
         }
 
-        prospectRepository.findByEmailIgnoreCaseAndDeletionStatusFalse(request.getEmail())
-                .ifPresent(p -> {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT,
-                        "A prospect with email '" + request.getEmail() + "' already exists in the system");
-                });
+        boolean hasEmail = request.getEmail() != null && !request.getEmail().isBlank();
+        boolean hasPhone = request.getPhone() != null && !request.getPhone().isBlank();
+        if (!hasEmail && !hasPhone) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one of email or phone number is required");
+        }
+
+        if (hasEmail) {
+            prospectRepository.findByEmailIgnoreCaseAndDeletionStatusFalse(request.getEmail())
+                    .ifPresent(p -> {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT,
+                            "A prospect with email '" + request.getEmail() + "' already exists in the system");
+                    });
+        }
 
         prospectRepository.findByContactFirstNameIgnoreCaseAndContactLastNameIgnoreCaseAndCompanyNameIgnoreCaseAndDeletionStatusFalse(
                 request.getContactFirstName(), request.getContactLastName(), request.getCompanyName())
@@ -220,6 +229,9 @@ public class ProspectServiceImpl implements ProspectService {
                 requestingUserId,
                 true
         );
+
+        prospect.setExtensionRequestPending(true);
+        prospectRepository.save(prospect);
 
         log.info("Protection extension requested — prospectId: {}, requestedBy: {}", prospectId, requestingUserId);
 
@@ -756,6 +768,14 @@ public class ProspectServiceImpl implements ProspectService {
         if (!approve) {
             alert.setStatus(AlertStatus.REJECTED);
             alertRepository.save(alert);
+
+            prospectRepository.findById(alert.getRelatedEntityId())
+                    .filter(p -> !Boolean.TRUE.equals(p.getDeletionStatus()))
+                    .ifPresent(p -> {
+                        p.setExtensionRequestPending(false);
+                        prospectRepository.save(p);
+                    });
+
             log.info("Protection extension rejected — alertId: {}, rejectedBy: {}", alertId, requestingUserId);
             auditService.log(AuditActionType.PROSPECT_UPDATED, RelatedEntityType.PROSPECT,
                     alert.getRelatedEntityId(), requestingUserId, null, null,
@@ -773,6 +793,8 @@ public class ProspectServiceImpl implements ProspectService {
 
         int current = prospect.getProtectionPeriodMonths() != null ? prospect.getProtectionPeriodMonths() : 0;
         prospect.setProtectionPeriodMonths(current + extensionMonths);
+        prospect.setExtensionRequestPending(false);
+        prospect.setProtectionExtendedAt(LocalDateTime.now());
         prospectRepository.save(prospect);
 
         alert.setStatus(AlertStatus.RESOLVED);

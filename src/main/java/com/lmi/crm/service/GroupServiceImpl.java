@@ -118,8 +118,8 @@ public class GroupServiceImpl implements GroupService {
         if (request.getFacilitatorId() != null) {
             User facilitator = userRepository.findById(request.getFacilitatorId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facilitator not found"));
-            if (facilitator.getRole() != UserRole.LICENSEE) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Facilitator must be a Licensee");
+            if (facilitator.getRole() != UserRole.LICENSEE && facilitator.getRole() != UserRole.ASSOCIATE) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Facilitator must be a Licensee or Associate");
             }
             effectiveFacilitatorId = request.getFacilitatorId();
         } else {
@@ -297,8 +297,8 @@ public class GroupServiceImpl implements GroupService {
                  requestingUser.getRole() == UserRole.SUPER_ADMIN)) {
             User facilitator = userRepository.findById(request.getFacilitatorId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facilitator not found"));
-            if (facilitator.getRole() != UserRole.LICENSEE) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Facilitator must be a Licensee");
+            if (facilitator.getRole() != UserRole.LICENSEE && facilitator.getRole() != UserRole.ASSOCIATE) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Facilitator must be a Licensee or Associate");
             }
             group.setFacilitatorId(request.getFacilitatorId());
         }

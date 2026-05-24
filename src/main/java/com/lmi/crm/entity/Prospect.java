@@ -78,6 +78,12 @@ public class Prospect {
     @Column(name = "protection_period_months")
     private Integer protectionPeriodMonths;
 
+    @Column(name = "extension_request_pending")
+    private boolean extensionRequestPending = false;
+
+    @Column(name = "protection_extended_at")
+    private LocalDateTime protectionExtendedAt;
+
     @Column(name = "deletion_status")
     private Boolean deletionStatus = false;
 

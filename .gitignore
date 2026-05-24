@@ -38,3 +38,6 @@ application-prod.properties
 application-secret.properties
 *.env
 .env
+
+### Local checklists ###
+PROD_READINESS.md

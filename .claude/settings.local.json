@@ -20,7 +20,9 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('success:', d['success'], '|', d['message']\\)\")",
       "Bash(grep -E \"\\\\.\\(java|ts|tsx|js\\)$\")",
       "Bash(mvn compile *)",
-      "Bash(xargs ls -la)"
+      "Bash(xargs ls -la)",
+      "Bash(xargs -I{} basename {})",
+      "Bash(git check-ignore *)"
     ]
   }
 }

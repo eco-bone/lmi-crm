@@ -4,8 +4,11 @@ import com.lmi.crm.dao.ProspectLicenseeRepository;
 import com.lmi.crm.dao.ProspectRepository;
 import com.lmi.crm.dao.UserRepository;
 import com.lmi.crm.entity.Prospect;
+import com.lmi.crm.enums.AuditActionType;
 import com.lmi.crm.enums.ProspectProgramType;
 import com.lmi.crm.enums.ProspectStatus;
+import com.lmi.crm.enums.RelatedEntityType;
+import com.lmi.crm.service.AuditService;
 import com.lmi.crm.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,9 @@ public class ProtectionScheduler {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private AuditService auditService;
 
     // -------------------------------------------------------------------------
     // Job 2 runs before Job 1 (same cron) so that prospects reaching day 75
@@ -67,6 +73,12 @@ public class ProtectionScheduler {
 
                 log.warn("Prospect unprotected (no first meeting) — prospectId: {}, company: {}",
                         prospect.getId(), prospect.getCompanyName());
+
+                auditService.log(AuditActionType.PROSPECT_UNPROTECTED, RelatedEntityType.PROSPECT,
+                        prospect.getId(), null, null,
+                        java.util.Map.of("company", prospect.getCompanyName(), "reason", "no_first_meeting_75_days"),
+                        null);
+
             } catch (Exception e) {
                 log.error("Error processing protection expiry for prospectId: {} — {}",
                         prospect.getId(), e.getMessage());
@@ -159,6 +171,13 @@ public class ProtectionScheduler {
 
                 log.warn("Prospect unprotected (grace period expired) — prospectId: {}, company: {}, programType: {}",
                         prospect.getId(), prospect.getCompanyName(), prospect.getProgramType());
+
+                auditService.log(AuditActionType.PROSPECT_UNPROTECTED, RelatedEntityType.PROSPECT,
+                        prospect.getId(), null, null,
+                        java.util.Map.of("company", prospect.getCompanyName(), "reason", "grace_period_expired",
+                                "programType", prospect.getProgramType().name()),
+                        null);
+
             } catch (Exception e) {
                 log.error("Error processing grace period expiry for prospectId: {} — {}",
                         prospect.getId(), e.getMessage());
@@ -214,6 +233,15 @@ public class ProtectionScheduler {
                 log.warn("Grace period started — prospectId: {}, company: {}, programType: {}, lastMeeting: {}",
                         prospect.getId(), prospect.getCompanyName(),
                         prospect.getProgramType(), prospect.getLastMeetingDate());
+
+                auditService.log(AuditActionType.PROSPECT_GRACE_PERIOD_ENTERED, RelatedEntityType.PROSPECT,
+                        prospect.getId(), null, null,
+                        java.util.Map.of("company", prospect.getCompanyName(),
+                                "programType", prospect.getProgramType().name(),
+                                "lastMeetingDate", prospect.getLastMeetingDate() != null
+                                        ? prospect.getLastMeetingDate().toString() : "none"),
+                        null);
+
             } catch (Exception e) {
                 log.error("Error processing activity deadline for prospectId: {} — {}",
                         prospect.getId(), e.getMessage());

@@ -25,11 +25,9 @@ public class AddProspectRequest {
 
     private String designation;
 
-    @NotBlank
     @Email
     private String email;
 
-    @NotBlank
     @Pattern(regexp = "\\d{10}", message = "Phone number must be exactly 10 digits")
     private String phone;
 

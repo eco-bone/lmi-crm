@@ -12,6 +12,9 @@ import com.lmi.crm.entity.OtpStore;
 import com.lmi.crm.entity.User;
 import com.lmi.crm.enums.OtpType;
 import com.lmi.crm.enums.UserStatus;
+import com.lmi.crm.enums.AuditActionType;
+import com.lmi.crm.enums.RelatedEntityType;
+import com.lmi.crm.service.AuditService;
 import com.lmi.crm.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuditService auditService;
 
     @Override
     public LoginResponse login(LoginRequest request) {
@@ -76,6 +82,9 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtUtil.generateToken(user);
         log.info("login — success — userId: {}, role: {}", user.getId(), user.getRole());
+
+        auditService.log(AuditActionType.LOGIN, RelatedEntityType.USER, user.getId(),
+                user.getId(), null, null, null);
 
         return LoginResponse.builder()
                 .token(token)

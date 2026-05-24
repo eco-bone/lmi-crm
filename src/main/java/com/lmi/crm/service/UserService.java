@@ -24,7 +24,7 @@ public interface UserService {
 
     ApiResponse<UserResponse> approveRejectAssociateCreation(Integer alertId, boolean approve, Integer requestingAdminId);
 
-    Object getUsers(Integer requestingUserId, boolean getAll, UserRole roleFilter, UserStatus statusFilter, boolean includeAllStatuses, int page, int limit);
+    Object getUsers(Integer requestingUserId, boolean getAll, UserRole roleFilter, UserStatus statusFilter, boolean includeAllStatuses, Integer licenseeIdFilter, int page, int limit);
 
     UserResponse getUserDetail(Integer requestingUserId, Integer targetUserId);
 
@@ -39,4 +39,6 @@ public interface UserService {
     ApiResponse<UserResponse> approveRejectAssociateDeactivation(Integer requestingUserId, Integer alertId, boolean approve);
 
     UsersPageResponse searchUsers(Integer requestingUserId, String q, String scope, UserRole role, int page, int limit);
+
+    UsersPageResponse getLicenseesAndAssociates(Integer requestingUserId, int page, int limit);
 }

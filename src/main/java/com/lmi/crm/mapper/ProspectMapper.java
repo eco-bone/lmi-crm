@@ -98,6 +98,8 @@ public class ProspectMapper {
         response.setType(prospect.getType());
         response.setStatus(prospect.getStatus());
         response.setProtectionPeriodMonths(prospect.getProtectionPeriodMonths());
+        response.setExtensionRequestPending(prospect.isExtensionRequestPending());
+        response.setProtectionExtendedAt(prospect.getProtectionExtendedAt());
         response.setEntryDate(prospect.getEntryDate());
         response.setFirstMeetingDate(prospect.getFirstMeetingDate());
         response.setLastMeetingDate(prospect.getLastMeetingDate());

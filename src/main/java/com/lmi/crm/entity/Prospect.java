@@ -79,7 +79,7 @@ public class Prospect {
     private Integer protectionPeriodMonths;
 
     @Column(name = "extension_request_pending")
-    private boolean extensionRequestPending = false;
+    private Boolean extensionRequestPending = false;
 
     @Column(name = "protection_extended_at")
     private LocalDateTime protectionExtendedAt;

@@ -28,6 +28,7 @@ public class ProspectResponse {
     private Integer protectionPeriodMonths;
     private boolean extensionRequestPending;
     private LocalDateTime protectionExtendedAt;
+    private boolean conversionRequestPending;
     private LocalDate entryDate;
     private LocalDate firstMeetingDate;
     private LocalDate lastMeetingDate;

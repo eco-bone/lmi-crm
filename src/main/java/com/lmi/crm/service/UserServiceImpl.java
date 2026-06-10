@@ -25,11 +25,13 @@ import com.lmi.crm.enums.AuditActionType;
 import com.lmi.crm.enums.RelatedEntityType;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.enums.UserStatus;
+import com.lmi.crm.event.NotificationEvent;
 import com.lmi.crm.mapper.LicenseeMapper;
 import com.lmi.crm.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -62,6 +64,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Autowired
     private AlertService alertService;
@@ -128,7 +133,9 @@ public class UserServiceImpl implements UserService {
         List<LicenseeCity> savedCities = licenseeCityRepository.saveAll(cities);
 
         String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
-        notificationService.sendInviteEmail(user.getEmail(), inviteLink, tempPassword);
+        String userEmail = user.getEmail();
+        eventPublisher.publishEvent(new NotificationEvent(this, "Invite email — userId: " + userId,
+                ns -> ns.sendInviteEmail(userEmail, inviteLink, tempPassword)));
 
         log.info("Licensee created — id: {}, email: {}, createdBy: {}", userId, user.getEmail(), requestingUserId);
 
@@ -176,7 +183,10 @@ public class UserServiceImpl implements UserService {
         associate = userRepository.save(associate);
 
         String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
-        notificationService.sendInviteEmail(associate.getEmail(), inviteLink, tempPassword);
+        String associateEmail = associate.getEmail();
+        Integer associateId = associate.getId();
+        eventPublisher.publishEvent(new NotificationEvent(this, "Invite email — associateId: " + associateId,
+                ns -> ns.sendInviteEmail(associateEmail, inviteLink, tempPassword)));
 
         log.info("Associate created directly by admin — id: {}, email: {}, licenseeId: {}, createdBy: {}",
                 associate.getId(), associate.getEmail(), associate.getLicenseeId(), requestingAdminId);
@@ -218,7 +228,8 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
 
         String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
-        notificationService.sendInviteEmail(savedUser.getEmail(), inviteLink, tempPassword);
+        eventPublisher.publishEvent(new NotificationEvent(this, "Invite email — userId: " + savedUser.getId(),
+                ns -> ns.sendInviteEmail(savedUser.getEmail(), inviteLink, tempPassword)));
 
         log.info("Admin created — id: {}, email: {}, createdBy: {}", savedUser.getId(), savedUser.getEmail(), requestingSuperAdminId);
 
@@ -301,7 +312,7 @@ public class UserServiceImpl implements UserService {
             log.info("approveRejectAssociateCreation — rejected — alertId: {}, adminId: {}", alertId, requestingAdminId);
             auditService.log(AuditActionType.ASSOCIATE_REQUEST_REJECTED, RelatedEntityType.USER,
                     alert.getRelatedEntityId(), requestingAdminId, null, null, Map.of("alertId", alertId));
-            return ApiResponse.rejected("Associate creation request rejected");
+            return ApiResponse.success("Associate creation request rejected", null);
         }
 
         log.debug("approveRejectAssociateCreation — approving — alertId: {}", alertId);
@@ -336,12 +347,15 @@ public class UserServiceImpl implements UserService {
         alertRepository.save(alert);
 
         String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
-        notificationService.sendInviteEmail(associate.getEmail(), inviteLink, tempPassword);
-
         final User savedAssociate = associate;
+        eventPublisher.publishEvent(new NotificationEvent(this, "Invite email — associateId: " + savedAssociate.getId(),
+                ns -> ns.sendInviteEmail(savedAssociate.getEmail(), inviteLink, tempPassword)));
+
         userRepository.findById(savedAssociate.getLicenseeId()).ifPresent(licensee ->
-                notificationService.sendAssociateApprovedEmail(
-                        licensee.getEmail(), savedAssociate.getFirstName(), savedAssociate.getLastName()));
+                eventPublisher.publishEvent(new NotificationEvent(this,
+                        "Associate approved email — associateId: " + savedAssociate.getId(),
+                        ns -> ns.sendAssociateApprovedEmail(
+                                licensee.getEmail(), savedAssociate.getFirstName(), savedAssociate.getLastName()))));
 
         log.info("Associate created — id: {}, email: {}, licenseeId: {}, approvedBy: {}",
                 associate.getId(), associate.getEmail(), associate.getLicenseeId(), requestingAdminId);
@@ -725,7 +739,9 @@ public class UserServiceImpl implements UserService {
         List<User> admins = new ArrayList<>();
         admins.addAll(userRepository.findByRole(UserRole.ADMIN));
         admins.addAll(userRepository.findByRole(UserRole.SUPER_ADMIN));
-        admins.forEach(admin -> notificationService.sendUserDeactivatedEmail(admin.getEmail(), fullName, role));
+        admins.forEach(admin -> eventPublisher.publishEvent(new NotificationEvent(this,
+                "User deactivated email — targetUserId: " + targetUserId + " — to: " + admin.getEmail(),
+                ns -> ns.sendUserDeactivatedEmail(admin.getEmail(), fullName, role))));
 
         return userMapper.toResponse(targetUser);
     }
@@ -807,7 +823,7 @@ public class UserServiceImpl implements UserService {
             log.info("approveRejectAssociateDeactivation — rejected — alertId: {}, rejectedBy: {}", alertId, requestingUserId);
             auditService.log(AuditActionType.ASSOCIATE_REQUEST_REJECTED, RelatedEntityType.USER,
                     alert.getRelatedEntityId(), requestingUserId, null, null, Map.of("alertId", alertId, "requestType", "DEACTIVATION"));
-            return ApiResponse.rejected("Associate deactivation request rejected");
+            return ApiResponse.success("Associate deactivation request rejected", null);
         }
 
         log.debug("approveRejectAssociateDeactivation — approving — alertId: {}, associateId: {}", alertId, alert.getRelatedEntityId());

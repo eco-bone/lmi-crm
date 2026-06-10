@@ -14,10 +14,12 @@ import com.lmi.crm.enums.OtpType;
 import com.lmi.crm.enums.UserStatus;
 import com.lmi.crm.enums.AuditActionType;
 import com.lmi.crm.enums.RelatedEntityType;
+import com.lmi.crm.event.NotificationEvent;
 import com.lmi.crm.service.AuditService;
 import com.lmi.crm.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -162,7 +167,8 @@ public class AuthServiceImpl implements AuthService {
         otpStoreRepository.save(otpStore);
 
         log.debug("sendEmailOtp — OTP saved, sending email — userId: {}, email: {}", userId, user.getEmail());
-        notificationService.sendOtpEmail(user.getEmail(), otp);
+        eventPublisher.publishEvent(new NotificationEvent(this, "OTP email — userId: " + userId,
+                ns -> ns.sendOtpEmail(user.getEmail(), otp)));
 
         log.info("sendEmailOtp — sent — userId: {}, email: {}", userId, user.getEmail());
         return "OTP sent to " + user.getEmail();
@@ -198,7 +204,8 @@ public class AuthServiceImpl implements AuthService {
         otpStoreRepository.save(otpStore);
 
         log.debug("sendPhoneOtp — OTP saved, sending SMS — userId: {}, phone: {}", userId, user.getPhone());
-        notificationService.sendOtpSms(user.getPhone(), otp);
+        eventPublisher.publishEvent(new NotificationEvent(this, "OTP SMS — userId: " + userId,
+                ns -> ns.sendOtpSms(user.getPhone(), otp)));
 
         log.info("sendPhoneOtp — sent — userId: {}, phone: {}", userId, user.getPhone());
         return "OTP sent to " + user.getPhone();

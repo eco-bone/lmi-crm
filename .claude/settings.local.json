@@ -22,7 +22,14 @@
       "Bash(mvn compile *)",
       "Bash(xargs ls -la)",
       "Bash(xargs -I{} basename {})",
-      "Bash(git check-ignore *)"
+      "Bash(git check-ignore *)",
+      "Bash(xargs ls)",
+      "Bash(./mvnw -q -o compile)",
+      "Bash(./mvnw -q -o test)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(./mvnw -q dependency:resolve-plugins)",
+      "Bash(./mvnw -q test -Dtest=NotificationEventListenerTest)",
+      "Bash(mvn -q -o compile)"
     ]
   }
 }

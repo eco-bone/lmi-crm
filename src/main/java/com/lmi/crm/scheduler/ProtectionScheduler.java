@@ -8,10 +8,12 @@ import com.lmi.crm.enums.AuditActionType;
 import com.lmi.crm.enums.ProspectProgramType;
 import com.lmi.crm.enums.ProspectStatus;
 import com.lmi.crm.enums.RelatedEntityType;
+import com.lmi.crm.event.NotificationEvent;
 import com.lmi.crm.service.AuditService;
 import com.lmi.crm.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,9 @@ public class ProtectionScheduler {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Autowired
     private AuditService auditService;
@@ -60,14 +65,16 @@ public class ProtectionScheduler {
 
                 prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospect.getId())
                         .ifPresent(pl -> userRepository.findById(pl.getLicenseeId()).ifPresent(licensee ->
-                                notificationService.sendProtectionWarningEmail(
-                                        licensee.getEmail(), prospect.getCompanyName(), message)
+                                eventPublisher.publishEvent(new NotificationEvent(this,
+                                        "Protection warning email — prospectId: " + prospect.getId() + " — to: " + licensee.getEmail(),
+                                        ns -> ns.sendProtectionWarningEmail(licensee.getEmail(), prospect.getCompanyName(), message)))
                         ));
 
                 if (prospect.getAssociateId() != null) {
                     userRepository.findById(prospect.getAssociateId()).ifPresent(associate ->
-                            notificationService.sendProtectionWarningEmail(
-                                    associate.getEmail(), prospect.getCompanyName(), message)
+                            eventPublisher.publishEvent(new NotificationEvent(this,
+                                    "Protection warning email — prospectId: " + prospect.getId() + " — to: " + associate.getEmail(),
+                                    ns -> ns.sendProtectionWarningEmail(associate.getEmail(), prospect.getCompanyName(), message)))
                     );
                 }
 
@@ -104,20 +111,22 @@ public class ProtectionScheduler {
 
                 prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospect.getId())
                         .ifPresent(pl -> userRepository.findById(pl.getLicenseeId()).ifPresent(licensee ->
-                                notificationService.sendProtectionWarningEmail(
-                                        licensee.getEmail(),
-                                        prospect.getCompanyName(),
-                                        "Day 45 — first meeting not recorded. Prospect will become unprotected at day 75."
-                                )
+                                eventPublisher.publishEvent(new NotificationEvent(this,
+                                        "Protection warning email — prospectId: " + prospect.getId() + " — to: " + licensee.getEmail(),
+                                        ns -> ns.sendProtectionWarningEmail(
+                                                licensee.getEmail(),
+                                                prospect.getCompanyName(),
+                                                "Day 45 — first meeting not recorded. Prospect will become unprotected at day 75.")))
                         ));
 
                 if (prospect.getAssociateId() != null) {
                     userRepository.findById(prospect.getAssociateId()).ifPresent(associate ->
-                            notificationService.sendProtectionWarningEmail(
-                                    associate.getEmail(),
-                                    prospect.getCompanyName(),
-                                    "Day 45 — first meeting not recorded. Prospect will become unprotected at day 75."
-                            )
+                            eventPublisher.publishEvent(new NotificationEvent(this,
+                                    "Protection warning email — prospectId: " + prospect.getId() + " — to: " + associate.getEmail(),
+                                    ns -> ns.sendProtectionWarningEmail(
+                                            associate.getEmail(),
+                                            prospect.getCompanyName(),
+                                            "Day 45 — first meeting not recorded. Prospect will become unprotected at day 75.")))
                     );
                 }
 
@@ -158,14 +167,16 @@ public class ProtectionScheduler {
 
                 prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospect.getId())
                         .ifPresent(pl -> userRepository.findById(pl.getLicenseeId()).ifPresent(licensee ->
-                                notificationService.sendProtectionWarningEmail(
-                                        licensee.getEmail(), prospect.getCompanyName(), message)
+                                eventPublisher.publishEvent(new NotificationEvent(this,
+                                        "Protection warning email — prospectId: " + prospect.getId() + " — to: " + licensee.getEmail(),
+                                        ns -> ns.sendProtectionWarningEmail(licensee.getEmail(), prospect.getCompanyName(), message)))
                         ));
 
                 if (prospect.getAssociateId() != null) {
                     userRepository.findById(prospect.getAssociateId()).ifPresent(associate ->
-                            notificationService.sendProtectionWarningEmail(
-                                    associate.getEmail(), prospect.getCompanyName(), message)
+                            eventPublisher.publishEvent(new NotificationEvent(this,
+                                    "Protection warning email — prospectId: " + prospect.getId() + " — to: " + associate.getEmail(),
+                                    ns -> ns.sendProtectionWarningEmail(associate.getEmail(), prospect.getCompanyName(), message)))
                     );
                 }
 
@@ -213,20 +224,22 @@ public class ProtectionScheduler {
 
                 prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospect.getId())
                         .ifPresent(pl -> userRepository.findById(pl.getLicenseeId()).ifPresent(licensee ->
-                                notificationService.sendProtectionWarningEmail(
-                                        licensee.getEmail(),
-                                        prospect.getCompanyName(),
-                                        "No activity recorded within the base protection period. Grace period of 3 months has started."
-                                )
+                                eventPublisher.publishEvent(new NotificationEvent(this,
+                                        "Protection warning email — prospectId: " + prospect.getId() + " — to: " + licensee.getEmail(),
+                                        ns -> ns.sendProtectionWarningEmail(
+                                                licensee.getEmail(),
+                                                prospect.getCompanyName(),
+                                                "No activity recorded within the base protection period. Grace period of 3 months has started.")))
                         ));
 
                 if (prospect.getAssociateId() != null) {
                     userRepository.findById(prospect.getAssociateId()).ifPresent(associate ->
-                            notificationService.sendProtectionWarningEmail(
-                                    associate.getEmail(),
-                                    prospect.getCompanyName(),
-                                    "No activity recorded within the base protection period. Grace period of 3 months has started."
-                            )
+                            eventPublisher.publishEvent(new NotificationEvent(this,
+                                    "Protection warning email — prospectId: " + prospect.getId() + " — to: " + associate.getEmail(),
+                                    ns -> ns.sendProtectionWarningEmail(
+                                            associate.getEmail(),
+                                            prospect.getCompanyName(),
+                                            "No activity recorded within the base protection period. Grace period of 3 months has started.")))
                     );
                 }
 

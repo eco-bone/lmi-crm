@@ -13,10 +13,12 @@ import com.lmi.crm.enums.AlertStatus;
 import com.lmi.crm.enums.AlertType;
 import com.lmi.crm.enums.RelatedEntityType;
 import com.lmi.crm.enums.UserRole;
+import com.lmi.crm.event.NotificationEvent;
 import com.lmi.crm.mapper.AlertMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +48,9 @@ public class AlertServiceImpl implements AlertService {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
     @Value("${app.base-url}")
     private String baseUrl;
 
@@ -72,7 +77,8 @@ public class AlertServiceImpl implements AlertService {
         log.info("createAlert — saved — alertId: {}, type: {}, title: {}, triggeredBy: {}", saved.getId(), alertType, title, triggeredBy);
 
         log.debug("createAlert — dispatching admin email notification — alertId: {}", saved.getId());
-        notificationService.sendAdminAlertEmail(title, description, baseUrl + "/admin/alerts");
+        eventPublisher.publishEvent(new NotificationEvent(this, "Admin alert email — alertId: " + saved.getId(),
+                ns -> ns.sendAdminAlertEmail(title, description, baseUrl + "/admin/alerts")));
     }
 
     @Override

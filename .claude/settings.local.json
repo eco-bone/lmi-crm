@@ -29,7 +29,11 @@
       "Bash(echo \"exit: $?\")",
       "Bash(./mvnw -q dependency:resolve-plugins)",
       "Bash(./mvnw -q test -Dtest=NotificationEventListenerTest)",
-      "Bash(mvn -q -o compile)"
+      "Bash(mvn -q -o compile)",
+      "Bash(git fetch *)",
+      "Bash(git merge *)",
+      "Bash(mvn -q -Dtest=NotificationEventListenerTest test)",
+      "Bash(./mvnw -q -o -Dtest=NotificationEventListenerTest test)"
     ]
   }
 }

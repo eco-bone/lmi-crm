@@ -3,6 +3,7 @@ package com.lmi.crm.event;
 import com.lmi.crm.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -14,6 +15,7 @@ public class NotificationEventListener {
     @Autowired
     private NotificationService notificationService;
 
+    @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void onNotificationEvent(NotificationEvent event) {
         try {

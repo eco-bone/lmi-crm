@@ -138,6 +138,14 @@ public class ProspectServiceImpl implements ProspectService {
                     });
         }
 
+        if (hasPhone) {
+            prospectRepository.findByPhoneAndDeletionStatusFalse(request.getPhone())
+                    .ifPresent(p -> {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT,
+                            "A prospect with phone number '" + request.getPhone() + "' already exists in the system");
+                    });
+        }
+
         prospectRepository.findByContactFirstNameIgnoreCaseAndContactLastNameIgnoreCaseAndCompanyNameIgnoreCaseAndDeletionStatusFalse(
                 request.getContactFirstName(), request.getContactLastName(), request.getCompanyName())
                 .ifPresent(p -> {

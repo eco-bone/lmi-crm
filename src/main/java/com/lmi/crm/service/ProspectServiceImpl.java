@@ -529,6 +529,10 @@ public class ProspectServiceImpl implements ProspectService {
                 .orElse(null);
         ProspectResponse response = prospectMapper.toResponse(prospect, licenseeId, null);
 
+        boolean conversionPending = alertRepository.existsByAlertTypeAndRelatedEntityIdAndStatus(
+                AlertType.PROSPECT_CONVERSION_REQUEST, prospectId, AlertStatus.PENDING);
+        response.setConversionRequestPending(conversionPending);
+
         log.info("GET /api/prospects/{} — returned full details for userId: {}", prospectId, requestingUserId);
 
         return response;
@@ -615,6 +619,7 @@ public class ProspectServiceImpl implements ProspectService {
         if (!approve) {
             alert.setStatus(AlertStatus.REJECTED);
             alertRepository.save(alert);
+
             log.info("Conversion rejected — alertId: {}, rejectedBy: {}", alertId, requestingUserId);
             auditService.log(AuditActionType.PROSPECT_CONVERSION_REJECTED, RelatedEntityType.PROSPECT,
                     alert.getRelatedEntityId(), requestingUserId, null, null, Map.of("alertId", alertId));

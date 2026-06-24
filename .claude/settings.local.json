@@ -33,7 +33,10 @@
       "Bash(git fetch *)",
       "Bash(git merge *)",
       "Bash(mvn -q -Dtest=NotificationEventListenerTest test)",
-      "Bash(./mvnw -q -o -Dtest=NotificationEventListenerTest test)"
+      "Bash(./mvnw -q -o -Dtest=NotificationEventListenerTest test)",
+      "Bash(npx --version)",
+      "Bash(npx --yes md-to-pdf INSTRUCTIONS.md)",
+      "Bash(xargs -I{} echo {})"
     ]
   }
 }

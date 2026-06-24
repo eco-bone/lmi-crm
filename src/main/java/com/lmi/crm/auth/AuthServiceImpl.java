@@ -59,10 +59,11 @@ public class AuthServiceImpl implements AuthService {
         log.debug("login — attempting — identifier: {}", request.getIdentifier());
 
         User user = userRepository.findByEmail(request.getIdentifier())
-                .or(() -> {
-                    log.debug("login — email not found, trying phone — identifier: {}", request.getIdentifier());
-                    return userRepository.findByPhone(request.getIdentifier());
-                })
+                // Phone-based login disabled until DLT SMS registration is complete — re-enable once phone OTP is live again.
+                // .or(() -> {
+                //     log.debug("login — email not found, trying phone — identifier: {}", request.getIdentifier());
+                //     return userRepository.findByPhone(request.getIdentifier());
+                // })
                 .orElseThrow(() -> {
                     log.warn("login — no user found for identifier: {}", request.getIdentifier());
                     return new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
@@ -134,7 +135,7 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("setupPassword — password set, invitation token cleared — userId: {}", user.getId());
 
-        return "Password set successfully. Please verify your email and phone to activate your account.";
+        return "Password set successfully. Please verify your email to activate your account.";
     }
 
     @Override
@@ -179,6 +180,12 @@ public class AuthServiceImpl implements AuthService {
     public String sendPhoneOtp(Integer userId) {
         log.debug("sendPhoneOtp — userId: {}", userId);
 
+        // Phone OTP disabled until DLT SMS template registration is complete.
+        // Re-enable the block below once phone numbers are ready to receive OTP SMS again.
+        log.info("sendPhoneOtp — skipped, phone OTP is currently disabled — userId: {}", userId);
+        return "Phone verification is temporarily disabled.";
+
+        /*
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
 
@@ -209,6 +216,7 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("sendPhoneOtp — sent — userId: {}, phone: {}", userId, user.getPhone());
         return "OTP sent to " + user.getPhone();
+        */
     }
 
     @Override
@@ -246,12 +254,13 @@ public class AuthServiceImpl implements AuthService {
 
         boolean emailVerified = otpStoreRepository.findByUserIdAndTypeAndVerifiedFalse(userId, OtpType.EMAIL).isEmpty()
                 && otpStoreRepository.existsByUserIdAndTypeAndVerifiedTrue(userId, OtpType.EMAIL);
-        boolean phoneVerified = otpStoreRepository.findByUserIdAndTypeAndVerifiedFalse(userId, OtpType.PHONE).isEmpty()
-                && otpStoreRepository.existsByUserIdAndTypeAndVerifiedTrue(userId, OtpType.PHONE);
+        // Phone OTP disabled until DLT SMS registration is complete — activation no longer waits on it.
+        // boolean phoneVerified = otpStoreRepository.findByUserIdAndTypeAndVerifiedFalse(userId, OtpType.PHONE).isEmpty()
+        //         && otpStoreRepository.existsByUserIdAndTypeAndVerifiedTrue(userId, OtpType.PHONE);
 
-        log.debug("verifyOtp — verification state — userId: {}, emailVerified: {}, phoneVerified: {}", userId, emailVerified, phoneVerified);
+        log.debug("verifyOtp — verification state — userId: {}, emailVerified: {}", userId, emailVerified);
 
-        if (emailVerified && phoneVerified) {
+        if (emailVerified /* && phoneVerified */) {
             user.setStatus(UserStatus.ACTIVE);
             userRepository.save(user);
             otpStoreRepository.deleteByUserId(userId);

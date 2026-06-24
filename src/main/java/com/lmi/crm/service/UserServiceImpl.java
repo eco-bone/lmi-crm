@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lmi.crm.dao.AlertRepository;
 import com.lmi.crm.dao.LicenseeCityRepository;
+import com.lmi.crm.dao.ProspectLicenseeRepository;
+import com.lmi.crm.dao.ProspectRepository;
 import com.lmi.crm.dao.UserRepository;
 import com.lmi.crm.dto.request.AddAssociateRequest;
 import com.lmi.crm.dto.request.AddLicenseeRequest;
@@ -18,10 +20,13 @@ import com.lmi.crm.dto.response.UsersSummaryResponse;
 import com.lmi.crm.dto.response.UsersPageResponse;
 import com.lmi.crm.entity.Alert;
 import com.lmi.crm.entity.LicenseeCity;
+import com.lmi.crm.entity.Prospect;
+import com.lmi.crm.entity.ProspectLicensee;
 import com.lmi.crm.entity.User;
 import com.lmi.crm.enums.AlertStatus;
 import com.lmi.crm.enums.AlertType;
 import com.lmi.crm.enums.AuditActionType;
+import com.lmi.crm.enums.ProspectType;
 import com.lmi.crm.enums.RelatedEntityType;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.enums.UserStatus;
@@ -61,6 +66,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private AlertRepository alertRepository;
+
+    @Autowired
+    private ProspectRepository prospectRepository;
+
+    @Autowired
+    private ProspectLicenseeRepository prospectLicenseeRepository;
 
     @Autowired
     private NotificationService notificationService;
@@ -405,12 +416,17 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can filter by licensee");
         }
 
+        // Licensees are always scoped to their own associates — they cannot see another licensee's roster,
+        // and don't need to (or get to) pass licenseeId themselves to achieve this.
+        Integer effectiveLicenseeId = isLicensee ? requestingUser.getId() : licenseeIdFilter;
+
         final UserRole rf = roleFilter;
         final UserStatus es = effectiveStatus;
+        final Integer lf = effectiveLicenseeId;
         List<User> filteredUsers = scopedUsers.stream()
                 .filter(u -> rf == null || u.getRole() == rf)
                 .filter(u -> es == null || u.getStatus() == es)
-                .filter(u -> licenseeIdFilter == null || licenseeIdFilter.equals(u.getLicenseeId()))
+                .filter(u -> lf == null || lf.equals(u.getLicenseeId()))
                 .toList();
 
         List<UserResponse> filteredResponses = filteredUsers.stream().map(this::mapUserWithCities).toList();
@@ -715,9 +731,11 @@ public class UserServiceImpl implements UserService {
                 resolveAlertIfPresent(AlertType.ASSOCIATE_DEACTIVATION_REQUEST, targetUserId);
             }
             case LICENSEE -> {
-                // TODO: transfer all prospect_licensees where licenseeId = targetUserId to MLO — implement after ProspectService is built
-                // TODO: reassign all associates under this licensee to MLO — implement after ProspectService is built
                 targetUser.setStatus(UserStatus.INACTIVE);
+                User mloUser = resolveMloUser();
+                List<User> reassignedAssociates = reassignAssociatesToMlo(targetUserId, mloUser);
+                List<Prospect> reassignedRecords = reassignProspectsAndClientsToMlo(targetUserId, mloUser);
+                notifyMloReassignment(targetUser, mloUser, reassignedAssociates, reassignedRecords);
             }
             default -> targetUser.setStatus(UserStatus.INACTIVE);
         }
@@ -744,6 +762,85 @@ public class UserServiceImpl implements UserService {
                 ns -> ns.sendUserDeactivatedEmail(admin.getEmail(), fullName, role))));
 
         return userMapper.toResponse(targetUser);
+    }
+
+    private User resolveMloUser() {
+        if (mloUserId == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "MLO licensee is not configured (app.mlo-user-id)");
+        }
+        return userRepository.findById(mloUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Configured MLO user not found with id: " + mloUserId));
+    }
+
+    private List<User> reassignAssociatesToMlo(Integer deactivatedLicenseeId, User mloUser) {
+        List<User> associates = userRepository.findAssociatesByLicensee(deactivatedLicenseeId, UserRole.ASSOCIATE, null);
+        associates.forEach(a -> a.setLicenseeId(mloUser.getId()));
+        userRepository.saveAll(associates);
+
+        log.info("reassignAssociatesToMlo — moved {} associate(s) from licenseeId: {} to MLO licenseeId: {}",
+                associates.size(), deactivatedLicenseeId, mloUser.getId());
+        return associates;
+    }
+
+    private List<Prospect> reassignProspectsAndClientsToMlo(Integer deactivatedLicenseeId, User mloUser) {
+        List<ProspectLicensee> links = prospectLicenseeRepository.findByLicenseeId(deactivatedLicenseeId);
+        links.forEach(l -> l.setLicenseeId(mloUser.getId()));
+        prospectLicenseeRepository.saveAll(links);
+
+        List<Integer> prospectIds = links.stream().map(ProspectLicensee::getProspectId).distinct().toList();
+        List<Prospect> records = prospectIds.isEmpty()
+                ? List.of()
+                : prospectRepository.findByIdInAndDeletionStatusFalse(prospectIds);
+
+        log.info("reassignProspectsAndClientsToMlo — moved {} prospect/client link(s) ({} record(s)) from licenseeId: {} to MLO licenseeId: {}",
+                links.size(), records.size(), deactivatedLicenseeId, mloUser.getId());
+        return records;
+    }
+
+    private void notifyMloReassignment(User deactivatedLicensee, User mloUser, List<User> reassignedAssociates, List<Prospect> reassignedRecords) {
+        String licenseeName = deactivatedLicensee.getFirstName() + " " + deactivatedLicensee.getLastName();
+        String associateSummary = buildAssociateSummaryTable(reassignedAssociates);
+        String prospectSummary = buildProspectSummaryTable(reassignedRecords);
+
+        List<User> recipients = new ArrayList<>();
+        recipients.addAll(userRepository.findByRole(UserRole.ADMIN));
+        recipients.addAll(userRepository.findByRole(UserRole.SUPER_ADMIN));
+        recipients.add(mloUser);
+
+        recipients.forEach(recipient -> eventPublisher.publishEvent(new NotificationEvent(this,
+                "Licensee reassignment summary email — deactivatedLicenseeId: " + deactivatedLicensee.getId() + " — to: " + recipient.getEmail(),
+                ns -> ns.sendLicenseeReassignmentSummaryEmail(recipient.getEmail(), licenseeName, associateSummary, prospectSummary))));
+    }
+
+    private String buildAssociateSummaryTable(List<User> associates) {
+        if (associates.isEmpty()) {
+            return "No associates were reassigned.";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Total reassigned: %d%n%n", associates.size()));
+        sb.append(String.format("%-25s %-35s%n", "Name", "Email"));
+        sb.append("-".repeat(60)).append("\n");
+        for (User associate : associates) {
+            sb.append(String.format("%-25s %-35s%n", associate.getFirstName() + " " + associate.getLastName(), associate.getEmail()));
+        }
+        return sb.toString();
+    }
+
+    private String buildProspectSummaryTable(List<Prospect> records) {
+        if (records.isEmpty()) {
+            return "No prospects or clients were reassigned.";
+        }
+        long prospectCount = records.stream().filter(r -> r.getType() == ProspectType.PROSPECT).count();
+        long clientCount = records.stream().filter(r -> r.getType() == ProspectType.CLIENT).count();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Total reassigned: %d (Prospects: %d, Clients: %d)%n%n", records.size(), prospectCount, clientCount));
+        sb.append(String.format("%-30s %-10s %-20s%n", "Company Name", "Type", "City"));
+        sb.append("-".repeat(62)).append("\n");
+        for (Prospect record : records) {
+            sb.append(String.format("%-30s %-10s %-20s%n", record.getCompanyName(), record.getType(), record.getCity()));
+        }
+        return sb.toString();
     }
 
     @Override

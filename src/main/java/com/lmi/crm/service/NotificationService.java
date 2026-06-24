@@ -21,4 +21,6 @@ public interface NotificationService {
     void sendRecordUpdatedEmail(String toEmail, String recordType, String recordName);
 
     void sendAssociateApprovedEmail(String toLicenseeEmail, String associateFirstName, String associateLastName);
+
+    void sendLicenseeReassignmentSummaryEmail(String toEmail, String deactivatedLicenseeName, String associateSummary, String prospectSummary);
 }

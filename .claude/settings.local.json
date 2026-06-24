@@ -36,7 +36,8 @@
       "Bash(./mvnw -q -o -Dtest=NotificationEventListenerTest test)",
       "Bash(npx --version)",
       "Bash(npx --yes md-to-pdf INSTRUCTIONS.md)",
-      "Bash(xargs -I{} echo {})"
+      "Bash(xargs -I{} echo {})",
+      "Bash(awk '/catch \\\\\\(/{p=1} p{print} /throw ex;/{if\\(p\\){print \"---\"; p=0}}' /Users/ajay/personal/lmi-crm/src/main/java/com/lmi/crm/controller/AlertController.java)"
     ]
   }
 }

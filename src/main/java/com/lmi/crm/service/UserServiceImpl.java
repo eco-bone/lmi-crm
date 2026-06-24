@@ -894,9 +894,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UsersPageResponse getLicenseesAndAssociates(Integer requestingUserId, int page, int limit) {
-        List<UserRole> roles = List.of(UserRole.LICENSEE, UserRole.ASSOCIATE);
-        List<User> users = userRepository.findActiveByRoles(roles, UserStatus.ACTIVE);
+    public UsersPageResponse getLicenseesAndAssociates(Integer requestingUserId, List<UserRole> roles, Integer licenseeId) {
+        List<UserRole> effectiveRoles = (roles == null || roles.isEmpty())
+                ? List.of(UserRole.values())
+                : roles;
+        List<User> users = userRepository.findActiveByRolesAndLicenseeId(effectiveRoles, UserStatus.ACTIVE, licenseeId);
 
         long overallTotal = users.size();
         long activeCount = users.stream().filter(u -> u.getStatus() == UserStatus.ACTIVE).count();
@@ -905,15 +907,10 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toMap(r -> r, r -> users.stream().filter(u -> u.getRole() == r).count()));
 
         List<UserResponse> allResponses = users.stream().map(this::mapUserWithCities).toList();
+        Page<UserResponse> pageResult = new PageImpl<>(allResponses);
 
-        int start = page * limit;
-        int end = Math.min(start + limit, allResponses.size());
-        List<UserResponse> pageContent = start < allResponses.size()
-                ? allResponses.subList(start, end) : List.of();
-        Page<UserResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
-
-        log.info("getLicenseesAndAssociates — requestingUserId: {}, page: {}, limit: {}, total: {}",
-                requestingUserId, page, limit, overallTotal);
+        log.info("getLicenseesAndAssociates — requestingUserId: {}, roles: {}, licenseeId: {}, total: {}",
+                requestingUserId, effectiveRoles, licenseeId, overallTotal);
 
         return UsersPageResponse.builder()
                 .overallTotal(overallTotal)

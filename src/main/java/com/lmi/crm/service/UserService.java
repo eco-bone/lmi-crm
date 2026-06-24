@@ -12,6 +12,8 @@ import com.lmi.crm.dto.response.UsersPageResponse;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.enums.UserStatus;
 
+import java.util.List;
+
 public interface UserService {
 
     LicenseeResponse addLicensee(AddLicenseeRequest request, Integer requestingUserId);
@@ -40,5 +42,5 @@ public interface UserService {
 
     UsersPageResponse searchUsers(Integer requestingUserId, String q, String scope, UserRole role, int page, int limit);
 
-    UsersPageResponse getLicenseesAndAssociates(Integer requestingUserId, int page, int limit);
+    UsersPageResponse getLicenseesAndAssociates(Integer requestingUserId, List<UserRole> roles, Integer licenseeId);
 }

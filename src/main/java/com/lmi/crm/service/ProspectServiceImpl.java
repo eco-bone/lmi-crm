@@ -25,10 +25,13 @@ import com.lmi.crm.enums.ProspectType;
 import com.lmi.crm.enums.ProvisionalDecision;
 import com.lmi.crm.enums.RelatedEntityType;
 import com.lmi.crm.enums.UserRole;
+import com.lmi.crm.enums.UserStatus;
+import com.lmi.crm.event.NotificationEvent;
 import com.lmi.crm.mapper.ProspectMapper;
 import com.lmi.crm.util.FuzzyMatchUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -75,6 +78,9 @@ public class ProspectServiceImpl implements ProspectService {
     private NotificationService notificationService;
 
     @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
     private AuditService auditService;
 
     @Override
@@ -94,9 +100,25 @@ public class ProspectServiceImpl implements ProspectService {
         if (requestingUser.getRole() == UserRole.LICENSEE) {
             effectiveLicenseeId = requestingUserId;
             associateId = request.getAssociateId();
+            if (associateId != null) {
+                User associate = userRepository.findById(associateId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Associate not found with id: " + associateId));
+                if (associate.getRole() != UserRole.ASSOCIATE) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target user is not an associate");
+                }
+                if (!requestingUserId.equals(associate.getLicenseeId())) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Associate does not belong to your licensee");
+                }
+                if (associate.getStatus() != UserStatus.ACTIVE) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Associate is not active");
+                }
+            }
         } else {
             if (requestingUser.getLicenseeId() == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Associate is not linked to a licensee");
+            }
+            if (requestingUser.getStatus() != UserStatus.ACTIVE) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Associate is not active");
             }
             effectiveLicenseeId = requestingUser.getLicenseeId();
             associateId = requestingUserId;
@@ -113,6 +135,14 @@ public class ProspectServiceImpl implements ProspectService {
                     .ifPresent(p -> {
                         throw new ResponseStatusException(HttpStatus.CONFLICT,
                             "A prospect with email '" + request.getEmail() + "' already exists in the system");
+                    });
+        }
+
+        if (hasPhone) {
+            prospectRepository.findByPhoneAndDeletionStatusFalse(request.getPhone())
+                    .ifPresent(p -> {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT,
+                            "A prospect with phone number '" + request.getPhone() + "' already exists in the system");
                     });
         }
 
@@ -422,6 +452,9 @@ public class ProspectServiceImpl implements ProspectService {
             if (isLicensee && !requestingUserId.equals(newAssociate.getLicenseeId())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Associate does not belong to your licensee");
             }
+            if (newAssociate.getStatus() != UserStatus.ACTIVE) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Associate is not active");
+            }
             prospect.setAssociateId(request.getNewAssociateId());
         }
 
@@ -444,7 +477,9 @@ public class ProspectServiceImpl implements ProspectService {
         if (savedProspect.getAssociateId() != null) {
             userRepository.findById(savedProspect.getAssociateId()).ifPresent(u -> emails.add(u.getEmail()));
         }
-        emails.forEach(email -> notificationService.sendRecordUpdatedEmail(email, recordType, savedProspect.getCompanyName()));
+        emails.forEach(email -> eventPublisher.publishEvent(new NotificationEvent(this,
+                "Record updated email — prospectId: " + prospectId + " — to: " + email,
+                ns -> ns.sendRecordUpdatedEmail(email, recordType, savedProspect.getCompanyName()))));
 
         return prospectMapper.toResponse(savedProspect, licenseeId, null);
     }
@@ -596,7 +631,7 @@ public class ProspectServiceImpl implements ProspectService {
             log.info("Conversion rejected — alertId: {}, rejectedBy: {}", alertId, requestingUserId);
             auditService.log(AuditActionType.PROSPECT_CONVERSION_REJECTED, RelatedEntityType.PROSPECT,
                     alert.getRelatedEntityId(), requestingUserId, null, null, Map.of("alertId", alertId));
-            return ApiResponse.rejected("Conversion request rejected");
+            return ApiResponse.success("Conversion request rejected", null);
         }
 
         Prospect prospect = prospectRepository.findById(alert.getRelatedEntityId())
@@ -673,7 +708,7 @@ public class ProspectServiceImpl implements ProspectService {
             log.info("Provisional prospect rejected — prospectId: {}, rejectedBy: {}", prospect.getId(), requestingUserId);
             auditService.log(AuditActionType.PROVISIONAL_REJECTED, RelatedEntityType.PROSPECT,
                     prospect.getId(), requestingUserId, null, null, Map.of("alertId", alertId));
-            return ApiResponse.rejected("Provisional prospect rejected and removed");
+            return ApiResponse.success("Provisional prospect rejected and removed", null);
 
         } else {
             alert.setStatus(AlertStatus.RESOLVED);
@@ -785,7 +820,7 @@ public class ProspectServiceImpl implements ProspectService {
             auditService.log(AuditActionType.PROSPECT_UPDATED, RelatedEntityType.PROSPECT,
                     alert.getRelatedEntityId(), requestingUserId, null, null,
                     Map.of("alertId", alertId, "extensionDecision", "REJECTED"));
-            return ApiResponse.rejected("Protection extension request rejected");
+            return ApiResponse.success("Protection extension request rejected", null);
         }
 
         if (extensionMonths == null || extensionMonths <= 0) {

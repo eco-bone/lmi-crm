@@ -1,0 +1,5 @@
+role,firstName,lastName,email,phone,cities,primaryCity,licenseeEmail
+LICENSEE,Rajesh,Kumar,rajesh.kumar@lmisolutions.com,9876543210,"Mumbai,Pune,Nashik",Mumbai,
+LICENSEE,Priya,Sharma,priya.sharma@lmisolutions.com,9123456780,Delhi,Delhi,
+ASSOCIATE,Amit,Verma,amit.verma@lmisolutions.com,9988776655,,,rajesh.kumar@lmisolutions.com
+ASSOCIATE,Sneha,Joshi,sneha.joshi@lmisolutions.com,9871234560,,,priya.sharma@lmisolutions.com

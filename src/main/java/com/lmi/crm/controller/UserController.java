@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/api")
@@ -181,13 +183,13 @@ public class UserController {
     @GetMapping("/users/directory")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<UsersPageResponse>> getLicenseesAndAssociates(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int limit) {
+            @RequestParam(required = false) List<UserRole> roles,
+            @RequestParam(required = false) Integer licenseeId) {
         Integer requestingUserId = null;
         try {
             requestingUserId = SecurityUtils.getCurrentUserId();
-            log.info("GET /api/users/directory — requestingUserId: {}, page: {}, limit: {}", requestingUserId, page, limit);
-            UsersPageResponse response = userService.getLicenseesAndAssociates(requestingUserId, page, limit);
+            log.info("GET /api/users/directory — requestingUserId: {}, roles: {}, licenseeId: {}", requestingUserId, roles, licenseeId);
+            UsersPageResponse response = userService.getLicenseesAndAssociates(requestingUserId, roles, licenseeId);
             return ResponseEntity.ok(ApiResponse.success("Directory retrieved successfully", response));
         } catch (RuntimeException ex) {
             log.error("GET /api/users/directory — failed — requestingUserId: {} — {}", requestingUserId, ex.getMessage(), ex);

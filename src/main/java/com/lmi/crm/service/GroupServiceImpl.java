@@ -25,10 +25,12 @@ import com.lmi.crm.enums.AuditActionType;
 import com.lmi.crm.enums.ProspectType;
 import com.lmi.crm.enums.RelatedEntityType;
 import com.lmi.crm.enums.UserRole;
+import com.lmi.crm.event.NotificationEvent;
 import com.lmi.crm.mapper.GroupMapper;
 import com.lmi.crm.mapper.ProspectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -73,6 +75,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Autowired
     private GroupMapper groupMapper;
@@ -366,7 +371,9 @@ public class GroupServiceImpl implements GroupService {
                 }
             });
         }
-        emails.forEach(email -> notificationService.sendRecordUpdatedEmail(email, "Group", groupLabel));
+        emails.forEach(email -> eventPublisher.publishEvent(new NotificationEvent(this,
+                "Record updated email — group #" + savedGroup.getId() + " — to: " + email,
+                ns -> ns.sendRecordUpdatedEmail(email, "Group", groupLabel))));
 
         return buildGroupResponse(savedGroup);
     }
@@ -465,7 +472,7 @@ public class GroupServiceImpl implements GroupService {
             alert.setStatus(AlertStatus.REJECTED);
             alertRepository.save(alert);
             log.info("Group deletion rejected — alertId: {}, rejectedBy: {}", alertId, requestingUserId);
-            return ApiResponse.rejected("Group deletion request rejected");
+            return ApiResponse.success("Group deletion request rejected", null);
         }
 
         alert.setStatus(AlertStatus.RESOLVED);

@@ -114,6 +114,19 @@ public class NotificationServiceImpl implements NotificationService {
         send(toLicenseeEmail, subject, body);
     }
 
+    @Override
+    public void sendLicenseeReassignmentSummaryEmail(String toEmail, String deactivatedLicenseeName, String associateSummary, String prospectSummary) {
+        log.info("Sending licensee reassignment summary email to: {}", toEmail);
+        String subject = "Licensee Deactivated — Records Reassigned to MLO: " + deactivatedLicenseeName;
+        String body = "The licensee \"" + deactivatedLicenseeName + "\" has been deactivated. "
+                + "All of their associates and prospects/clients have been reassigned to the Master Licensee (MLO).\n\n"
+                + "ASSOCIATES REASSIGNED\n"
+                + associateSummary + "\n\n"
+                + "PROSPECTS / CLIENTS REASSIGNED\n"
+                + prospectSummary;
+        send(toEmail, subject, body);
+    }
+
     private void send(String toEmail, String subject, String body) {
         long start = System.currentTimeMillis();
 

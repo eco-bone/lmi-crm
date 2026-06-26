@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lmi.crm.dao.AlertRepository;
 import com.lmi.crm.dao.LicenseeCityRepository;
+import com.lmi.crm.dao.ProspectLicenseeRepository;
+import com.lmi.crm.dao.ProspectRepository;
 import com.lmi.crm.dao.UserRepository;
 import com.lmi.crm.dto.request.AddAssociateRequest;
 import com.lmi.crm.dto.request.AddLicenseeRequest;
@@ -18,18 +20,23 @@ import com.lmi.crm.dto.response.UsersSummaryResponse;
 import com.lmi.crm.dto.response.UsersPageResponse;
 import com.lmi.crm.entity.Alert;
 import com.lmi.crm.entity.LicenseeCity;
+import com.lmi.crm.entity.Prospect;
+import com.lmi.crm.entity.ProspectLicensee;
 import com.lmi.crm.entity.User;
 import com.lmi.crm.enums.AlertStatus;
 import com.lmi.crm.enums.AlertType;
 import com.lmi.crm.enums.AuditActionType;
+import com.lmi.crm.enums.ProspectType;
 import com.lmi.crm.enums.RelatedEntityType;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.enums.UserStatus;
+import com.lmi.crm.event.NotificationEvent;
 import com.lmi.crm.mapper.LicenseeMapper;
 import com.lmi.crm.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -61,7 +68,16 @@ public class UserServiceImpl implements UserService {
     private AlertRepository alertRepository;
 
     @Autowired
+    private ProspectRepository prospectRepository;
+
+    @Autowired
+    private ProspectLicenseeRepository prospectLicenseeRepository;
+
+    @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Autowired
     private AlertService alertService;
@@ -128,7 +144,9 @@ public class UserServiceImpl implements UserService {
         List<LicenseeCity> savedCities = licenseeCityRepository.saveAll(cities);
 
         String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
-        notificationService.sendInviteEmail(user.getEmail(), inviteLink, tempPassword);
+        String userEmail = user.getEmail();
+        eventPublisher.publishEvent(new NotificationEvent(this, "Invite email — userId: " + userId,
+                ns -> ns.sendInviteEmail(userEmail, inviteLink, tempPassword)));
 
         log.info("Licensee created — id: {}, email: {}, createdBy: {}", userId, user.getEmail(), requestingUserId);
 
@@ -176,7 +194,10 @@ public class UserServiceImpl implements UserService {
         associate = userRepository.save(associate);
 
         String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
-        notificationService.sendInviteEmail(associate.getEmail(), inviteLink, tempPassword);
+        String associateEmail = associate.getEmail();
+        Integer associateId = associate.getId();
+        eventPublisher.publishEvent(new NotificationEvent(this, "Invite email — associateId: " + associateId,
+                ns -> ns.sendInviteEmail(associateEmail, inviteLink, tempPassword)));
 
         log.info("Associate created directly by admin — id: {}, email: {}, licenseeId: {}, createdBy: {}",
                 associate.getId(), associate.getEmail(), associate.getLicenseeId(), requestingAdminId);
@@ -218,7 +239,8 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
 
         String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
-        notificationService.sendInviteEmail(savedUser.getEmail(), inviteLink, tempPassword);
+        eventPublisher.publishEvent(new NotificationEvent(this, "Invite email — userId: " + savedUser.getId(),
+                ns -> ns.sendInviteEmail(savedUser.getEmail(), inviteLink, tempPassword)));
 
         log.info("Admin created — id: {}, email: {}, createdBy: {}", savedUser.getId(), savedUser.getEmail(), requestingSuperAdminId);
 
@@ -301,7 +323,7 @@ public class UserServiceImpl implements UserService {
             log.info("approveRejectAssociateCreation — rejected — alertId: {}, adminId: {}", alertId, requestingAdminId);
             auditService.log(AuditActionType.ASSOCIATE_REQUEST_REJECTED, RelatedEntityType.USER,
                     alert.getRelatedEntityId(), requestingAdminId, null, null, Map.of("alertId", alertId));
-            return ApiResponse.rejected("Associate creation request rejected");
+            return ApiResponse.success("Associate creation request rejected", null);
         }
 
         log.debug("approveRejectAssociateCreation — approving — alertId: {}", alertId);
@@ -336,12 +358,15 @@ public class UserServiceImpl implements UserService {
         alertRepository.save(alert);
 
         String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
-        notificationService.sendInviteEmail(associate.getEmail(), inviteLink, tempPassword);
-
         final User savedAssociate = associate;
+        eventPublisher.publishEvent(new NotificationEvent(this, "Invite email — associateId: " + savedAssociate.getId(),
+                ns -> ns.sendInviteEmail(savedAssociate.getEmail(), inviteLink, tempPassword)));
+
         userRepository.findById(savedAssociate.getLicenseeId()).ifPresent(licensee ->
-                notificationService.sendAssociateApprovedEmail(
-                        licensee.getEmail(), savedAssociate.getFirstName(), savedAssociate.getLastName()));
+                eventPublisher.publishEvent(new NotificationEvent(this,
+                        "Associate approved email — associateId: " + savedAssociate.getId(),
+                        ns -> ns.sendAssociateApprovedEmail(
+                                licensee.getEmail(), savedAssociate.getFirstName(), savedAssociate.getLastName()))));
 
         log.info("Associate created — id: {}, email: {}, licenseeId: {}, approvedBy: {}",
                 associate.getId(), associate.getEmail(), associate.getLicenseeId(), requestingAdminId);
@@ -391,12 +416,17 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can filter by licensee");
         }
 
+        // Licensees are always scoped to their own associates — they cannot see another licensee's roster,
+        // and don't need to (or get to) pass licenseeId themselves to achieve this.
+        Integer effectiveLicenseeId = isLicensee ? requestingUser.getId() : licenseeIdFilter;
+
         final UserRole rf = roleFilter;
         final UserStatus es = effectiveStatus;
+        final Integer lf = effectiveLicenseeId;
         List<User> filteredUsers = scopedUsers.stream()
                 .filter(u -> rf == null || u.getRole() == rf)
                 .filter(u -> es == null || u.getStatus() == es)
-                .filter(u -> licenseeIdFilter == null || licenseeIdFilter.equals(u.getLicenseeId()))
+                .filter(u -> lf == null || lf.equals(u.getLicenseeId()))
                 .toList();
 
         List<UserResponse> filteredResponses = filteredUsers.stream().map(this::mapUserWithCities).toList();
@@ -701,9 +731,11 @@ public class UserServiceImpl implements UserService {
                 resolveAlertIfPresent(AlertType.ASSOCIATE_DEACTIVATION_REQUEST, targetUserId);
             }
             case LICENSEE -> {
-                // TODO: transfer all prospect_licensees where licenseeId = targetUserId to MLO — implement after ProspectService is built
-                // TODO: reassign all associates under this licensee to MLO — implement after ProspectService is built
                 targetUser.setStatus(UserStatus.INACTIVE);
+                User mloUser = resolveMloUser();
+                List<User> reassignedAssociates = reassignAssociatesToMlo(targetUserId, mloUser);
+                List<Prospect> reassignedRecords = reassignProspectsAndClientsToMlo(targetUserId, mloUser);
+                notifyMloReassignment(targetUser, mloUser, reassignedAssociates, reassignedRecords);
             }
             default -> targetUser.setStatus(UserStatus.INACTIVE);
         }
@@ -725,9 +757,90 @@ public class UserServiceImpl implements UserService {
         List<User> admins = new ArrayList<>();
         admins.addAll(userRepository.findByRole(UserRole.ADMIN));
         admins.addAll(userRepository.findByRole(UserRole.SUPER_ADMIN));
-        admins.forEach(admin -> notificationService.sendUserDeactivatedEmail(admin.getEmail(), fullName, role));
+        admins.forEach(admin -> eventPublisher.publishEvent(new NotificationEvent(this,
+                "User deactivated email — targetUserId: " + targetUserId + " — to: " + admin.getEmail(),
+                ns -> ns.sendUserDeactivatedEmail(admin.getEmail(), fullName, role))));
 
         return userMapper.toResponse(targetUser);
+    }
+
+    private User resolveMloUser() {
+        if (mloUserId == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "MLO licensee is not configured (app.mlo-user-id)");
+        }
+        return userRepository.findById(mloUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Configured MLO user not found with id: " + mloUserId));
+    }
+
+    private List<User> reassignAssociatesToMlo(Integer deactivatedLicenseeId, User mloUser) {
+        List<User> associates = userRepository.findAssociatesByLicensee(deactivatedLicenseeId, UserRole.ASSOCIATE, null);
+        associates.forEach(a -> a.setLicenseeId(mloUser.getId()));
+        userRepository.saveAll(associates);
+
+        log.info("reassignAssociatesToMlo — moved {} associate(s) from licenseeId: {} to MLO licenseeId: {}",
+                associates.size(), deactivatedLicenseeId, mloUser.getId());
+        return associates;
+    }
+
+    private List<Prospect> reassignProspectsAndClientsToMlo(Integer deactivatedLicenseeId, User mloUser) {
+        List<ProspectLicensee> links = prospectLicenseeRepository.findByLicenseeId(deactivatedLicenseeId);
+        links.forEach(l -> l.setLicenseeId(mloUser.getId()));
+        prospectLicenseeRepository.saveAll(links);
+
+        List<Integer> prospectIds = links.stream().map(ProspectLicensee::getProspectId).distinct().toList();
+        List<Prospect> records = prospectIds.isEmpty()
+                ? List.of()
+                : prospectRepository.findByIdInAndDeletionStatusFalse(prospectIds);
+
+        log.info("reassignProspectsAndClientsToMlo — moved {} prospect/client link(s) ({} record(s)) from licenseeId: {} to MLO licenseeId: {}",
+                links.size(), records.size(), deactivatedLicenseeId, mloUser.getId());
+        return records;
+    }
+
+    private void notifyMloReassignment(User deactivatedLicensee, User mloUser, List<User> reassignedAssociates, List<Prospect> reassignedRecords) {
+        String licenseeName = deactivatedLicensee.getFirstName() + " " + deactivatedLicensee.getLastName();
+        String associateSummary = buildAssociateSummaryTable(reassignedAssociates);
+        String prospectSummary = buildProspectSummaryTable(reassignedRecords);
+
+        List<User> recipients = new ArrayList<>();
+        recipients.addAll(userRepository.findByRole(UserRole.ADMIN));
+        recipients.addAll(userRepository.findByRole(UserRole.SUPER_ADMIN));
+        recipients.add(mloUser);
+
+        recipients.forEach(recipient -> eventPublisher.publishEvent(new NotificationEvent(this,
+                "Licensee reassignment summary email — deactivatedLicenseeId: " + deactivatedLicensee.getId() + " — to: " + recipient.getEmail(),
+                ns -> ns.sendLicenseeReassignmentSummaryEmail(recipient.getEmail(), licenseeName, associateSummary, prospectSummary))));
+    }
+
+    private String buildAssociateSummaryTable(List<User> associates) {
+        if (associates.isEmpty()) {
+            return "No associates were reassigned.";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Total reassigned: %d%n%n", associates.size()));
+        sb.append(String.format("%-25s %-35s%n", "Name", "Email"));
+        sb.append("-".repeat(60)).append("\n");
+        for (User associate : associates) {
+            sb.append(String.format("%-25s %-35s%n", associate.getFirstName() + " " + associate.getLastName(), associate.getEmail()));
+        }
+        return sb.toString();
+    }
+
+    private String buildProspectSummaryTable(List<Prospect> records) {
+        if (records.isEmpty()) {
+            return "No prospects or clients were reassigned.";
+        }
+        long prospectCount = records.stream().filter(r -> r.getType() == ProspectType.PROSPECT).count();
+        long clientCount = records.stream().filter(r -> r.getType() == ProspectType.CLIENT).count();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Total reassigned: %d (Prospects: %d, Clients: %d)%n%n", records.size(), prospectCount, clientCount));
+        sb.append(String.format("%-30s %-10s %-20s%n", "Company Name", "Type", "City"));
+        sb.append("-".repeat(62)).append("\n");
+        for (Prospect record : records) {
+            sb.append(String.format("%-30s %-10s %-20s%n", record.getCompanyName(), record.getType(), record.getCity()));
+        }
+        return sb.toString();
     }
 
     @Override
@@ -807,7 +920,7 @@ public class UserServiceImpl implements UserService {
             log.info("approveRejectAssociateDeactivation — rejected — alertId: {}, rejectedBy: {}", alertId, requestingUserId);
             auditService.log(AuditActionType.ASSOCIATE_REQUEST_REJECTED, RelatedEntityType.USER,
                     alert.getRelatedEntityId(), requestingUserId, null, null, Map.of("alertId", alertId, "requestType", "DEACTIVATION"));
-            return ApiResponse.rejected("Associate deactivation request rejected");
+            return ApiResponse.success("Associate deactivation request rejected", null);
         }
 
         log.debug("approveRejectAssociateDeactivation — approving — alertId: {}, associateId: {}", alertId, alert.getRelatedEntityId());
@@ -878,9 +991,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UsersPageResponse getLicenseesAndAssociates(Integer requestingUserId, int page, int limit) {
-        List<UserRole> roles = List.of(UserRole.LICENSEE, UserRole.ASSOCIATE);
-        List<User> users = userRepository.findActiveByRoles(roles, UserStatus.ACTIVE);
+    public UsersPageResponse getLicenseesAndAssociates(Integer requestingUserId, List<UserRole> roles, Integer licenseeId) {
+        List<UserRole> effectiveRoles = (roles == null || roles.isEmpty())
+                ? List.of(UserRole.values())
+                : roles;
+        List<User> users = userRepository.findActiveByRolesAndLicenseeId(effectiveRoles, UserStatus.ACTIVE, licenseeId);
 
         long overallTotal = users.size();
         long activeCount = users.stream().filter(u -> u.getStatus() == UserStatus.ACTIVE).count();
@@ -889,15 +1004,10 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toMap(r -> r, r -> users.stream().filter(u -> u.getRole() == r).count()));
 
         List<UserResponse> allResponses = users.stream().map(this::mapUserWithCities).toList();
+        Page<UserResponse> pageResult = new PageImpl<>(allResponses);
 
-        int start = page * limit;
-        int end = Math.min(start + limit, allResponses.size());
-        List<UserResponse> pageContent = start < allResponses.size()
-                ? allResponses.subList(start, end) : List.of();
-        Page<UserResponse> pageResult = new PageImpl<>(pageContent, PageRequest.of(page, limit), allResponses.size());
-
-        log.info("getLicenseesAndAssociates — requestingUserId: {}, page: {}, limit: {}, total: {}",
-                requestingUserId, page, limit, overallTotal);
+        log.info("getLicenseesAndAssociates — requestingUserId: {}, roles: {}, licenseeId: {}, total: {}",
+                requestingUserId, effectiveRoles, licenseeId, overallTotal);
 
         return UsersPageResponse.builder()
                 .overallTotal(overallTotal)

@@ -1,0 +1,29 @@
+Hello,
+
+Thank you for reviewing our request. Here are the details of our email sending use case:
+
+About our application:
+We are building an internal CRM portal for LMI Solutions, a training and development organisation operating across India. The portal is used exclusively by our licensees and associates — all of whom are onboarded directly by our team.
+
+Types of emails we send:
+- Account invitation emails (one-time, sent when a new user is added)
+- OTP verification codes during login
+- Task reminder notifications
+- Weekly activity summary reports
+- Administrative alerts for prospect ownership changes
+
+Sending frequency:
+Low volume. We have approximately 60 users at launch, growing to a few hundred over time. Peak sending would be the initial invite batch (~60 emails at once). After that, transactional emails only — typically fewer than 20 per day.
+
+Recipient list management:
+All recipients are known, internal users added manually by an admin. There are no public sign-up forms, no purchased lists, and no cold outreach. Recipients are added one by one through the CRM admin panel.
+
+Bounce and complaint handling:
+We monitor sending statistics via the SES CloudWatch dashboard. Any bounced or undeliverable addresses are immediately removed from the system by the admin.
+
+Verified identity:
+Our domain lmisouthasia.com is verified in SES (Asia Pacific Mumbai region).
+
+We are not sending any marketing or bulk promotional email. All emails are strictly transactional and recipient-initiated.
+
+Thank you for your time.

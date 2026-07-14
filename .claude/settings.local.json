@@ -38,7 +38,15 @@
       "Bash(npx --yes md-to-pdf INSTRUCTIONS.md)",
       "Bash(xargs -I{} echo {})",
       "Bash(awk '/catch \\\\\\(/{p=1} p{print} /throw ex;/{if\\(p\\){print \"---\"; p=0}}' /Users/ajay/personal/lmi-crm/src/main/java/com/lmi/crm/controller/AlertController.java)",
-      "Bash(env)"
+      "Bash(env)",
+      "Bash(git checkout *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(python3 *)",
+      "Bash(pip3 install *)",
+      "Bash(/private/tmp/claude-503/-Users-ajay-personal-lmi-crm/ff63c0eb-4bae-416e-bb76-ca1214efa78a/scratchpad/venv/bin/pip install *)",
+      "Bash(/private/tmp/claude-503/-Users-ajay-personal-lmi-crm/ff63c0eb-4bae-416e-bb76-ca1214efa78a/scratchpad/venv/bin/python3 -c ' *)",
+      "Bash(/private/tmp/claude-503/-Users-ajay-personal-lmi-crm/ff63c0eb-4bae-416e-bb76-ca1214efa78a/scratchpad/venv/bin/python3 *)"
     ]
   }
 }

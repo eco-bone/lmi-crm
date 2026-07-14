@@ -54,6 +54,9 @@ public class User implements UserDetails {
     @Column(name = "invitation_token")
     private String invitationToken;
 
+    @Column(name = "invite_email_sent", nullable = false, columnDefinition = "boolean default false")
+    private boolean inviteEmailSent = false;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

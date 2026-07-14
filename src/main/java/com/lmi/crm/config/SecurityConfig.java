@@ -64,6 +64,7 @@ public class SecurityConfig {
                                 "/api/auth/setup/verify-phone",
                                 "/api/auth/setup/otp",
                                 "/api/auth/setup/validate-token",
+                                // "/api/test/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"

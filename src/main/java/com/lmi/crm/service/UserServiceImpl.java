@@ -14,6 +14,7 @@ import com.lmi.crm.dto.request.ResetPasswordRequest;
 import com.lmi.crm.dto.request.UpdateCityRequest;
 import com.lmi.crm.dto.request.UpdateUserRequest;
 import com.lmi.crm.dto.response.ApiResponse;
+import com.lmi.crm.dto.response.ImportResult;
 import com.lmi.crm.dto.response.LicenseeResponse;
 import com.lmi.crm.dto.response.UserResponse;
 import com.lmi.crm.dto.response.UsersSummaryResponse;
@@ -34,6 +35,12 @@ import com.lmi.crm.event.NotificationEvent;
 import com.lmi.crm.mapper.LicenseeMapper;
 import com.lmi.crm.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,14 +48,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -1025,5 +1035,288 @@ public class UserServiceImpl implements UserService {
                     alertRepository.save(a);
                     log.info("Alert auto-resolved — alertId: {}, type: {}, relatedEntityId: {}", a.getId(), alertType, relatedEntityId);
                 });
+    }
+
+    @Override
+    @Transactional
+    public ImportResult importUsers(MultipartFile file, Integer requestingUserId) {
+        log.info("importUsers — started — requestingUserId: {}, filename: {}", requestingUserId, file.getOriginalFilename());
+
+        List<String[]> licenseeRows = new ArrayList<>();
+        List<String[]> associateRows = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
+        int totalRows = 0;
+
+        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+            Sheet sheet = workbook.getSheetAt(0);
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) continue;
+
+                String role = cellString(row.getCell(0));
+                if (role == null || role.isBlank()) continue;
+
+                totalRows++;
+                String[] data = new String[]{
+                        role.trim().toUpperCase(),
+                        cellString(row.getCell(1)),  // firstName
+                        cellString(row.getCell(2)),  // lastName
+                        cellString(row.getCell(3)),  // email
+                        cellPhone(row.getCell(4)),   // phone (may be numeric in Excel)
+                        cellString(row.getCell(5)),  // cities
+                        cellString(row.getCell(6)),  // primaryCity
+                        cellString(row.getCell(7))   // licenseeEmail
+                };
+
+                if ("LICENSEE".equals(data[0])) licenseeRows.add(data);
+                else if ("ASSOCIATE".equals(data[0])) associateRows.add(data);
+                else errors.add("Row " + (i + 1) + ": unknown role '" + data[0] + "' — skipped");
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to read Excel file: " + e.getMessage());
+        }
+
+        int imported = 0;
+        int skipped = 0;
+
+        // email → userId map for licensees created in this batch (to resolve associate references)
+        Map<String, Integer> importedLicenseeIds = new HashMap<>();
+
+        for (String[] row : licenseeRows) {
+            String email = row[3] != null ? row[3].trim().toLowerCase() : null;
+            if (email == null || email.isBlank()) {
+                errors.add("Licensee '" + row[1] + " " + row[2] + "': missing email — skipped");
+                skipped++;
+                continue;
+            }
+            if (userRepository.findByEmail(email).isPresent()) {
+                log.warn("importUsers — DUPLICATE licensee skipped (email exists): {}", email);
+                // still register the ID so associates in this file can link to existing licensees
+                userRepository.findByEmail(email).ifPresent(u -> importedLicenseeIds.put(email, u.getId()));
+                skipped++;
+                continue;
+            }
+
+            String phone = row[4];
+            if (phone != null && userRepository.findByPhone(phone).isPresent()) {
+                errors.add("Licensee '" + email + "': phone " + phone + " already exists — skipped");
+                skipped++;
+                continue;
+            }
+
+            String citiesRaw = row[5];
+            String primaryCity = row[6] != null ? row[6].trim() : null;
+            List<String> cityNames = (citiesRaw != null && !citiesRaw.isBlank())
+                    ? Arrays.stream(citiesRaw.split(",")).map(String::trim).filter(c -> !c.isBlank()).toList()
+                    : List.of();
+
+            if (cityNames.isEmpty()) {
+                errors.add("Licensee '" + email + "': missing cities — skipped");
+                skipped++;
+                continue;
+            }
+
+            if (primaryCity == null || primaryCity.isBlank()) {
+                if (cityNames.size() == 1) {
+                    primaryCity = cityNames.get(0);
+                    log.info("importUsers — single city defaulted as primary for licensee: {} — city: {}", email, primaryCity);
+                } else {
+                    errors.add("Licensee '" + email + "': multiple cities but no primaryCity specified — skipped");
+                    skipped++;
+                    continue;
+                }
+            }
+
+            String tempPassword = "Temp-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+            String invitationToken = UUID.randomUUID().toString();
+
+            User user = User.builder()
+                    .firstName(row[1] != null ? row[1].trim() : "")
+                    .lastName(row[2] != null ? row[2].trim() : "")
+                    .email(email)
+                    .phone(phone)
+                    .password(passwordEncoder.encode(tempPassword))
+                    .role(UserRole.LICENSEE)
+                    .status(UserStatus.PENDING)
+                    .invitationToken(invitationToken)
+                    .build();
+            user = userRepository.save(user);
+            final Integer userId = user.getId();
+
+            final String finalPrimary = primaryCity;
+            List<LicenseeCity> cities = cityNames.stream()
+                    .map(c -> LicenseeCity.builder()
+                            .licenseeId(userId)
+                            .city(c)
+                            .isPrimary(c.equalsIgnoreCase(finalPrimary))
+                            .build())
+                    .toList();
+            licenseeCityRepository.saveAll(cities);
+
+            importedLicenseeIds.put(email, userId);
+
+            log.info("importUsers — licensee imported — id: {}, email: {}", userId, email);
+            imported++;
+        }
+
+        for (String[] row : associateRows) {
+            String email = row[3] != null ? row[3].trim().toLowerCase() : null;
+            if (email == null || email.isBlank()) {
+                errors.add("Associate '" + row[1] + " " + row[2] + "': missing email — skipped");
+                skipped++;
+                continue;
+            }
+            if (userRepository.findByEmail(email).isPresent()) {
+                log.warn("importUsers — DUPLICATE associate skipped (email exists): {}", email);
+                skipped++;
+                continue;
+            }
+
+            String phone = row[4];
+            if (phone != null && userRepository.findByPhone(phone).isPresent()) {
+                errors.add("Associate '" + email + "': phone " + phone + " already exists — skipped");
+                skipped++;
+                continue;
+            }
+
+            String licenseeEmail = row[7] != null ? row[7].trim().toLowerCase() : null;
+            if (licenseeEmail == null || licenseeEmail.isBlank()) {
+                errors.add("Associate '" + email + "': missing licenseeEmail — skipped");
+                skipped++;
+                continue;
+            }
+
+            Integer licenseeId = importedLicenseeIds.get(licenseeEmail);
+            if (licenseeId == null) {
+                licenseeId = userRepository.findByEmail(licenseeEmail)
+                        .filter(u -> u.getRole() == UserRole.LICENSEE)
+                        .map(User::getId)
+                        .orElse(null);
+            }
+            if (licenseeId == null) {
+                errors.add("Associate '" + email + "': licensee '" + licenseeEmail + "' not found — skipped");
+                skipped++;
+                continue;
+            }
+
+            String tempPassword = "Temp-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+            String invitationToken = UUID.randomUUID().toString();
+
+            User associate = User.builder()
+                    .firstName(row[1] != null ? row[1].trim() : "")
+                    .lastName(row[2] != null ? row[2].trim() : "")
+                    .email(email)
+                    .phone(phone)
+                    .password(passwordEncoder.encode(tempPassword))
+                    .role(UserRole.ASSOCIATE)
+                    .status(UserStatus.PENDING)
+                    .invitationToken(invitationToken)
+                    .licenseeId(licenseeId)
+                    .build();
+            associate = userRepository.save(associate);
+
+            log.info("importUsers — associate imported — id: {}, email: {}, licenseeId: {}", associate.getId(), email, licenseeId);
+            imported++;
+        }
+
+        log.info("importUsers — complete — total: {}, imported: {}, skipped: {}, errors: {}", totalRows, imported, skipped, errors.size());
+
+        return ImportResult.builder()
+                .totalRows(totalRows)
+                .imported(imported)
+                .skipped(skipped)
+                .errors(errors)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ImportResult sendInvites(List<Integer> userIds, Integer requestingUserId) {
+        log.info("sendInvites — requestingUserId: {}, userIds: {}", requestingUserId, userIds);
+
+        List<String> errors = new ArrayList<>();
+        int sent = 0;
+        int skipped = 0;
+
+        for (Integer userId : userIds) {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) {
+                errors.add("User id " + userId + ": not found — skipped");
+                skipped++;
+                continue;
+            }
+            if (user.getStatus() != UserStatus.PENDING) {
+                errors.add("User id " + userId + " (" + user.getEmail() + "): status is " + user.getStatus() + ", expected PENDING — skipped");
+                skipped++;
+                continue;
+            }
+
+            dispatchInvite(user);
+            sent++;
+        }
+
+        log.info("sendInvites — complete — sent: {}, skipped: {}", sent, skipped);
+        return ImportResult.builder()
+                .totalRows(userIds.size())
+                .imported(sent)
+                .skipped(skipped)
+                .errors(errors)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ImportResult sendInvitesAll(Integer requestingUserId) {
+        List<User> pending = userRepository.findByInviteEmailSentFalseAndStatus(UserStatus.PENDING);
+        log.info("sendInvitesAll — requestingUserId: {}, eligible users: {}", requestingUserId, pending.size());
+
+        for (User user : pending) {
+            dispatchInvite(user);
+        }
+
+        log.info("sendInvitesAll — complete — sent: {}", pending.size());
+        return ImportResult.builder()
+                .totalRows(pending.size())
+                .imported(pending.size())
+                .skipped(0)
+                .errors(List.of())
+                .build();
+    }
+
+    private void dispatchInvite(User user) {
+        String tempPassword = "Temp-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        String invitationToken = UUID.randomUUID().toString();
+
+        user.setPassword(passwordEncoder.encode(tempPassword));
+        user.setInvitationToken(invitationToken);
+        user.setInviteEmailSent(true);
+        userRepository.save(user);
+
+        final String email = user.getEmail();
+        final String inviteLink = frontendUrl + "/setup-account?token=" + invitationToken;
+        eventPublisher.publishEvent(new NotificationEvent(this, "Invite email — userId: " + user.getId(),
+                ns -> ns.sendInviteEmail(email, inviteLink, tempPassword)));
+
+        log.info("dispatchInvite — sent — userId: {}, email: {}", user.getId(), email);
+    }
+
+    private String cellString(Cell cell) {
+        if (cell == null) return null;
+        return switch (cell.getCellType()) {
+            case STRING -> cell.getStringCellValue();
+            case NUMERIC -> String.valueOf((long) cell.getNumericCellValue());
+            case BLANK -> null;
+            default -> null;
+        };
+    }
+
+    private String cellPhone(Cell cell) {
+        if (cell == null) return null;
+        if (cell.getCellType() == CellType.NUMERIC) {
+            long val = (long) cell.getNumericCellValue();
+            return String.valueOf(val);
+        }
+        String raw = cellString(cell);
+        return raw != null ? raw.trim() : null;
     }
 }

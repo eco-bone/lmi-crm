@@ -166,14 +166,14 @@ public class AlertServiceImpl implements AlertService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
-        List<Object[]> rows = alertRepository.countByAlertType();
+        List<Object[]> rows = alertRepository.countByAlertTypeGroupedForStatus(AlertStatus.PENDING);
         Map<AlertType, Long> byType = Arrays.stream(AlertType.values())
                 .collect(Collectors.toMap(t -> t, t -> 0L));
         rows.forEach(row -> byType.put((AlertType) row[0], (Long) row[1]));
 
         long total = byType.values().stream().mapToLong(Long::longValue).sum();
 
-        log.info("getAlertSummary — requestingUserId: {}, total: {}", requestingUserId, total);
+        log.info("getAlertSummary — requestingUserId: {}, pendingTotal: {}", requestingUserId, total);
 
         return new AlertSummaryResponse(total, byType);
     }

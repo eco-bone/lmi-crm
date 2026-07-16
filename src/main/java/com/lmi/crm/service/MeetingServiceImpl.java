@@ -52,7 +52,7 @@ public class MeetingServiceImpl implements MeetingService {
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        if (requestingUser.getRole() != UserRole.LICENSEE && requestingUser.getRole() != UserRole.ASSOCIATE) {
+        if (!requestingUser.getRole().isLicenseeTier() && requestingUser.getRole() != UserRole.ASSOCIATE) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
@@ -62,7 +62,7 @@ public class MeetingServiceImpl implements MeetingService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Prospect not found");
         }
 
-        if (requestingUser.getRole() == UserRole.LICENSEE) {
+        if (requestingUser.getRole().isLicenseeTier()) {
             if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospect.getId(), requestingUserId)) {
                 log.warn("Access denied — licensee {} not linked to prospect {}", requestingUserId, prospect.getId());
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
@@ -239,7 +239,7 @@ public class MeetingServiceImpl implements MeetingService {
                 log.warn("Access denied — associate {} does not own prospect {}", userId, prospectId);
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
-        } else if (role == UserRole.LICENSEE) {
+        } else if (role.isLicenseeTier()) {
             if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, userId)) {
                 log.warn("Access denied — licensee {} not linked to prospect {}", userId, prospectId);
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");

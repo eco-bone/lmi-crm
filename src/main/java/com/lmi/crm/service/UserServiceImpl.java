@@ -179,7 +179,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.findById(request.getLicenseeId())
-                .filter(u -> u.getRole() == UserRole.LICENSEE)
+                .filter(u -> u.getRole().isLicenseeTier())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Licensee not found with id: " + request.getLicenseeId()));
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -266,7 +266,7 @@ public class UserServiceImpl implements UserService {
 
         User licensee = userRepository.findById(requestingLicenseeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + requestingLicenseeId));
-        if (licensee.getRole() != UserRole.LICENSEE) {
+        if (!licensee.getRole().isLicenseeTier()) {
             log.warn("requestAssociateCreation — rejected — userId: {} is not LICENSEE (role: {})", requestingLicenseeId, licensee.getRole());
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only a Licensee can request associate creation");
         }
@@ -395,7 +395,7 @@ public class UserServiceImpl implements UserService {
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + requestingUserId));
 
-        boolean isLicensee = requestingUser.getRole() == UserRole.LICENSEE;
+        boolean isLicensee = requestingUser.getRole().isLicenseeTier();
         boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
 
         // Full scoped list (no role/status filters) — used for summary counts
@@ -473,7 +473,7 @@ public class UserServiceImpl implements UserService {
 
     private UserResponse mapUserWithCities(User user) {
         UserResponse response = userMapper.toResponse(user);
-        if (user.getRole() == UserRole.LICENSEE) {
+        if (user.getRole().isLicenseeTier()) {
             List<LicenseeCity> cities = licenseeCityRepository.findByLicenseeId(user.getId());
             response.setCities(cities.stream().map(c -> {
                 LicenseeResponse.CityInfo info = new LicenseeResponse.CityInfo();
@@ -500,7 +500,7 @@ public class UserServiceImpl implements UserService {
 
         if (!isSelf) {
             switch (requestingUser.getRole()) {
-                case LICENSEE:
+                case LICENSEE, MASTER_LICENSEE:
                     if (!requestingUserId.equals(targetUser.getLicenseeId())) {
                         log.warn("getUserDetail — access denied — licenseeId: {} tried to view userId: {} (licenseeId: {})", requestingUserId, targetUserId, targetUser.getLicenseeId());
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
@@ -517,7 +517,7 @@ public class UserServiceImpl implements UserService {
 
         UserResponse response = userMapper.toResponse(targetUser);
 
-        if (targetUser.getRole() == UserRole.LICENSEE) {
+        if (targetUser.getRole().isLicenseeTier()) {
             List<LicenseeCity> cities = licenseeCityRepository.findByLicenseeId(targetUser.getId());
             response.setCities(cities.stream().map(c -> {
                 LicenseeResponse.CityInfo info = new LicenseeResponse.CityInfo();
@@ -578,7 +578,7 @@ public class UserServiceImpl implements UserService {
                 if (originalRole != UserRole.ASSOCIATE)
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admin can only change role of Associates");
             } else if (requesterRole == UserRole.SUPER_ADMIN) {
-                if (originalRole == UserRole.LICENSEE)
+                if (originalRole.isLicenseeTier())
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Licensee role cannot be changed");
             }
 
@@ -601,8 +601,8 @@ public class UserServiceImpl implements UserService {
 
         User savedUser = userRepository.save(targetUser);
 
-        // City operations — only relevant when original role is LICENSEE
-        if (originalRole == UserRole.LICENSEE && request.getCities() != null) {
+        // City operations — only relevant when original role is LICENSEE (or MASTER_LICENSEE)
+        if (originalRole.isLicenseeTier() && request.getCities() != null) {
             List<LicenseeCity> existingCities = licenseeCityRepository.findByLicenseeId(targetUserId);
 
             for (UpdateCityRequest cityReq : request.getCities()) {
@@ -630,7 +630,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // Primary city change — ADMIN or SUPER_ADMIN only
-        if (originalRole == UserRole.LICENSEE && isAdmin && request.getNewPrimaryCity() != null) {
+        if (originalRole.isLicenseeTier() && isAdmin && request.getNewPrimaryCity() != null) {
             List<LicenseeCity> allCities = licenseeCityRepository.findByLicenseeId(targetUserId);
             LicenseeCity currentPrimary = allCities.stream()
                     .filter(c -> Boolean.TRUE.equals(c.getIsPrimary()))
@@ -751,7 +751,7 @@ public class UserServiceImpl implements UserService {
                 targetUser.setStatus(UserStatus.INACTIVE);
                 resolveAlertIfPresent(AlertType.ASSOCIATE_DEACTIVATION_REQUEST, targetUserId);
             }
-            case LICENSEE -> {
+            case LICENSEE, MASTER_LICENSEE -> {
                 targetUser.setStatus(UserStatus.INACTIVE);
                 List<User> associates = userRepository.findAssociatesByLicensee(targetUserId, UserRole.ASSOCIATE, null);
                 List<ProspectLicensee> links = prospectLicenseeRepository.findByLicenseeId(targetUserId);
@@ -771,7 +771,7 @@ public class UserServiceImpl implements UserService {
 
         AuditActionType deactivateAction = switch (targetRole) {
             case ASSOCIATE -> AuditActionType.ASSOCIATE_DEACTIVATED;
-            case LICENSEE -> AuditActionType.LICENSEE_DEACTIVATED;
+            case LICENSEE, MASTER_LICENSEE -> AuditActionType.LICENSEE_DEACTIVATED;
             default -> AuditActionType.ADMIN_DEACTIVATED;
         };
         auditService.log(deactivateAction, RelatedEntityType.USER, targetUserId,
@@ -872,7 +872,7 @@ public class UserServiceImpl implements UserService {
 
         User requestingUser = userRepository.findById(requestingLicenseeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + requestingLicenseeId));
-        if (requestingUser.getRole() != UserRole.LICENSEE) {
+        if (!requestingUser.getRole().isLicenseeTier()) {
             log.warn("requestAssociateDeactivation — access denied — userId: {}, role: {}", requestingLicenseeId, requestingUser.getRole());
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
@@ -975,7 +975,7 @@ public class UserServiceImpl implements UserService {
             Integer licenseeId;
             if (requestingUser.getRole() == UserRole.ASSOCIATE) {
                 licenseeId = requestingUser.getLicenseeId();
-            } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+            } else if (requestingUser.getRole().isLicenseeTier()) {
                 licenseeId = requestingUserId;
             } else {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
@@ -1202,7 +1202,7 @@ public class UserServiceImpl implements UserService {
             Integer licenseeId = importedLicenseeIds.get(licenseeEmail);
             if (licenseeId == null) {
                 licenseeId = userRepository.findByEmail(licenseeEmail)
-                        .filter(u -> u.getRole() == UserRole.LICENSEE)
+                        .filter(u -> u.getRole().isLicenseeTier())
                         .map(User::getId)
                         .orElse(null);
             }

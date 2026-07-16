@@ -5,5 +5,11 @@ public enum UserRole {
     LICENSEE,
     ASSOCIATE,
     MASTER_LICENSEE,
-    SUPER_ADMIN
+    SUPER_ADMIN;
+
+    public boolean isLicenseeTier() {
+        return this == LICENSEE || this == MASTER_LICENSEE;
+    }
 }
+
+

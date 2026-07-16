@@ -25,7 +25,7 @@ public class GroupController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('MASTER_LICENSEE') or hasRole('ASSOCIATE') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<GroupResponse>> addGroup(
             @Valid @RequestBody AddGroupRequest request) {
         Integer requestingUserId = null;
@@ -105,7 +105,7 @@ public class GroupController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('MASTER_LICENSEE') or hasRole('ASSOCIATE') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<GroupResponse>> updateGroup(
             @PathVariable Integer id,
             @Valid @RequestBody UpdateGroupRequest request) {
@@ -124,7 +124,7 @@ public class GroupController {
     }
 
     @PostMapping("/{id}/deletion-request")
-    @PreAuthorize("hasRole('LICENSEE')")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('MASTER_LICENSEE')")
     public ResponseEntity<ApiResponse<String>> requestGroupDeletion(@PathVariable Integer id) {
         Integer requestingUserId = null;
         try {

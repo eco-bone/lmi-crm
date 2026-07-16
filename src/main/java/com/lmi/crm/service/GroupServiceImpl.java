@@ -95,7 +95,7 @@ public class GroupServiceImpl implements GroupService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
-        if (!isAdmin && requestingUser.getRole() != UserRole.LICENSEE && requestingUser.getRole() != UserRole.ASSOCIATE) {
+        if (!isAdmin && !requestingUser.getRole().isLicenseeTier() && requestingUser.getRole() != UserRole.ASSOCIATE) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
@@ -106,11 +106,11 @@ public class GroupServiceImpl implements GroupService {
             }
             User licensee = userRepository.findById(request.getLicenseeId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Licensee not found"));
-            if (licensee.getRole() != UserRole.LICENSEE) {
+            if (!licensee.getRole().isLicenseeTier()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target user is not a licensee");
             }
             effectiveLicenseeId = request.getLicenseeId();
-        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+        } else if (requestingUser.getRole().isLicenseeTier()) {
             effectiveLicenseeId = requestingUserId;
         } else {
             effectiveLicenseeId = requestingUser.getLicenseeId();
@@ -123,7 +123,7 @@ public class GroupServiceImpl implements GroupService {
         if (request.getFacilitatorId() != null) {
             User facilitator = userRepository.findById(request.getFacilitatorId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facilitator not found"));
-            if (facilitator.getRole() != UserRole.LICENSEE && facilitator.getRole() != UserRole.ASSOCIATE) {
+            if (!facilitator.getRole().isLicenseeTier() && facilitator.getRole() != UserRole.ASSOCIATE) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Facilitator must be a Licensee or Associate");
             }
             effectiveFacilitatorId = request.getFacilitatorId();
@@ -180,7 +180,7 @@ public class GroupServiceImpl implements GroupService {
         if (requestingUser.getRole() == UserRole.ASSOCIATE) {
             Integer parentLicenseeId = requestingUser.getLicenseeId();
             groups = groupRepository.findByLicenseeIdAndDeletionStatusFalse(parentLicenseeId);
-        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+        } else if (requestingUser.getRole().isLicenseeTier()) {
             groups = groupRepository.findByLicenseeIdAndDeletionStatusFalse(requestingUserId);
         } else if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {
             if (licenseeIdFilter != null) {
@@ -254,7 +254,7 @@ public class GroupServiceImpl implements GroupService {
             if (!group.getLicenseeId().equals(requestingUser.getLicenseeId())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
-        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+        } else if (requestingUser.getRole().isLicenseeTier()) {
             if (!group.getLicenseeId().equals(requestingUserId)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
@@ -280,7 +280,7 @@ public class GroupServiceImpl implements GroupService {
             if (!group.getLicenseeId().equals(requestingUser.getLicenseeId())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
-        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+        } else if (requestingUser.getRole().isLicenseeTier()) {
             if (!group.getLicenseeId().equals(requestingUserId)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
@@ -297,12 +297,12 @@ public class GroupServiceImpl implements GroupService {
         if (request.getPpmTfeDateSent() != null) group.setPpmTfeDateSent(request.getPpmTfeDateSent());
 
         if (request.getFacilitatorId() != null &&
-                (requestingUser.getRole() == UserRole.LICENSEE ||
+                (requestingUser.getRole().isLicenseeTier() ||
                  requestingUser.getRole() == UserRole.ADMIN ||
                  requestingUser.getRole() == UserRole.SUPER_ADMIN)) {
             User facilitator = userRepository.findById(request.getFacilitatorId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facilitator not found"));
-            if (facilitator.getRole() != UserRole.LICENSEE && facilitator.getRole() != UserRole.ASSOCIATE) {
+            if (!facilitator.getRole().isLicenseeTier() && facilitator.getRole() != UserRole.ASSOCIATE) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Facilitator must be a Licensee or Associate");
             }
             group.setFacilitatorId(request.getFacilitatorId());
@@ -312,7 +312,7 @@ public class GroupServiceImpl implements GroupService {
                 (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN)) {
             User newLicensee = userRepository.findById(request.getLicenseeId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Licensee not found"));
-            if (newLicensee.getRole() != UserRole.LICENSEE) {
+            if (!newLicensee.getRole().isLicenseeTier()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target user is not a licensee");
             }
             group.setLicenseeId(request.getLicenseeId());
@@ -384,7 +384,7 @@ public class GroupServiceImpl implements GroupService {
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        if (requestingUser.getRole() != UserRole.LICENSEE) {
+        if (!requestingUser.getRole().isLicenseeTier()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
@@ -539,7 +539,7 @@ public class GroupServiceImpl implements GroupService {
             groups = groupRepository.findByDeletionStatusFalse();
         } else if (requestingUser.getRole() == UserRole.ASSOCIATE) {
             groups = groupRepository.findByLicenseeIdAndDeletionStatusFalse(requestingUser.getLicenseeId());
-        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+        } else if (requestingUser.getRole().isLicenseeTier()) {
             groups = groupRepository.findByLicenseeIdAndDeletionStatusFalse(requestingUserId);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");

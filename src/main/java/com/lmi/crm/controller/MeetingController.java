@@ -24,7 +24,7 @@ public class MeetingController {
     private MeetingService meetingService;
 
     @PostMapping
-    @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE')")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('MASTER_LICENSEE') or hasRole('ASSOCIATE')")
     public ResponseEntity<ApiResponse<MeetingResponse>> addMeeting(@Valid @RequestBody AddMeetingRequest request) {
         Integer requestingUserId = null;
         try {
@@ -75,7 +75,7 @@ public class MeetingController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('MASTER_LICENSEE') or hasRole('ASSOCIATE') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<MeetingResponse>> updateMeeting(
             @PathVariable Integer id,
             @Valid @RequestBody UpdateMeetingRequest request) {
@@ -94,7 +94,7 @@ public class MeetingController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('MASTER_LICENSEE') or hasRole('ASSOCIATE') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<String>> deleteMeeting(@PathVariable Integer id) {
         Integer requestingUserId = null;
         try {

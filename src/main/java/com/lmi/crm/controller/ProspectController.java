@@ -97,7 +97,7 @@ public class ProspectController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE')")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('MASTER_LICENSEE') or hasRole('ASSOCIATE')")
     public ResponseEntity<ApiResponse<ProspectResponse>> addProspect(
             @Valid @RequestBody AddProspectRequest request) {
         Integer requestingUserId = null;
@@ -140,7 +140,7 @@ public class ProspectController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('LICENSEE') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('MASTER_LICENSEE') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<ProspectResponse>> updateProspect(
             @PathVariable Integer id,
             @Valid @RequestBody UpdateProspectRequest request) {
@@ -176,7 +176,7 @@ public class ProspectController {
     }
 
     @PostMapping("/{id}/convert")
-    @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE')")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('MASTER_LICENSEE') or hasRole('ASSOCIATE')")
     public ResponseEntity<ApiResponse<String>> requestConversion(@PathVariable Integer id) {
         Integer requestingUserId = null;
         try {
@@ -248,7 +248,7 @@ public class ProspectController {
     }
 
     @PostMapping("/{id}/extension-request")
-    @PreAuthorize("hasRole('LICENSEE') or hasRole('ASSOCIATE')")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('MASTER_LICENSEE') or hasRole('ASSOCIATE')")
     public ResponseEntity<ApiResponse<String>> requestProtectionExtension(
             @PathVariable Integer id) {
         Integer requestingUserId = null;

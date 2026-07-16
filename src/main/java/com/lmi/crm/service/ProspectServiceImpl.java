@@ -90,14 +90,14 @@ public class ProspectServiceImpl implements ProspectService {
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        if (requestingUser.getRole() != UserRole.LICENSEE && requestingUser.getRole() != UserRole.ASSOCIATE) {
+        if (!requestingUser.getRole().isLicenseeTier() && requestingUser.getRole() != UserRole.ASSOCIATE) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         Integer effectiveLicenseeId;
         Integer associateId;
 
-        if (requestingUser.getRole() == UserRole.LICENSEE) {
+        if (requestingUser.getRole().isLicenseeTier()) {
             effectiveLicenseeId = requestingUserId;
             associateId = request.getAssociateId();
             if (associateId != null) {
@@ -228,12 +228,12 @@ public class ProspectServiceImpl implements ProspectService {
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        if (requestingUser.getRole() != UserRole.LICENSEE && requestingUser.getRole() != UserRole.ASSOCIATE) {
+        if (!requestingUser.getRole().isLicenseeTier() && requestingUser.getRole() != UserRole.ASSOCIATE) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         boolean isOwner;
-        if (requestingUser.getRole() == UserRole.LICENSEE) {
+        if (requestingUser.getRole().isLicenseeTier()) {
             isOwner = prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, requestingUserId);
         } else {
             isOwner = prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, requestingUser.getLicenseeId());
@@ -295,7 +295,7 @@ public class ProspectServiceImpl implements ProspectService {
                 prospects = prospects.stream().filter(p -> p.getType() == typeFilter).toList();
             }
 
-        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+        } else if (requestingUser.getRole().isLicenseeTier()) {
             List<Integer> prospectIds = prospectLicenseeRepository.findByLicenseeId(requestingUserId)
                     .stream().map(ProspectLicensee::getProspectId).toList();
             prospects = prospectRepository.findByIdInAndDeletionStatusFalse(prospectIds);
@@ -396,7 +396,7 @@ public class ProspectServiceImpl implements ProspectService {
 
         if (requestingUser.getRole() == UserRole.ASSOCIATE) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied: Associates cannot update prospects");
-        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+        } else if (requestingUser.getRole().isLicenseeTier()) {
             if (!prospectLicenseeRepository.existsByProspectIdAndLicenseeId(prospectId, requestingUserId)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
@@ -425,7 +425,7 @@ public class ProspectServiceImpl implements ProspectService {
                 && (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN)) {
             User newLicensee = userRepository.findById(request.getNewLicenseeId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-            if (newLicensee.getRole() != UserRole.LICENSEE) {
+            if (!newLicensee.getRole().isLicenseeTier()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target user is not a licensee");
             }
             ProspectLicensee existing = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospectId)
@@ -440,7 +440,7 @@ public class ProspectServiceImpl implements ProspectService {
 
         if (request.getNewAssociateId() != null) {
             boolean isAdmin = requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN;
-            boolean isLicensee = requestingUser.getRole() == UserRole.LICENSEE;
+            boolean isLicensee = requestingUser.getRole().isLicenseeTier();
             if (!isAdmin && !isLicensee) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
             }
@@ -552,7 +552,7 @@ public class ProspectServiceImpl implements ProspectService {
         User requestingUser = userRepository.findById(requestingUserId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        if (requestingUser.getRole() != UserRole.ASSOCIATE && requestingUser.getRole() != UserRole.LICENSEE) {
+        if (requestingUser.getRole() != UserRole.ASSOCIATE && !requestingUser.getRole().isLicenseeTier()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
@@ -736,7 +736,7 @@ public class ProspectServiceImpl implements ProspectService {
             prospects = prospectRepository.searchAll(keyword);
         } else if (requestingUser.getRole() == UserRole.ASSOCIATE) {
             prospects = prospectRepository.searchByAssociateId(keyword, requestingUserId);
-        } else if (requestingUser.getRole() == UserRole.LICENSEE) {
+        } else if (requestingUser.getRole().isLicenseeTier()) {
             List<Integer> ids = prospectLicenseeRepository.findByLicenseeId(requestingUserId)
                     .stream().map(ProspectLicensee::getProspectId).toList();
             prospects = ids.isEmpty() ? List.of() : prospectRepository.searchByIds(keyword, ids);

@@ -155,7 +155,7 @@ public class UserController {
     }
 
     @PostMapping("/licensees/associates/request")
-    @PreAuthorize("hasRole('LICENSEE')")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('MASTER_LICENSEE')")
     public ResponseEntity<String> requestAssociateCreation(
             @Valid @RequestBody RequestAssociateCreationRequest request) {
         Integer requestingUserId = null;
@@ -219,7 +219,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN') or hasRole('LICENSEE')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN') or hasRole('LICENSEE') or hasRole('MASTER_LICENSEE')")
     public ResponseEntity<ApiResponse<?>> getUsers(
             @RequestParam(defaultValue = "false") boolean getAll,
             @RequestParam(required = false) UserRole role,
@@ -301,7 +301,7 @@ public class UserController {
     }
 
     @PostMapping("/users/associates/{id}/deactivation-request")
-    @PreAuthorize("hasRole('LICENSEE')")
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('MASTER_LICENSEE')")
     public ResponseEntity<String> requestAssociateDeactivation(@PathVariable Integer id) {
         Integer requestingUserId = null;
         try {

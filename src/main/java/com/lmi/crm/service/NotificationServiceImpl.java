@@ -14,7 +14,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")
+    @Value("${app.mail.from}")
     private String fromEmail;
 
     @Override

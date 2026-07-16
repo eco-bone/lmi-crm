@@ -6,11 +6,13 @@ import com.lmi.crm.dto.request.RequestAssociateCreationRequest;
 import com.lmi.crm.dto.request.ResetPasswordRequest;
 import com.lmi.crm.dto.request.UpdateUserRequest;
 import com.lmi.crm.dto.response.ApiResponse;
+import com.lmi.crm.dto.response.ImportResult;
 import com.lmi.crm.dto.response.LicenseeResponse;
 import com.lmi.crm.dto.response.UserResponse;
 import com.lmi.crm.dto.response.UsersPageResponse;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.enums.UserStatus;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -43,4 +45,10 @@ public interface UserService {
     UsersPageResponse searchUsers(Integer requestingUserId, String q, String scope, UserRole role, int page, int limit);
 
     UsersPageResponse getLicenseesAndAssociates(Integer requestingUserId, List<UserRole> roles, Integer licenseeId);
+
+    ImportResult importUsers(MultipartFile file, Integer requestingUserId);
+
+    ImportResult sendInvites(List<Integer> userIds, Integer requestingUserId);
+
+    ImportResult sendInvitesAll(Integer requestingUserId);
 }

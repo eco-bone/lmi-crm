@@ -30,6 +30,9 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     @Value("${app.cors.allowed-origins:}")
     private String allowedOrigins;
 
@@ -64,12 +67,14 @@ public class SecurityConfig {
                                 "/api/auth/setup/verify-phone",
                                 "/api/auth/setup/otp",
                                 "/api/auth/setup/validate-token",
+                                // "/api/test/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

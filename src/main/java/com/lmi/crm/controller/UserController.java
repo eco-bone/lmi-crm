@@ -4,8 +4,10 @@ import com.lmi.crm.dto.request.AddAssociateRequest;
 import com.lmi.crm.dto.request.AddLicenseeRequest;
 import com.lmi.crm.dto.request.RequestAssociateCreationRequest;
 import com.lmi.crm.dto.request.ResetPasswordRequest;
+import com.lmi.crm.dto.request.SendInviteRequest;
 import com.lmi.crm.dto.request.UpdateUserRequest;
 import com.lmi.crm.dto.response.ApiResponse;
+import com.lmi.crm.dto.response.ImportResult;
 import com.lmi.crm.dto.response.LicenseeResponse;
 import com.lmi.crm.dto.response.UserResponse;
 import com.lmi.crm.dto.response.UsersPageResponse;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -30,6 +33,65 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @PostMapping("/admin/users/invite")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<ImportResult>> sendInvites(
+            @Valid @RequestBody SendInviteRequest request) {
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("POST /api/admin/users/invite — requestingUserId: {}, userIds: {}", requestingUserId, request.getUserIds());
+            ImportResult result = userService.sendInvites(request.getUserIds(), requestingUserId);
+            log.info("POST /api/admin/users/invite — sent: {}, skipped: {}", result.getImported(), result.getSkipped());
+            return ResponseEntity.ok(ApiResponse.success("Invites sent", result));
+        } catch (RuntimeException ex) {
+            log.error("POST /api/admin/users/invite — failed — requestingUserId: {} — {}", requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("POST /api/admin/users/invite — unexpected error — requestingUserId: {}", requestingUserId, ex);
+            throw ex;
+        }
+    }
+
+    @PostMapping("/admin/users/invite/all")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<ImportResult>> sendInvitesAll() {
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("POST /api/admin/users/invite/all — requestingUserId: {}", requestingUserId);
+            ImportResult result = userService.sendInvitesAll(requestingUserId);
+            log.info("POST /api/admin/users/invite/all — sent: {}", result.getImported());
+            return ResponseEntity.ok(ApiResponse.success("All pending invites sent", result));
+        } catch (RuntimeException ex) {
+            log.error("POST /api/admin/users/invite/all — failed — requestingUserId: {} — {}", requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("POST /api/admin/users/invite/all — unexpected error — requestingUserId: {}", requestingUserId, ex);
+            throw ex;
+        }
+    }
+
+    @PostMapping("/admin/import")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<ImportResult>> importUsers(
+            @RequestParam("file") MultipartFile file) {
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("POST /api/admin/import — requestingUserId: {}, filename: {}", requestingUserId, file.getOriginalFilename());
+            ImportResult result = userService.importUsers(file, requestingUserId);
+            log.info("POST /api/admin/import — complete — imported: {}, skipped: {}, errors: {}", result.getImported(), result.getSkipped(), result.getErrors().size());
+            return ResponseEntity.ok(ApiResponse.success("Import complete", result));
+        } catch (RuntimeException ex) {
+            log.error("POST /api/admin/import — failed — requestingUserId: {} — {}", requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("POST /api/admin/import — unexpected error — requestingUserId: {}", requestingUserId, ex);
+            throw ex;
+        }
     }
 
     @PostMapping("/admin/create")

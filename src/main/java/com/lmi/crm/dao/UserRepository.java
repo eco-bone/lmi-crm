@@ -52,4 +52,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     long countByLicenseeIdAndRole(Integer licenseeId, UserRole role);
 
     long countByLicenseeIdAndRoleAndStatus(Integer licenseeId, UserRole role, UserStatus status);
+
+    List<User> findByInviteEmailSentFalseAndStatus(UserStatus status);
 }

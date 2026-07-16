@@ -742,10 +742,14 @@ public class UserServiceImpl implements UserService {
             }
             case LICENSEE -> {
                 targetUser.setStatus(UserStatus.INACTIVE);
-                User mloUser = resolveMloUser();
-                List<User> reassignedAssociates = reassignAssociatesToMlo(targetUserId, mloUser);
-                List<Prospect> reassignedRecords = reassignProspectsAndClientsToMlo(targetUserId, mloUser);
-                notifyMloReassignment(targetUser, mloUser, reassignedAssociates, reassignedRecords);
+                List<User> associates = userRepository.findAssociatesByLicensee(targetUserId, UserRole.ASSOCIATE, null);
+                List<ProspectLicensee> links = prospectLicenseeRepository.findByLicenseeId(targetUserId);
+                if (!associates.isEmpty() || !links.isEmpty()) {
+                    User mloUser = resolveMloUser();
+                    List<User> reassignedAssociates = reassignAssociatesToMlo(targetUserId, associates, mloUser);
+                    List<Prospect> reassignedRecords = reassignProspectsAndClientsToMlo(targetUserId, links, mloUser);
+                    notifyMloReassignment(targetUser, mloUser, reassignedAssociates, reassignedRecords);
+                }
             }
             default -> targetUser.setStatus(UserStatus.INACTIVE);
         }
@@ -782,8 +786,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Configured MLO user not found with id: " + mloUserId));
     }
 
-    private List<User> reassignAssociatesToMlo(Integer deactivatedLicenseeId, User mloUser) {
-        List<User> associates = userRepository.findAssociatesByLicensee(deactivatedLicenseeId, UserRole.ASSOCIATE, null);
+    private List<User> reassignAssociatesToMlo(Integer deactivatedLicenseeId, List<User> associates, User mloUser) {
         associates.forEach(a -> a.setLicenseeId(mloUser.getId()));
         userRepository.saveAll(associates);
 
@@ -792,8 +795,7 @@ public class UserServiceImpl implements UserService {
         return associates;
     }
 
-    private List<Prospect> reassignProspectsAndClientsToMlo(Integer deactivatedLicenseeId, User mloUser) {
-        List<ProspectLicensee> links = prospectLicenseeRepository.findByLicenseeId(deactivatedLicenseeId);
+    private List<Prospect> reassignProspectsAndClientsToMlo(Integer deactivatedLicenseeId, List<ProspectLicensee> links, User mloUser) {
         links.forEach(l -> l.setLicenseeId(mloUser.getId()));
         prospectLicenseeRepository.saveAll(links);
 

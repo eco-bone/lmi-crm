@@ -242,7 +242,7 @@ public class UserServiceImpl implements UserService {
         String tempPassword = "Temp-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         User user = userMapper.forAdmin(request.getFirstName(), request.getLastName(),
-                request.getEmail(), request.getPhone(), tempPassword);
+                request.getEmail(), request.getPhone(), passwordEncoder.encode(tempPassword));
         String invitationToken = UUID.randomUUID().toString();
         user.setStatus(UserStatus.PENDING);
         user.setInvitationToken(invitationToken);

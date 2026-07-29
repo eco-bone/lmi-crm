@@ -41,3 +41,7 @@ application-secret.properties
 
 ### Local checklists ###
 PROD_READINESS.md
+
+### Logs ###
+logs/
+*.log

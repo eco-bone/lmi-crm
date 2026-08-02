@@ -18,14 +18,18 @@ import java.time.LocalDateTime;
 @Component
 public class ProspectMapper {
 
+    public Integer defaultProtectionPeriodMonths(ProspectProgramType programType) {
+        if (programType == ProspectProgramType.LI) {
+            return 12;
+        } else if (programType == ProspectProgramType.SI) {
+            return 6;
+        }
+        return null;
+    }
+
     public Prospect fromAddProspectRequest(AddProspectRequest request, Integer associateId,
                                            Integer requestingUserId, boolean isProvisional) {
-        Integer protectionPeriodMonths = null;
-        if (request.getProgramType() == ProspectProgramType.LI) {
-            protectionPeriodMonths = 12;
-        } else if (request.getProgramType() == ProspectProgramType.SI) {
-            protectionPeriodMonths = 6;
-        }
+        Integer protectionPeriodMonths = defaultProtectionPeriodMonths(request.getProgramType());
 
         return Prospect.builder()
                 .companyName(request.getCompanyName())

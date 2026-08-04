@@ -35,4 +35,7 @@ public interface AlertRepository extends JpaRepository<Alert, Integer> {
 
     @Query("SELECT a.alertType, COUNT(a) FROM Alert a GROUP BY a.alertType")
     List<Object[]> countByAlertType();
+
+    @Query("SELECT a.alertType, COUNT(a) FROM Alert a WHERE a.status = :status GROUP BY a.alertType")
+    List<Object[]> countByAlertTypeGroupedForStatus(AlertStatus status);
 }

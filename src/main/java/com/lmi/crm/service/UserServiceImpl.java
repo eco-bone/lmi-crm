@@ -407,10 +407,8 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
-        // Summary counts from full scoped list
+        // Global summary counts — intentionally role-agnostic (system-wide totals)
         long overallTotal = scopedUsers.size();
-        long activeCount = scopedUsers.stream().filter(u -> u.getStatus() == UserStatus.ACTIVE).count();
-        long inactiveCount = scopedUsers.stream().filter(u -> u.getStatus() == UserStatus.INACTIVE).count();
         Map<UserRole, Long> countByRole = Arrays.stream(UserRole.values())
                 .collect(Collectors.toMap(r -> r, r -> scopedUsers.stream().filter(u -> u.getRole() == r).count()));
 
@@ -433,10 +431,23 @@ public class UserServiceImpl implements UserService {
         final UserRole rf = roleFilter;
         final UserStatus es = effectiveStatus;
         final Integer lf = effectiveLicenseeId;
-        List<User> filteredUsers = scopedUsers.stream()
+
+        // activeCount/inactiveCount must respect the role and licensee filters:
+        // role=LICENSEE means "active licensees", not "active users of any role".
+        // Previously they were computed from the unfiltered list, so activating an
+        // ADMIN inflated the Licensees/Associates stat cards on the admin dashboard.
+        // The status filter is deliberately NOT applied here — on a default
+        // (ACTIVE-only) request it would make activeCount tautological and force
+        // inactiveCount to always be 0.
+        List<User> roleScopedUsers = scopedUsers.stream()
                 .filter(u -> rf == null || u.getRole() == rf)
-                .filter(u -> es == null || u.getStatus() == es)
                 .filter(u -> lf == null || lf.equals(u.getLicenseeId()))
+                .toList();
+        long activeCount = roleScopedUsers.stream().filter(u -> u.getStatus() == UserStatus.ACTIVE).count();
+        long inactiveCount = roleScopedUsers.stream().filter(u -> u.getStatus() == UserStatus.INACTIVE).count();
+
+        List<User> filteredUsers = roleScopedUsers.stream()
+                .filter(u -> es == null || u.getStatus() == es)
                 .toList();
 
         List<UserResponse> filteredResponses = filteredUsers.stream().map(this::mapUserWithCities).toList();

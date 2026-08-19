@@ -40,7 +40,6 @@ public class Prospect {
 
     private String designation;
 
-    @Column(unique = true)
     private String email;
 
     private String phone;

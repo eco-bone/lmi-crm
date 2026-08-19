@@ -4,18 +4,22 @@ import com.lmi.crm.dto.request.AddProspectRequest;
 import com.lmi.crm.dto.request.UpdateProspectRequest;
 import com.lmi.crm.dto.response.ApiResponse;
 import com.lmi.crm.dto.response.DuplicateCheckResponse;
+import com.lmi.crm.dto.response.ImportResult;
 import com.lmi.crm.dto.response.ProspectResponse;
 import com.lmi.crm.dto.response.ProspectsPageResponse;
 import com.lmi.crm.enums.ProspectStatus;
 import com.lmi.crm.enums.ProspectType;
 import com.lmi.crm.enums.ProvisionalDecision;
+import com.lmi.crm.service.ImportService;
 import com.lmi.crm.service.ProspectService;
 import com.lmi.crm.util.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,9 +29,11 @@ import java.util.List;
 public class ProspectController {
 
     private final ProspectService prospectService;
+    private final ImportService importService;
 
-    public ProspectController(ProspectService prospectService) {
+    public ProspectController(ProspectService prospectService, ImportService importService) {
         this.prospectService = prospectService;
+        this.importService = importService;
     }
 
     @GetMapping
@@ -118,6 +124,28 @@ public class ProspectController {
             throw ex;
         } catch (Exception ex) {
             log.error("POST /api/prospects — unexpected error — requestingUserId: {}, company: {}", requestingUserId, request.getCompanyName(), ex);
+            throw ex;
+        }
+    }
+
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('LICENSEE') or hasRole('MASTER_LICENSEE') or hasRole('ASSOCIATE')")
+    public ResponseEntity<ApiResponse<ImportResult>> importProspects(@RequestParam("file") MultipartFile file) {
+        Integer requestingUserId = null;
+        try {
+            requestingUserId = SecurityUtils.getCurrentUserId();
+            log.info("POST /api/prospects/import — requestingUserId: {}, filename: {}", requestingUserId, file.getOriginalFilename());
+            ImportResult result = importService.importProspects(file, requestingUserId);
+            log.info("POST /api/prospects/import — requestingUserId: {}, totalRows: {}, imported: {}, skipped: {}",
+                    requestingUserId, result.getTotalRows(), result.getImported(), result.getSkipped());
+            String message = String.format("Import complete: %d imported, %d skipped out of %d rows",
+                    result.getImported(), result.getSkipped(), result.getTotalRows());
+            return ResponseEntity.ok(ApiResponse.success(message, result));
+        } catch (RuntimeException ex) {
+            log.error("POST /api/prospects/import — failed — requestingUserId: {} — {}", requestingUserId, ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("POST /api/prospects/import — unexpected error — requestingUserId: {}", requestingUserId, ex);
             throw ex;
         }
     }

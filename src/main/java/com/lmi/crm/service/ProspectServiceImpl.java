@@ -404,6 +404,15 @@ public class ProspectServiceImpl implements ProspectService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
+        if (request.getEmail() != null && !request.getEmail().equalsIgnoreCase(prospect.getEmail())) {
+            prospectRepository.findByEmailIgnoreCaseAndDeletionStatusFalse(request.getEmail())
+                    .filter(p -> !p.getId().equals(prospectId))
+                    .ifPresent(p -> {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT,
+                            "A prospect with email '" + request.getEmail() + "' already exists in the system");
+                    });
+        }
+
         prospectMapper.updateFromRequest(request, prospect);
 
         if (requestingUser.getRole() == UserRole.ADMIN || requestingUser.getRole() == UserRole.SUPER_ADMIN) {

@@ -14,6 +14,7 @@ import com.lmi.crm.enums.ProspectType;
 import com.lmi.crm.enums.RelatedEntityType;
 import com.lmi.crm.enums.UserRole;
 import com.lmi.crm.enums.UserStatus;
+import com.lmi.crm.exception.RowImportException;
 import com.lmi.crm.mapper.ProspectMapper;
 import com.lmi.crm.util.ExcelUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +33,10 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -90,6 +93,7 @@ public class ImportServiceImpl implements ImportService {
         int totalRows = 0;
         int imported = 0;
         List<String> errors = new ArrayList<>();
+        Map<String, Integer> failuresByField = new LinkedHashMap<>();
 
         try (Workbook workbook = WorkbookFactory.create(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
@@ -119,6 +123,8 @@ public class ImportServiceImpl implements ImportService {
                     imported++;
                 } catch (Exception ex) {
                     errors.add("Row " + rowNumber + ": " + ex.getMessage());
+                    String field = ex instanceof RowImportException rie ? rie.getField() : "other";
+                    failuresByField.merge(field, 1, Integer::sum);
                 }
             }
         } catch (ResponseStatusException ex) {
@@ -130,6 +136,7 @@ public class ImportServiceImpl implements ImportService {
         }
 
         int skipped = totalRows - imported;
+        String summary = buildSummary(totalRows, imported, skipped, failuresByField);
 
         log.info("Excel import completed — requestingUserId: {}, totalRows: {}, imported: {}, skipped: {}",
                 requestingUserId, totalRows, imported, skipped);
@@ -142,7 +149,29 @@ public class ImportServiceImpl implements ImportService {
                 .imported(imported)
                 .skipped(skipped)
                 .errors(errors)
+                .summary(summary)
                 .build();
+    }
+
+    private String buildSummary(int totalRows, int imported, int skipped, Map<String, Integer> failuresByField) {
+        if (totalRows == 0) {
+            return "No data rows found in the file";
+        }
+        if (skipped == 0) {
+            return String.format("%d of %d rows imported successfully", imported, totalRows);
+        }
+
+        String breakdown = failuresByField.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .map(entry -> String.format("%s (%d row%s)", entry.getKey(), entry.getValue(), entry.getValue() == 1 ? "" : "s"))
+                .collect(Collectors.joining(", "));
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%d imported, %d skipped out of %d rows.", imported, skipped, totalRows));
+        if (!breakdown.isEmpty()) {
+            sb.append(String.format(" Issues found — %s. See row-by-row details below.", breakdown));
+        }
+        return sb.toString();
     }
 
     private void importRow(Row row, Map<String, Integer> headerIndex, Integer associateId,
@@ -158,10 +187,10 @@ public class ImportServiceImpl implements ImportService {
         String referredBy = ExcelUtil.getString(row, headerIndex, "referredBy");
 
         if (phone != null && !phone.matches("\\d{10}")) {
-            throw new IllegalArgumentException("phone must be exactly 10 digits: '" + phone + "'");
+            throw new RowImportException("phone", "phone must be exactly 10 digits (no spaces/dashes): '" + phone + "'");
         }
         if (email == null && phone == null) {
-            throw new IllegalArgumentException("At least one of email or phone is required");
+            throw new RowImportException("email/phone", "at least one of email or phone is required");
         }
 
         String classificationRaw = ExcelUtil.getString(row, headerIndex, "classificationType");
@@ -181,17 +210,17 @@ public class ImportServiceImpl implements ImportService {
 
         if (email != null) {
             prospectRepository.findByEmailIgnoreCaseAndDeletionStatusFalse(email).ifPresent(p -> {
-                throw new IllegalArgumentException("a prospect with email '" + email + "' already exists (id " + p.getId() + ")");
+                throw new RowImportException("email", "a prospect with email '" + email + "' already exists (id " + p.getId() + ")");
             });
         }
         if (phone != null) {
             prospectRepository.findByPhoneAndDeletionStatusFalse(phone).ifPresent(p -> {
-                throw new IllegalArgumentException("a prospect with phone '" + phone + "' already exists (id " + p.getId() + ")");
+                throw new RowImportException("phone", "a prospect with phone '" + phone + "' already exists (id " + p.getId() + ")");
             });
         }
         prospectRepository.findByContactFirstNameIgnoreCaseAndContactLastNameIgnoreCaseAndCompanyNameIgnoreCaseAndDeletionStatusFalse(
                 contactFirstName, contactLastName, companyName).ifPresent(p -> {
-                    throw new IllegalArgumentException("duplicate contact: " + contactFirstName + " " + contactLastName
+                    throw new RowImportException("contact", "duplicate contact: " + contactFirstName + " " + contactLastName
                             + " at " + companyName + " already exists (id " + p.getId() + ")");
                 });
 
@@ -202,7 +231,7 @@ public class ImportServiceImpl implements ImportService {
         LocalDate firstMeetingDate = ExcelUtil.getDate(row, headerIndex, "firstMeetingDate");
         LocalDate lastMeetingDate = ExcelUtil.getDate(row, headerIndex, "lastMeetingDate");
         if (firstMeetingDate != null && lastMeetingDate != null && lastMeetingDate.isBefore(firstMeetingDate)) {
-            throw new IllegalArgumentException("lastMeetingDate cannot be before firstMeetingDate");
+            throw new RowImportException("lastMeetingDate", "lastMeetingDate cannot be before firstMeetingDate");
         }
 
         Prospect prospect = Prospect.builder()
@@ -236,7 +265,7 @@ public class ImportServiceImpl implements ImportService {
 
     private String requireField(String value, String fieldName) {
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(fieldName + " is required");
+            throw new RowImportException(fieldName, fieldName + " is required");
         }
         return value;
     }
@@ -246,7 +275,7 @@ public class ImportServiceImpl implements ImportService {
             return Enum.valueOf(enumClass, value.trim().toUpperCase().replace(' ', '_'));
         } catch (IllegalArgumentException ex) {
             String allowed = String.join(", ", Arrays.stream(enumClass.getEnumConstants()).map(Enum::name).toList());
-            throw new IllegalArgumentException("invalid " + fieldName + " '" + value + "' — expected one of: " + allowed);
+            throw new RowImportException(fieldName, "invalid " + fieldName + " '" + value + "' — expected one of: " + allowed);
         }
     }
 }

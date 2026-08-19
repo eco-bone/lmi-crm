@@ -138,9 +138,7 @@ public class ProspectController {
             ImportResult result = importService.importProspects(file, requestingUserId);
             log.info("POST /api/prospects/import — requestingUserId: {}, totalRows: {}, imported: {}, skipped: {}",
                     requestingUserId, result.getTotalRows(), result.getImported(), result.getSkipped());
-            String message = String.format("Import complete: %d imported, %d skipped out of %d rows",
-                    result.getImported(), result.getSkipped(), result.getTotalRows());
-            return ResponseEntity.ok(ApiResponse.success(message, result));
+            return ResponseEntity.ok(ApiResponse.success(result.getSummary(), result));
         } catch (RuntimeException ex) {
             log.error("POST /api/prospects/import — failed — requestingUserId: {} — {}", requestingUserId, ex.getMessage(), ex);
             throw ex;

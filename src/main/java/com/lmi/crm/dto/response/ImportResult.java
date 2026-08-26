@@ -12,4 +12,5 @@ public class ImportResult {
     private int imported;
     private int skipped;
     private List<String> errors;
+    private String summary;
 }

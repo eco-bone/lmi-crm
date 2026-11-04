@@ -64,6 +64,7 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/setup/password",
                                 "/api/auth/setup/verify-email",
+                                "/api/auth/setup/resend-otp",
                                 "/api/auth/setup/verify-phone",
                                 "/api/auth/setup/otp",
                                 "/api/auth/setup/validate-token",

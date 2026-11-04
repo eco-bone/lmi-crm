@@ -2,6 +2,8 @@ package com.lmi.crm.auth;
 
 import com.lmi.crm.auth.dto.LoginRequest;
 import com.lmi.crm.auth.dto.LoginResponse;
+import com.lmi.crm.auth.dto.ResendOtpRequest;
+import com.lmi.crm.auth.dto.ResendOtpResponse;
 import com.lmi.crm.auth.dto.SetupPasswordRequest;
 import com.lmi.crm.auth.dto.TokenValidationResponse;
 import com.lmi.crm.auth.dto.VerifyOtpRequest;
@@ -69,6 +71,13 @@ public class AuthController {
             log.error("POST /api/auth/setup/verify-email — unexpected error — userId: {}", userId, ex);
             throw ex;
         }
+    }
+
+    @PostMapping("/setup/resend-otp")
+    public ResponseEntity<ApiResponse<ResendOtpResponse>> resendOtp(@Valid @RequestBody ResendOtpRequest request) {
+        log.info("POST /api/auth/setup/resend-otp");
+        ResendOtpResponse result = authService.resendEmailOtp(request);
+        return ResponseEntity.ok(ApiResponse.success(result.getMessage(), result));
     }
 
     @PostMapping("/setup/verify-phone")

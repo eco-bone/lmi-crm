@@ -44,7 +44,7 @@ class ResendEmailOtpTest {
     @Test
     void sendsNewOtpForPendingUserWhenNoRecentOtp() {
         User u = pendingUser();
-        when(userRepository.findByEmail("jain2604sunil@gmail.com")).thenReturn(Optional.of(u));
+        when(userRepository.findByEmailIgnoreCase("jain2604sunil@gmail.com")).thenReturn(Optional.of(u));
         when(userRepository.findById(35)).thenReturn(Optional.of(u));
         OtpStore expired = OtpStore.builder().userId(35).type(OtpType.EMAIL)
                 .createdAt(LocalDateTime.now().minusDays(1)).build();
@@ -64,7 +64,7 @@ class ResendEmailOtpTest {
     @Test
     void cooldownBlocksSecondRequest() {
         User u = pendingUser();
-        when(userRepository.findByEmail("jain2604sunil@gmail.com")).thenReturn(Optional.of(u));
+        when(userRepository.findByEmailIgnoreCase("jain2604sunil@gmail.com")).thenReturn(Optional.of(u));
         OtpStore fresh = OtpStore.builder().userId(35).type(OtpType.EMAIL)
                 .createdAt(LocalDateTime.now().minusSeconds(10)).build();
         when(otpStoreRepository.findByUserIdAndTypeAndVerifiedFalse(35, OtpType.EMAIL)).thenReturn(Optional.of(fresh));
@@ -78,7 +78,7 @@ class ResendEmailOtpTest {
 
     @Test
     void unknownEmailGetsGenericResponseAndNoOtp() {
-        when(userRepository.findByEmail("nobody@x.com")).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase("nobody@x.com")).thenReturn(Optional.empty());
         ResendOtpResponse r = authService.resendEmailOtp(new ResendOtpRequest("nobody@x.com"));
         assertNull(r.getUserId());
         assertNotNull(r.getMessage());
@@ -89,7 +89,7 @@ class ResendEmailOtpTest {
     void activeUserGetsGenericResponseAndNoOtp() {
         User u = pendingUser();
         u.setStatus(UserStatus.ACTIVE);
-        when(userRepository.findByEmail("jain2604sunil@gmail.com")).thenReturn(Optional.of(u));
+        when(userRepository.findByEmailIgnoreCase("jain2604sunil@gmail.com")).thenReturn(Optional.of(u));
         ResendOtpResponse r = authService.resendEmailOtp(new ResendOtpRequest("jain2604sunil@gmail.com"));
         assertNull(r.getUserId());
         verifyNoInteractions(otpStoreRepository, eventPublisher);

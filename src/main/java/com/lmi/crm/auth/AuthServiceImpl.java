@@ -188,7 +188,7 @@ public class AuthServiceImpl implements AuthService {
         // Same response whether or not the email exists / is pending, so this can't be used to probe accounts.
         final String genericMessage = "If a pending account exists for this email, a verification code has been sent.";
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .filter(u -> u.getStatus() == UserStatus.PENDING)
                 .orElse(null);
         if (user == null) {

@@ -2,6 +2,8 @@ package com.lmi.crm.auth;
 
 import com.lmi.crm.auth.dto.LoginRequest;
 import com.lmi.crm.auth.dto.LoginResponse;
+import com.lmi.crm.auth.dto.ResendOtpRequest;
+import com.lmi.crm.auth.dto.ResendOtpResponse;
 import com.lmi.crm.auth.dto.SetupPasswordRequest;
 import com.lmi.crm.auth.dto.TokenValidationResponse;
 import com.lmi.crm.auth.dto.VerifyOtpRequest;
@@ -173,6 +175,39 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("sendEmailOtp — sent — userId: {}, email: {}", userId, user.getEmail());
         return "OTP sent to " + user.getEmail();
+    }
+
+    private static final long RESEND_OTP_COOLDOWN_SECONDS = 60;
+
+    @Override
+    @Transactional
+    public ResendOtpResponse resendEmailOtp(ResendOtpRequest request) {
+        String email = request.getEmail().trim().toLowerCase();
+        log.debug("resendEmailOtp — email: {}", email);
+
+        // Same response whether or not the email exists / is pending, so this can't be used to probe accounts.
+        final String genericMessage = "If a pending account exists for this email, a verification code has been sent.";
+
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .filter(u -> u.getStatus() == UserStatus.PENDING)
+                .orElse(null);
+        if (user == null) {
+            log.warn("resendEmailOtp — no pending user for email: {}", email);
+            return ResendOtpResponse.builder().message(genericMessage).build();
+        }
+
+        otpStoreRepository.findByUserIdAndTypeAndVerifiedFalse(user.getId(), OtpType.EMAIL)
+                .filter(o -> o.getCreatedAt() != null
+                        && o.getCreatedAt().plusSeconds(RESEND_OTP_COOLDOWN_SECONDS).isAfter(LocalDateTime.now()))
+                .ifPresent(o -> {
+                    log.warn("resendEmailOtp — cooldown active — userId: {}", user.getId());
+                    throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
+                            "Please wait " + RESEND_OTP_COOLDOWN_SECONDS + " seconds before requesting another code");
+                });
+
+        sendEmailOtp(user.getId());
+        log.info("resendEmailOtp — sent — userId: {}", user.getId());
+        return ResendOtpResponse.builder().userId(user.getId()).message(genericMessage).build();
     }
 
     @Override

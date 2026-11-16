@@ -543,8 +543,8 @@ public class ProspectServiceImpl implements ProspectService {
         return response;
     }
 
-    // Admins, linked licensees and the assigned associate get full details; everyone else gets
-    // the company-only view. Both include the owning licensee so users can see who holds the prospect.
+    // Admins, linked licensees and the assigned associate get full details; everyone else gets the
+    // same record without email and phone. Both include the owning licensee's name.
     private List<ProspectResponse> toVisibleResponses(User requester, List<Prospect> prospects) {
         if (prospects.isEmpty()) return List.of();
 
@@ -566,11 +566,13 @@ public class ProspectServiceImpl implements ProspectService {
                     || licenseeOwnedIds.contains(p.getId())
                     || (role == UserRole.ASSOCIATE && requester.getId().equals(p.getAssociateId()));
             Integer licenseeId = licenseeMap.get(p.getId());
-            ProspectResponse r = full
-                    ? prospectMapper.toResponse(p, licenseeId, null)
-                    : prospectMapper.toLimitedResponse(p);
-            r.setLicenseeId(licenseeId);
+            ProspectResponse r = prospectMapper.toResponse(p, licenseeId, null);
             r.setLicenseeName(licenseeNames.get(licenseeId));
+            if (!full) {
+                r.setEmail(null);
+                r.setPhone(null);
+                r.setRestricted(true);
+            }
             return r;
         }).toList();
     }

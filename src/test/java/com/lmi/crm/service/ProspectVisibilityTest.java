@@ -8,6 +8,8 @@ import com.lmi.crm.dto.response.ProspectResponse;
 import com.lmi.crm.entity.Prospect;
 import com.lmi.crm.entity.ProspectLicensee;
 import com.lmi.crm.entity.User;
+import com.lmi.crm.enums.ClassificationType;
+import com.lmi.crm.enums.ProspectProgramType;
 import com.lmi.crm.enums.ProspectStatus;
 import com.lmi.crm.enums.ProspectType;
 import com.lmi.crm.enums.UserRole;
@@ -74,6 +76,8 @@ class ProspectVisibilityTest {
         p.setDesignation("MD");
         p.setEmail("gaurav@example.com");
         p.setPhone("9999999999");
+        p.setProgramType(ProspectProgramType.LI);
+        p.setClassificationType(ClassificationType.AA);
         p.setType(ProspectType.PROSPECT);
         p.setStatus(ProspectStatus.PROTECTED);
         p.setAssociateId(OWNER_ASSOCIATE);
@@ -92,7 +96,7 @@ class ProspectVisibilityTest {
     }
 
     @Test
-    void otherLicenseeGetsCompanyOnlyViewWithOwner() {
+    void otherLicenseeSeesRecordWithoutEmailAndPhone() {
         ProspectResponse r = viewAs(user(OTHER_LICENSEE, UserRole.LICENSEE, "B", "B"));
 
         assertTrue(r.isRestricted());
@@ -101,12 +105,13 @@ class ProspectVisibilityTest {
         assertEquals(ProspectStatus.PROTECTED, r.getStatus());
         assertEquals(OWNER_LICENSEE, r.getLicenseeId());
         assertEquals("Asha Rao", r.getLicenseeName());
-        assertNull(r.getContactFirstName());
-        assertNull(r.getContactLastName());
-        assertNull(r.getDesignation());
+        assertEquals("Gaurav", r.getContactFirstName());
+        assertEquals("Agarwal", r.getContactLastName());
+        assertEquals("MD", r.getDesignation());
+        assertEquals(ProspectProgramType.LI, r.getProgramType());
+        assertEquals(ClassificationType.AA, r.getClassificationType());
         assertNull(r.getEmail());
         assertNull(r.getPhone());
-        assertNull(r.getAssociateId());
     }
 
     @Test
@@ -125,10 +130,12 @@ class ProspectVisibilityTest {
     }
 
     @Test
-    void otherAssociateGetsCompanyOnlyView() {
+    void otherAssociateSeesRecordWithoutEmailAndPhone() {
         ProspectResponse r = viewAs(user(31, UserRole.ASSOCIATE, "X", "Y"));
         assertTrue(r.isRestricted());
         assertNull(r.getEmail());
+        assertNull(r.getPhone());
+        assertEquals("MD", r.getDesignation());
     }
 
     @Test

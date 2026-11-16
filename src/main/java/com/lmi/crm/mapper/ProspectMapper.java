@@ -78,11 +78,9 @@ public class ProspectMapper {
         response.setId(prospect.getId());
         response.setCompanyName(prospect.getCompanyName());
         response.setCity(prospect.getCity());
-        response.setContactFirstName(prospect.getContactFirstName());
-        response.setContactLastName(prospect.getContactLastName());
-        response.setDesignation(prospect.getDesignation());
         response.setType(prospect.getType());
         response.setStatus(prospect.getStatus());
+        response.setRestricted(true);
         return response;
     }
 

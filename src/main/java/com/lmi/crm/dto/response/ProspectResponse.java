@@ -37,4 +37,7 @@ public class ProspectResponse {
     private Integer createdBy;
     private LocalDateTime createdAt;
     private String provisionReason;
+    private String licenseeName;
+    // True when the requester does not own this prospect and only company-level fields are populated.
+    private boolean restricted;
 }

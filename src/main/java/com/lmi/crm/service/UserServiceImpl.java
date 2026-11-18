@@ -440,7 +440,7 @@ public class UserServiceImpl implements UserService {
         // (ACTIVE-only) request it would make activeCount tautological and force
         // inactiveCount to always be 0.
         List<User> roleScopedUsers = scopedUsers.stream()
-                .filter(u -> rf == null || u.getRole() == rf)
+                .filter(u -> rf == null || matchesRoleFilter(u.getRole(), rf))
                 .filter(u -> lf == null || lf.equals(u.getLicenseeId()))
                 .toList();
         long activeCount = roleScopedUsers.stream().filter(u -> u.getStatus() == UserStatus.ACTIVE).count();
@@ -469,6 +469,21 @@ public class UserServiceImpl implements UserService {
                 .countByRole(countByRole)
                 .users(pageResult)
                 .build();
+    }
+
+    // MASTER_LICENSEE is functionally identical to LICENSEE (see UserRole.isLicenseeTier()),
+    // but listing/search/directory filters historically used exact role equality and
+    // silently excluded MASTER_LICENSEE users whenever LICENSEE was requested.
+    private boolean matchesRoleFilter(UserRole actual, UserRole requested) {
+        if (actual == requested) return true;
+        return requested == UserRole.LICENSEE && actual == UserRole.MASTER_LICENSEE;
+    }
+
+    private List<UserRole> expandLicenseeTier(List<UserRole> roles) {
+        if (!roles.contains(UserRole.LICENSEE) || roles.contains(UserRole.MASTER_LICENSEE)) return roles;
+        List<UserRole> expanded = new ArrayList<>(roles);
+        expanded.add(UserRole.MASTER_LICENSEE);
+        return expanded;
     }
 
     private UserResponse mapUserWithCities(User user) {
@@ -984,7 +999,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (role != null) {
-            users = users.stream().filter(u -> u.getRole() == role).toList();
+            users = users.stream().filter(u -> matchesRoleFilter(u.getRole(), role)).toList();
         }
 
         long overallTotal = users.size();
@@ -1017,7 +1032,7 @@ public class UserServiceImpl implements UserService {
     public UsersPageResponse getLicenseesAndAssociates(Integer requestingUserId, List<UserRole> roles, Integer licenseeId) {
         List<UserRole> effectiveRoles = (roles == null || roles.isEmpty())
                 ? List.of(UserRole.values())
-                : roles;
+                : expandLicenseeTier(roles);
         List<User> users = userRepository.findActiveByRolesAndLicenseeId(effectiveRoles, UserStatus.ACTIVE, licenseeId);
 
         long overallTotal = users.size();

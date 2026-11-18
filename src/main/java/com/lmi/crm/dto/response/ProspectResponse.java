@@ -37,4 +37,7 @@ public class ProspectResponse {
     private Integer createdBy;
     private LocalDateTime createdAt;
     private String provisionReason;
+    private String licenseeName;
+    // True when the requester does not own this prospect; email and phone are withheld.
+    private boolean restricted;
 }

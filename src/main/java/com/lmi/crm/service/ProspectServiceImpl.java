@@ -342,18 +342,7 @@ public class ProspectServiceImpl implements ProspectService {
             globalPending = prospectRepository.countByStatusAndDeletionStatusFalse(ProspectStatus.PROVISIONAL);
         }
 
-        boolean useFullResponse = true;
-        List<Integer> allProspectIds = prospects.stream().map(Prospect::getId).toList();
-        Map<Integer, Integer> licenseeMap = (useFullResponse && !allProspectIds.isEmpty())
-                ? prospectLicenseeRepository.findByProspectIdInAndIsPrimaryTrue(allProspectIds)
-                        .stream().collect(Collectors.toMap(ProspectLicensee::getProspectId, ProspectLicensee::getLicenseeId))
-                : Map.of();
-
-        List<ProspectResponse> allResponses = prospects.stream()
-                .map(p -> useFullResponse
-                        ? prospectMapper.toResponse(p, licenseeMap.get(p.getId()), null)
-                        : prospectMapper.toLimitedResponse(p))
-                .toList();
+        List<ProspectResponse> allResponses = toVisibleResponses(requestingUser, prospects);
 
         log.info("getProspects — requestingUserId: {}, overallTotal: {}, prospectCount: {}, clientCount: {}",
                 requestingUserId, overallTotal, prospectCount, clientCount);
@@ -541,18 +530,57 @@ public class ProspectServiceImpl implements ProspectService {
 
         log.info("GET /api/prospects/{} — requestingUserId: {}, role: {}", prospectId, requestingUserId, requestingUser.getRole());
 
-        Integer licenseeId = prospectLicenseeRepository.findByProspectIdAndIsPrimaryTrue(prospectId)
-                .map(ProspectLicensee::getLicenseeId)
-                .orElse(null);
-        ProspectResponse response = prospectMapper.toResponse(prospect, licenseeId, null);
+        ProspectResponse response = toVisibleResponses(requestingUser, List.of(prospect)).get(0);
 
-        boolean conversionPending = alertRepository.existsByAlertTypeAndRelatedEntityIdAndStatus(
-                AlertType.PROSPECT_CONVERSION_REQUEST, prospectId, AlertStatus.PENDING);
-        response.setConversionRequestPending(conversionPending);
+        if (!response.isRestricted()) {
+            boolean conversionPending = alertRepository.existsByAlertTypeAndRelatedEntityIdAndStatus(
+                    AlertType.PROSPECT_CONVERSION_REQUEST, prospectId, AlertStatus.PENDING);
+            response.setConversionRequestPending(conversionPending);
+        }
 
-        log.info("GET /api/prospects/{} — returned full details for userId: {}", prospectId, requestingUserId);
+        log.info("GET /api/prospects/{} — userId: {}, restricted: {}", prospectId, requestingUserId, response.isRestricted());
 
         return response;
+    }
+
+    // Admins, linked licensees and the assigned associate get full details; everyone else gets the
+    // same record without email and phone. Both include the owning licensee's name.
+    private List<ProspectResponse> toVisibleResponses(User requester, List<Prospect> prospects) {
+        if (prospects.isEmpty()) return List.of();
+
+        List<Integer> prospectIds = prospects.stream().map(Prospect::getId).toList();
+        Map<Integer, Integer> licenseeMap = prospectLicenseeRepository.findByProspectIdInAndIsPrimaryTrue(prospectIds)
+                .stream().collect(Collectors.toMap(ProspectLicensee::getProspectId, ProspectLicensee::getLicenseeId, (a, b) -> a));
+        Map<Integer, String> licenseeNames = userRepository.findAllById(new HashSet<>(licenseeMap.values()))
+                .stream().collect(Collectors.toMap(User::getId, this::displayName));
+
+        UserRole role = requester.getRole();
+        boolean isAdmin = role == UserRole.ADMIN || role == UserRole.SUPER_ADMIN;
+        Set<Integer> licenseeOwnedIds = role.isLicenseeTier()
+                ? prospectLicenseeRepository.findByLicenseeId(requester.getId()).stream()
+                        .map(ProspectLicensee::getProspectId).collect(Collectors.toSet())
+                : Set.of();
+
+        return prospects.stream().map(p -> {
+            boolean full = isAdmin
+                    || licenseeOwnedIds.contains(p.getId())
+                    || (role == UserRole.ASSOCIATE && requester.getId().equals(p.getAssociateId()));
+            Integer licenseeId = licenseeMap.get(p.getId());
+            ProspectResponse r = prospectMapper.toResponse(p, licenseeId, null);
+            r.setLicenseeName(licenseeNames.get(licenseeId));
+            if (!full) {
+                r.setEmail(null);
+                r.setPhone(null);
+                r.setRestricted(true);
+            }
+            return r;
+        }).toList();
+    }
+
+    private String displayName(User u) {
+        return java.util.stream.Stream.of(u.getFirstName(), u.getLastName())
+                .filter(s -> s != null && !s.isBlank())
+                .collect(Collectors.joining(" "));
     }
 
     @Override
@@ -763,15 +791,7 @@ public class ProspectServiceImpl implements ProspectService {
         long provisionalCount = prospects.stream().filter(p -> p.getStatus() == ProspectStatus.PROVISIONAL).count();
         long unprotectedCount = prospects.stream().filter(p -> p.getStatus() == ProspectStatus.UNPROTECTED).count();
 
-        List<Integer> allIds = prospects.stream().map(Prospect::getId).toList();
-        Map<Integer, Integer> licenseeMap = (!allIds.isEmpty())
-                ? prospectLicenseeRepository.findByProspectIdInAndIsPrimaryTrue(allIds)
-                        .stream().collect(Collectors.toMap(ProspectLicensee::getProspectId, ProspectLicensee::getLicenseeId))
-                : Map.of();
-
-        List<ProspectResponse> allResponses = prospects.stream()
-                .map(p -> prospectMapper.toResponse(p, licenseeMap.get(p.getId()), null))
-                .toList();
+        List<ProspectResponse> allResponses = toVisibleResponses(requestingUser, prospects);
 
         int start = page * limit;
         int end = Math.min(start + limit, allResponses.size());
